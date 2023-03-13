@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">respartidores0.1</string>
+    <string name="todo">TODO</string>
+    <string name="usuario">Usuario</string>
+    <string name="password">PASSWORD</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="v_1_0">V 1.0</string>
 </resources>
