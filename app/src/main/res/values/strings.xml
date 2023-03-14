@@ -2,7 +2,19 @@
     <string name="app_name">respartidores0.1</string>
     <string name="todo">TODO</string>
     <string name="usuario">Usuario</string>
-    <string name="password">PASSWORD</string>
+    <string name="password">Password</string>
     <string name="ingresar">Ingresar</string>
     <string name="v_1_0">V 1.0</string>
+
+
+    <string-array name="empresas">
+        <item>Seleccione Empresa</item>
+        <item>Autodis</item>
+        <item>Vipla</item>
+        <item>Jacve</item>
+        <item>Cecra</item>
+        <item>Guvi</item>
+        <item>Pressa</item>
+    </string-array>
 </resources>
+
