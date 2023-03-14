@@ -25,7 +25,7 @@
             >
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -33,16 +33,18 @@
                 android:contentDescription="@string/todo"
                 tools:ignore="ImageContrastCheck"
                 app:srcCompat="@drawable/autodis"
-                 />
+                />
+
 
             <Spinner
+                android:id="@+id/spinerempresas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/spiner1"
+                android:backgroundTint="@color/ColorRojoTenue"
                 android:minHeight="48dp"
-                tools:ignore="SpeakableTextPresentCheck"
-                android:entries="@array/empresas"
-                />
+                android:prompt="@string/seleccione"
+                android:spinnerMode="dialog"
+                tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
 
@@ -53,6 +55,8 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_marginBottom="150dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:gravity="bottom">
 
             <com.google.android.material.textfield.TextInputLayout
@@ -78,7 +82,11 @@
                     android:maxLength="18"
                     android:textColorHint="#757575"
                     android:textSize="15sp"
-                    tools:ignore="TextContrastCheck" />
+                    android:drawableStart="@drawable/ic_us"
+                    android:drawablePadding="5dp"
+                    tools:ignore="TextContrastCheck"
+
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -97,7 +105,8 @@
                 app:boxCornerRadiusTopEnd="10dp"
                 app:boxCornerRadiusTopStart="10dp"
                 app:passwordToggleEnabled="true"
-                app:startIconTint="@null">
+                app:startIconTint="@null"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/txtinCla"
@@ -107,6 +116,8 @@
                     android:inputType="textPassword"
                     android:textColorHint="#757575"
                     android:textSize="15sp"
+                    android:drawableStart="@drawable/ic_action_candado"
+                    android:drawablePadding="3dp"
                     tools:ignore="TextContrastCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -116,7 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="40dp"
+                android:layout_margin="30dp"
                 android:background="@drawable/roundbutton"
                 android:text="@string/ingresar"
                 />
@@ -130,20 +141,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/PrimaryColor"
+        android:background="@color/ColorRojoTenue"
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/textViewVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/PrimaryColor"
+            android:background="@color/ColorRojoTenue"
             android:text="@string/v_1_0"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:layout_margin="5dp"
             android:textStyle="bold|italic"
-            android:layout_gravity="center"
+            android:layout_gravity="right"
+            android:paddingRight="15dp"
             tools:ignore="RtlHardcoded" />
 
 

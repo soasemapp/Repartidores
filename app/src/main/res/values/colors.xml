@@ -18,5 +18,6 @@
     <color name="PrimaryText">#212121</color>
     <color name="SecondaryText">#757575</color>
     <color name="DividerColor">#BDBDBD</color>
+    <color name="ColorRojoTenue">#D32F2F</color>
 
 </resources>

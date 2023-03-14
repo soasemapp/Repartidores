@@ -4,9 +4,9 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/PrimaryColor</item>
-        <item name="colorPrimaryDark">@color/DarkPrimaryColor</item>
-        <item name="colorAccent">@color/AccentColor</item>
+        <item name="colorPrimary">@color/ColorRojoTenue</item>
+        <item name="colorPrimaryDark">@color/red_700</item>
+        <item name="colorAccent">@color/red_500</item>
     </style>
 
 

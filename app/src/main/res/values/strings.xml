@@ -6,15 +6,7 @@
     <string name="ingresar">Ingresar</string>
     <string name="v_1_0">V 1.0</string>
 
+    <string name="seleccione"> Selecione su empresa</string>
 
-    <string-array name="empresas">
-        <item>Seleccione Empresa</item>
-        <item>Autodis</item>
-        <item>Vipla</item>
-        <item>Jacve</item>
-        <item>Cecra</item>
-        <item>Guvi</item>
-        <item>Pressa</item>
-    </string-array>
 </resources>
 
