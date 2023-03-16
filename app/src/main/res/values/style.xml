@@ -9,7 +9,6 @@
         <item name="colorAccent">@color/red_500</item>
     </style>
 
-
     <style name="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox." parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox" >
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/PrimaryColor</item>

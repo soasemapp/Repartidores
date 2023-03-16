@@ -3,22 +3,17 @@ package com.kepler.respartidores01;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
+
 
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private Spinner sempresas;
@@ -52,14 +47,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }else if (selection=="Vipla"){
                     foto.setImageResource(R.drawable.vipla);
                 } else if (selection=="Jacve") {
-
-
+                    foto.setImageResource(R.drawable.jacve);
                 } else if (selection=="Cecra") {
-
+                    foto.setImageResource(R.drawable.cecra);
                 } else if (selection=="Guvi") {
-
+                    foto.setImageResource(R.drawable.guvi);
                 }else{
-
+                    foto.setImageResource(R.drawable.pressa);
                 }
             }
 
@@ -86,12 +80,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 startActivity(inteto);
 
         }else {
-            Toast tost= Toast.makeText(this, "usuaio o contraseña incorrecta", Toast.LENGTH_LONG);
+            Toast tost= Toast.makeText(this, "Datos incorrectos", Toast.LENGTH_LONG);
             tost.show();
         }
-
-
-
     }
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
