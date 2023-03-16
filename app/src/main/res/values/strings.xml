@@ -8,5 +8,21 @@
 
     <string name="seleccione"> Selecione su empresa</string>
 
+
+    <string name="title_activity_principal">Principal</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Nombre</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Perfil</string>
+    <string name="menu_gallery">Paquetes por entregar</string>
+    <string name="menu_slideshow">Paquetes entrgados</string>
+    <string name="menu_mapa">Mapa</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
 
