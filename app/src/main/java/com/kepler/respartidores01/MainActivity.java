@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         spinner();
-
     }
 
     private void spinner() {
@@ -91,11 +90,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
     public void sendMessage(View view){
-        LeerWs();
-        //sesion();
+        //LeerWs();
+        sesion();
     }
 
-    /*public void sesion(){
+    public void sesion(){
         EditText textusu = findViewById(R.id.txtinUsu);
         String usua = textusu.getText().toString();
         EditText textcont =findViewById(R.id.txtinCla);
@@ -110,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Toast tost= Toast.makeText(this, "Datos incorrectos", Toast.LENGTH_LONG);
             tost.show();
         }
-    }*/
+    }
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         private void LeerWs(){
-        String url ="http://jacve.dyndns.org:9085/loginr";
+        String url =urlEmpresa;
 
             StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
