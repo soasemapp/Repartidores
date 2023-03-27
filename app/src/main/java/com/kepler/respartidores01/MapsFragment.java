@@ -36,17 +36,16 @@ public class MapsFragment extends Fragment {
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            mMap= googleMap;
            // LatLng sydney = new LatLng(-34, 151);
            // googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
           //  googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
-
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
+
             }
             mMap.setMyLocationEnabled(true);
-
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+           mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
             LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             LocationListener locationListener = new LocationListener() {
@@ -76,7 +75,6 @@ public class MapsFragment extends Fragment {
                 }
             };
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, (android.location.LocationListener) locationListener);
-
 
         }
 

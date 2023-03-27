@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void sendMessage(View view){
         //LeerWs();
-        sesion();
+        //sesion();
+        Intent inteto= new Intent(this, Principal.class);
+        startActivity(inteto);
     }
 
     public void sesion(){

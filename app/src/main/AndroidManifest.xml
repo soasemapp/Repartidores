@@ -40,6 +40,10 @@
             android:value="@string/gogle_map_key" />
 
         <activity
+            android:name=".MapsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_maps" />
+        <activity
             android:name=".Splash"
             android:exported="false" />
         <activity
