@@ -17,7 +17,7 @@
             android:icon="@drawable/ic_paclisto"
             android:title="@string/menu_slideshow" />
         <item
-            android:id="@+id/nav_mapa"
+            android:id="@+id/mapsActivity"
             android:title="@string/menu_mapa"
             android:icon="@drawable/ic_mapa"
             />
