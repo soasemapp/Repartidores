@@ -8,35 +8,44 @@
     tools:context=".ui.home.HomeFragment"
     >
 
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:gravity="bottom"
         >
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_margin="25dp"
             app:srcCompat="@drawable/ic_launcher_background"
-            />
+             android:layout_height="250dp"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="350dp"
+            android:layout_marginBottom="0dp"
             android:text="@string/name_repartidores"
             android:textAlignment="center"
 
             />
 
+    </LinearLayout>
+
+</ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:background="@color/ColorRojoTenue"
             android:orientation="vertical">
 
@@ -44,21 +53,19 @@
                 android:id="@+id/textViewVersion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_margin="5dp"
                 android:background="@color/ColorRojoTenue"
-                android:paddingRight="15dp"
                 android:text="@string/v_1_0"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
+                android:layout_margin="5dp"
                 android:textStyle="bold|italic"
+                android:layout_gravity="right"
+                android:paddingRight="15dp"
                 tools:ignore="RtlHardcoded" />
 
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

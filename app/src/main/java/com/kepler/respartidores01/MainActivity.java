@@ -1,8 +1,9 @@
 package com.kepler.respartidores01;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,13 +36,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private ArrayAdapter<String> adapter;
     private ImageView foto;
     String Usuario,Contraseña,Nombre,Apellidos,urlEmpresa;
+    private SharedPreferences preference;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
+        editor = preference.edit();
         spinner();
     }
+
+
+
 
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
@@ -58,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 if(selection=="Autodis"){
                     foto.setImageResource(R.drawable.autodis);
-                    urlEmpresa="autodis.ath.cx";
+                    urlEmpresa="http://autodis.ath.cx:9085";
 
                 }else if (selection=="Vipla"){
                     foto.setImageResource(R.drawable.vipla);
@@ -66,19 +74,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 } else if (selection=="Jacve") {
                     foto.setImageResource(R.drawable.jacve);
-                    urlEmpresa="jacve.dyndns.org:9085";
+                    urlEmpresa="http://jacve.dyndns.org:9085";
 
                 } else if (selection=="Cecra") {
                     foto.setImageResource(R.drawable.cecra);
-                    urlEmpresa="cecra.ath.cx:3380";
+                    urlEmpresa="http://cecra.ath.cx:9085";
 
                 } else if (selection=="Guvi") {
                     foto.setImageResource(R.drawable.guvi);
-                    urlEmpresa="jacve.dyndns.org:9085";
+                    urlEmpresa="http://guvi.ath.cx:9085";
 
                 }else if (selection=="Pressa"){
                     foto.setImageResource(R.drawable.pressa);
-                    urlEmpresa="cedistabasco.ddns.net";
+                    urlEmpresa="http://cedistabasco.ddns.net:9085";
                 }
             }
 
@@ -90,9 +98,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
     public void sendMessage(View view){
-        //LeerWs();
+        LeerWs();
         //sesion();
-        Intent inteto= new Intent(this, Principal.class);
+       Intent inteto= new Intent(this, Principal.class);
         startActivity(inteto);
     }
 
@@ -119,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         private void LeerWs(){
-        String url =urlEmpresa;
+        String url =urlEmpresa+"/loginr";
 
             StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
@@ -127,7 +135,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     try {
                         JSONObject jsonObject = new JSONObject(response);
 
-                        jsonObject.getString("");
+                        jsonObject=jsonObject.getJSONObject("UserInfo");
+                        editor.putString("user",  "jared");
+                        editor.putString("pass", "jared");
+
+
+
+                        editor.putString("name", jsonObject.getString("k_name"));
+                        editor.putString("lname", jsonObject.getString("k_lname"));
+                        editor.putString("type", jsonObject.getString("k_type"));
+                        editor.putString("branch", jsonObject.getString("k_branch"));
+                        editor.putString("email", jsonObject.getString("k_mail1"));
+                        editor.putString("codBra", jsonObject.getString("k_kcode"));
+                        editor.putString("NameBra", jsonObject.getString("k_dscr"));
+                        editor.putString("Server", urlEmpresa);
+                        editor.commit();
+
+                        Intent inteto= new Intent(MainActivity.this, Principal.class);
+                        startActivity(inteto);
+
+
                         Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
                     } catch (JSONException e) {
                         throw new RuntimeException(e);

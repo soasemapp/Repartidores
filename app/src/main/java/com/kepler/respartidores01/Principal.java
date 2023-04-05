@@ -1,32 +1,44 @@
 package com.kepler.respartidores01;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
+import com.kepler.respartidores01.databinding.DialogBinding;
 
 public class Principal extends AppCompatActivity {
-
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
+    Button btnscanner;
+    Button btnanadir;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         binding = ActivityPrincipalBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         setSupportActionBar(binding.appBarPrincipal.toolbar);
         binding.appBarPrincipal.toolbar.setOnClickListener(new View.OnClickListener() {
@@ -41,22 +53,86 @@ public class Principal extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,R.id.mapsActivity)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity)
                 .setOpenableLayout(drawer)
-                .build();        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+
+        binding.appBarPrincipal.toolbar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_scanner) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                builder.setView(inflater.inflate(R.layout.dialog, null))
+                        .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                // sign in the user ...
+                            }
+                        }).create().show();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        });
+
     }
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        IntentResult result= IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        if(result !=null){
+
+            if(result.getContents()==null){
+                Toast.makeText(this, "Lectura Cancelada", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, result.getContents(), Toast.LENGTH_SHORT).show();
+            }
+        }else{
+
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.principal, menu);
+
         return true;
+
+
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    public void respuesta(View view){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.escribirfolio, null)).setTitle("Introduce Folio")
+                .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // sign in the user ...
+                    }
+                }).create().show();
+
+    }
+
+    public void respuestascanner(View view){
+        IntentIntegrator integrador= new IntentIntegrator(Principal.this);
+        integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+        integrador.setPrompt("Lector - CDP");
+        integrador.setCameraId(0);
+        integrador.setBeepEnabled(true);
+        integrador.setBarcodeImageEnabled(true);
+        integrador.initiateScan();
     }
 }
