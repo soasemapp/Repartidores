@@ -5,7 +5,6 @@
     android:orientation="vertical"
     >
 
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,6 +15,7 @@
         android:text="@string/escanearfolio"
         android:drawableEnd="@drawable/ic_btnescabear"
         android:onClick="respuestascanner"
+        android:background="@drawable/roundbutton"
         />
     <Button
         android:layout_width="match_parent"
@@ -26,6 +26,7 @@
         android:text="@string/escribirFolio"
         android:drawableEnd="@drawable/ic_btnecribirescaner"
         android:onClick="respuesta"
+        android:background="@drawable/roundbutton"
         />
 
 </LinearLayout>

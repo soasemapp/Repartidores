@@ -24,7 +24,7 @@
     <string name="menu_slideshow">Paquetes entrgados</string>
     <string name="menu_mapa">Mapa</string>
     <string name="dialog_hint">Folio</string>
-    <string name="signin">Aceptar</string>
+    <string name="signin">Regresar</string>
     <string name="escanearfolio">Escanear Folio</string>
     <string name="escribirFolio">Ecribir Folio</string>
     <string name="titleescfolio">introduce folio</string>

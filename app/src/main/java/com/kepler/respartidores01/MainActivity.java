@@ -38,16 +38,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String Usuario,Contraseña,Nombre,Apellidos,urlEmpresa;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
+    String usua, conta;
+    EditText textusu, textcont;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        textusu = findViewById(R.id.txtinUsu);
+        textcont =findViewById(R.id.txtinCla);
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
         spinner();
     }
-
 
 
 
@@ -105,10 +108,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void sesion(){
-        EditText textusu = findViewById(R.id.txtinUsu);
-        String usua = textusu.getText().toString();
-        EditText textcont =findViewById(R.id.txtinCla);
-        String conta= textcont.getText().toString();
+         usua = textusu.getText().toString();
+        conta= textcont.getText().toString();
 
         if(usua.equals("admin") && conta.equals("admin")){
 
@@ -135,11 +136,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     try {
                         JSONObject jsonObject = new JSONObject(response);
 
-                        jsonObject=jsonObject.getJSONObject("UserInfo");
-                        editor.putString("user",  "jared");
+                        jsonObject = jsonObject.getJSONObject("UserInfo");
+                        editor.putString("user", "jared");
                         editor.putString("pass", "jared");
-
-
 
                         editor.putString("name", jsonObject.getString("k_name"));
                         editor.putString("lname", jsonObject.getString("k_lname"));
@@ -150,12 +149,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         editor.putString("NameBra", jsonObject.getString("k_dscr"));
                         editor.putString("Server", urlEmpresa);
                         editor.commit();
-
-                        Intent inteto= new Intent(MainActivity.this, Principal.class);
-                        startActivity(inteto);
-
+                            Intent inteto= new Intent(MainActivity.this, Principal.class);
+                            startActivity(inteto);
 
                         Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }

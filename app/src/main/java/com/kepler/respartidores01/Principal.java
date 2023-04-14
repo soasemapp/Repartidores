@@ -1,14 +1,15 @@
 package com.kepler.respartidores01;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -24,22 +25,29 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
-import com.kepler.respartidores01.databinding.DialogBinding;
 
-public class Principal extends AppCompatActivity {
+import java.util.ArrayList;
+
+public class Principal extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
-    Button btnscanner;
-    Button btnanadir;
+    public EditText textfolio;
+    ArrayList<String> folios= new ArrayList<>();
+    public String usa;
+   public ListView listporentregar;
+   public ArrayList<Pedidos> lpeA=new ArrayList<>();
+    Button iramap;
 
+
+    AlertDialog.Builder builder;
+    AlertDialog dialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityPrincipalBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
         setSupportActionBar(binding.appBarPrincipal.toolbar);
         binding.appBarPrincipal.toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,8 +67,9 @@ public class Principal extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        AgregarFolios();
 
-
+        //ACCESO A ESCRIBIR O ESCANEAR EL FOLIO DESDE UN DIALOGO
         binding.appBarPrincipal.toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_scanner) {
 
@@ -78,7 +87,40 @@ public class Principal extends AppCompatActivity {
             return super.onOptionsItemSelected(item);
         });
 
+        //Acceso al mapa desde los botones de la lista
+
     }
+    private void AgregarFolios(){
+        if(lpeA!=null){
+            listporentregar = findViewById(R.id.listaporentregar);
+            generarlista();
+            MiAdaptador miAdaptador = new MiAdaptador(getApplication(), R.layout.diseno_item, lpeA);
+            listporentregar.setAdapter(miAdaptador);
+        }else
+        {
+        }
+    }
+    private void generarlista() {
+        Pedidos n1 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n1);
+        Pedidos n2 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n2);
+        Pedidos n3 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n3);
+        Pedidos n4= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n4);
+        Pedidos n5= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n5);
+        Pedidos n6= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n6);
+        Pedidos n7= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n7);
+        Pedidos n8= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        lpeA.add(n8);
+    }
+
+
+    //ESCANEAR LOS FOLIOS
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         IntentResult result= IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -88,10 +130,10 @@ public class Principal extends AppCompatActivity {
             if(result.getContents()==null){
                 Toast.makeText(this, "Lectura Cancelada", Toast.LENGTH_SHORT).show();
             }else{
+               // folios.add(result.getContents());
                 Toast.makeText(this, result.getContents(), Toast.LENGTH_SHORT).show();
             }
         }else{
-
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -100,12 +142,8 @@ public class Principal extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.principal, menu);
-
         return true;
-
-
     }
-
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
@@ -113,26 +151,46 @@ public class Principal extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    public void respuesta(View view){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    public void respuesta(View view) {
+
+        builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.escribirfolio, null)).setTitle("Introduce Folio")
+        View dialogView = inflater.inflate(R.layout.escribirfolio, null);
+        builder.setView(dialogView).setTitle("Introduce Folio")
                 .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
+                    public void onClick(DialogInterface dialogInterface, int i) {
                     }
-                }).create().show();
-
+                });
+        dialog = builder.create();
+        dialog.show();
+        textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
     }
 
     public void respuestascanner(View view){
+
         IntentIntegrator integrador= new IntentIntegrator(Principal.this);
         integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrador.setPrompt("Lector - CDP");
+        integrador.setPrompt("Lector");
         integrador.setCameraId(0);
         integrador.setBeepEnabled(true);
         integrador.setBarcodeImageEnabled(true);
         integrador.initiateScan();
+    }
+
+  public void guardarfolio(View v){
+        usa=textfolio.getText().toString();
+        if(!usa.equals("")){
+           folios.add(textfolio.getText().toString());
+            Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
+            textfolio.setText("");
+        }else{
+            Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
     }
 }

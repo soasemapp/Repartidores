@@ -10,7 +10,7 @@
 
     <item android:id="@+id/action_scanner"
         android:icon="@drawable/ic_escaneo"
-        android:title="hola"
+        android:title="scanner"
         app:showAsAction="ifRoom"
         />
 </menu>

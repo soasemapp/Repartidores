@@ -15,7 +15,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.util.Printer;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,7 +47,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +65,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
-
+    Location location;
+    List<Address> address;
+    LatLng puntosdireccion = null;
+    Address direcc;
+    String dire;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,23 +80,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
-
-
-
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        LeerWs();
-
+        //LeerWs();
     }
-
     private void LeerWs(){
         String url =StrServer+"/consulfac";
-
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -111,7 +107,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-
             }
         },
                 new Response.ErrorListener() {
@@ -139,8 +134,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Volley .newRequestQueue(this).add(postRequest);
     }
 
-
-
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (gpsActived()==true) {
@@ -165,6 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
         }
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -184,16 +178,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Metodo para Obtener las coordenadas por la direccion
         Geocoder coder = new Geocoder(this);
-        List<Address> address;
-        LatLng puntosdireccion = null;
 
         try {
-            address = coder.getFromLocationName("C. Palomar 10, Sector Lagunilla, 99060 Fresnillo, Zac.", 3);
-            Address location = address.get(0);
-            location.getLatitude();
-            location.getLongitude();
+            address = coder.getFromLocationName("Aguascalientes 462-484, Quinta del Cobre, 99090 Fresnillo, Zac.", 3);
+            direcc = address.get(0);
+            direcc.getLatitude();
+            direcc.getLongitude();
 
-            puntosdireccion = new LatLng(location.getLatitude(), location.getLongitude() );
+            puntosdireccion = new LatLng(direcc.getLatitude(), direcc.getLongitude() );
 
         } catch (Exception ex) {
 
@@ -210,8 +202,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < puntos.size(); i++) {
             mMarker = mMap.addMarker(new MarkerOptions().position(puntos.get(i)).title("Cliente").draggable(true));
         }
-
-
             mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                @Override
                public void onMyLocationChange(@NonNull Location location) {
@@ -224,7 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                        LatLng Origen = new LatLng(latitudorigen,longitudorigen );
                        LatLng miCliente = new LatLng(Latitud,Longitud);
                        mMap.addMarker(new MarkerOptions().position(Origen).title( "Origen").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_maprepartidor)));
-                       mMap.addMarker(new MarkerOptions().position(miCliente).title("Direccion Cliente").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_entrega)));
+                       mMap.addMarker(new MarkerOptions().position(miCliente).title("Direccion Cliente"));
                        CameraPosition cameraPosition = new CameraPosition.Builder()
                                .target(new LatLng(latitudorigen, longitudorigen))
                                .zoom(17)
@@ -255,30 +245,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                }
            });
     }
+    public void rutacorta(){
 
-    private void rutaCorta(JSONObject jso) {
-        JSONArray jRoutes;
-        JSONArray jLegs;
-        JSONArray jdistancia;
-        try {
-            jRoutes = jso.getJSONArray("routes");
+        //ArrayList<String> hola= new ArrayList<>();
+        for(int i=0; i<address.size(); i++){
+           direcc= address.get(i);
+           Latitud=direcc.getLatitude();
+           Longitud=direcc.getLongitude();
+           obtenerdistancia();
+           // hola.set(i,dire);
+        }
 
-            for (int i = 0; i < jRoutes.length(); i++) {
+    }
 
-                jLegs = ((JSONObject) (jRoutes.get(i))).getJSONArray("legs");
+    public void entreado(View vi){
+      rutacorta();
+    }
 
-                for (int j = 0; j < jLegs.length(); j++) {
+    //Para obtener la distania de cada direccion
+    public void  obtenerdistancia() {
 
-                    jdistancia = ((JSONObject) jLegs.get(j)).getJSONArray("distance");
+        String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+        StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    jsonObject=jsonObject.getJSONArray("routes").getJSONObject(0);
+                    jsonObject=jsonObject.getJSONArray("legs").getJSONObject(0);
+                    jsonObject= jsonObject.getJSONObject("distance");
+                    dire= jsonObject.getString("text");
 
-                    new JSONObject(jdistancia.getString(Integer.parseInt("distance"))).getString("value");
+                  Toast.makeText(MapsActivity.this, dire, Toast.LENGTH_SHORT).show();
 
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+      Volley .newRequestQueue(this).add(trutac);
     }
+
+
 
     private void trazarRuta(JSONObject jso) {
 
@@ -298,12 +311,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     for (int k = 0; k < jSteps.length(); k++) {
 
-
                        String polyline = "" + ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
                         Log.i("end", "" + polyline);
                         List<LatLng> list = PolyUtil.decode(polyline);
                         mMap.addPolyline(new PolylineOptions().addAll(list).color(Color.RED).width(6));
-
                     }
 
                 }
@@ -334,5 +345,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).create().show();
     }
+
+
 
 }
