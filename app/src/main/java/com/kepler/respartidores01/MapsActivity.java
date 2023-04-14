@@ -252,7 +252,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
            direcc= address.get(i);
            Latitud=direcc.getLatitude();
            Longitud=direcc.getLongitude();
-           obtenerdistancia();
            // hola.set(i,dire);
         }
 
