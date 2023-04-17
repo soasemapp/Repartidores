@@ -3,6 +3,7 @@ package com.kepler.respartidores01;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -32,7 +33,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
     public EditText textfolio;
-    ArrayList<String> folios= new ArrayList<>();
+    public ArrayList<String> folios= new ArrayList<>();
     public String usa;
    public ListView listporentregar;
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
@@ -67,7 +68,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-        AgregarFolios();
+        //AgregarFolios();
 
         //ACCESO A ESCRIBIR O ESCANEAR EL FOLIO DESDE UN DIALOGO
         binding.appBarPrincipal.toolbar.setOnMenuItemClickListener(item -> {
@@ -90,35 +91,6 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         //Acceso al mapa desde los botones de la lista
 
     }
-    private void AgregarFolios(){
-        if(lpeA!=null){
-            listporentregar = findViewById(R.id.listaporentregar);
-            generarlista();
-            MiAdaptador miAdaptador = new MiAdaptador(getApplication(), R.layout.diseno_item, lpeA);
-            listporentregar.setAdapter(miAdaptador);
-        }else
-        {
-        }
-    }
-    private void generarlista() {
-        Pedidos n1 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n1);
-        Pedidos n2 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n2);
-        Pedidos n3 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n3);
-        Pedidos n4= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n4);
-        Pedidos n5= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n5);
-        Pedidos n6= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n6);
-        Pedidos n7= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n7);
-        Pedidos n8= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n8);
-    }
-
 
     //ESCANEAR LOS FOLIOS
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -187,6 +159,10 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         }else{
             Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
         }
+    }
+    public void irmapimb(View v){
+        Intent intetoa= new Intent(this, MapsActivity.class);
+        startActivity(intetoa);
     }
 
     @Override

@@ -48,6 +48,7 @@
             android:layout_margin="12dp"
             android:src="@drawable/ic_btnmap"
             android:backgroundTint="@color/ColorRojoTenue"
+            android:onClick="irmapimb"
             />
 
 

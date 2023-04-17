@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void sendMessage(View view){
         LeerWs();
         //sesion();
-       Intent inteto= new Intent(this, Principal.class);
+        Intent inteto= new Intent(MainActivity.this, Principal.class);
         startActivity(inteto);
     }
 
@@ -149,8 +149,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         editor.putString("NameBra", jsonObject.getString("k_dscr"));
                         editor.putString("Server", urlEmpresa);
                         editor.commit();
-                            Intent inteto= new Intent(MainActivity.this, Principal.class);
-                            startActivity(inteto);
+
+                        Intent inteto= new Intent(MainActivity.this, Principal.class);
+                        startActivity(inteto);
 
                         Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
 

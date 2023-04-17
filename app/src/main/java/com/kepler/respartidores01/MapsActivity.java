@@ -11,11 +11,13 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -69,13 +71,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     List<Address> address;
     LatLng puntosdireccion = null;
     Address direcc;
-    String dire;
+    Double dire;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
@@ -175,9 +178,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
         }
+//
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setRotateGesturesEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+
+
+        LocationManager locationManager = (LocationManager) MapsActivity.this.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                if (getApplicationContext() != null) {
+
+                    LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    Latitud = location.getLatitude();
+                    Longitud = location.getLongitude();
+
+                    if (mMarker != null) {
+                        mMarker.remove();
+                    }
+                    mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title(strname + " " + strlname).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_maprepartidor)));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(miUbicacion)
+                            .zoom(17)
+                            .bearing(90)
+                            .build();
+                    mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                }
+
+            }
+
+        };
+
+
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, locationListener);
+
+
 
         //Metodo para Obtener las coordenadas por la direccion
-        Geocoder coder = new Geocoder(this);
+       Geocoder coder = new Geocoder(this);
 
         try {
             address = coder.getFromLocationName("Aguascalientes 462-484, Quinta del Cobre, 99090 Fresnillo, Zac.", 3);
@@ -206,14 +249,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                @Override
                public void onMyLocationChange(@NonNull Location location) {
                    if (actualposition) {
+
+
                        latitudorigen = location.getLatitude();
                        longitudorigen = location.getLongitude();
                        actualposition = false;
                        String url =//"https://maps.googleapis.com/maps/api/directions/json?origin=23.172281128854596,%20-102.8708630775893&destination=23.172977863806704,%20-102.871723141316&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
                                "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
                        LatLng Origen = new LatLng(latitudorigen,longitudorigen );
+
+
                        LatLng miCliente = new LatLng(Latitud,Longitud);
-                       mMap.addMarker(new MarkerOptions().position(Origen).title( "Origen").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_maprepartidor)));
+                       //mMap.addMarker(new MarkerOptions().position(Origen).title( "Origen"));
                        mMap.addMarker(new MarkerOptions().position(miCliente).title("Direccion Cliente"));
                        CameraPosition cameraPosition = new CameraPosition.Builder()
                                .target(new LatLng(latitudorigen, longitudorigen))
@@ -247,46 +294,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     public void rutacorta(){
 
-        //ArrayList<String> hola= new ArrayList<>();
-        for(int i=0; i<address.size(); i++){
-           direcc= address.get(i);
-           Latitud=direcc.getLatitude();
-           Longitud=direcc.getLongitude();
+        ArrayList<Double> distancia=new ArrayList<>();
+        ArrayList<String> hola= new ArrayList<>();
+        for(int i=0; i<address.size(); i++) {
+            direcc = address.get(i);
+            Latitud = direcc.getLatitude();
+            Longitud = direcc.getLongitude();
+
+            String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+            StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>(){
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jso = new JSONObject(response);
+                        obtenerdistancia(jso);
+                        distancia.add(obtenerdistancia(jso));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError volleyError) {
+
+                }
+            });
+            Volley .newRequestQueue(this).add(trutac);
+        }
+
+        for(int j=0; j<distancia.get(j); j++){
+            if(distancia.get(j)<distancia.get(j+1)){
+                distancia.get(j);
+            }
+
         }
 
     }
 
     public void entreado(View vi){
-      rutacorta();
+
+        rutacorta();
     }
 
     //Para obtener la distania de cada direccion
-    public void  obtenerdistancia() {
-
-        String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
-        StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
+    private Double obtenerdistancia(JSONObject jsonObject) {
+        try{
                     jsonObject=jsonObject.getJSONArray("routes").getJSONObject(0);
                     jsonObject=jsonObject.getJSONArray("legs").getJSONObject(0);
                     jsonObject= jsonObject.getJSONObject("distance");
-                    dire= jsonObject.getString("text");
-
-                  Toast.makeText(MapsActivity.this, dire, Toast.LENGTH_SHORT).show();
+                    dire= jsonObject.getDouble("text");
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-      Volley .newRequestQueue(this).add(trutac);
+            e.printStackTrace();
+        }
+        return dire;
     }
 
 
