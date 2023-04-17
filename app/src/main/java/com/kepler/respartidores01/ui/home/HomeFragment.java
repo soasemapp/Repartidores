@@ -21,7 +21,7 @@ import com.kepler.respartidores01.ui.gallery.GalleryViewModel;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    TextView nanmereparti, apellido_repartidor;
+    TextView nanmereparti, apellido_repartidor, descrepartidor;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
@@ -44,12 +44,15 @@ public class HomeFragment extends Fragment {
 
         strname = preference.getString("name", "K_name");
         strlname = preference.getString("lname", "k_lname");
+        strbran = preference.getString("NameBra", "k_dscr");
 
         nanmereparti = (TextView) getView().findViewById(R.id.name_repartidor);
         apellido_repartidor= (TextView) getView().findViewById(R.id.last_repartidor);
+        descrepartidor= (TextView) getView().findViewById(R.id.descr);
 
         nanmereparti.setText(strname);
         apellido_repartidor.setText(strlname);
+        descrepartidor.setText(strbran);
 
     }
 

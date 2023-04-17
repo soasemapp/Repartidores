@@ -1,6 +1,8 @@
 package com.kepler.respartidores01.ui.gallery;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +31,9 @@ public class GalleryFragment extends Fragment {
     private FragmentGalleryBinding binding;
     ListView lista;
     ArrayList<Pedidos> lpeA=new ArrayList<>();
-
+    private SharedPreferences preference;
+    private SharedPreferences.Editor editor;
+    String strfolio, strnombre, strtelefono;
 
 
    public View onCreateView(@NonNull LayoutInflater inflater,
@@ -43,6 +47,12 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
+        preference= getContext().getSharedPreferences("consultas", Context.MODE_PRIVATE);
+        editor = preference.edit();
+
+      // strfolio = preference.getString("escfolios", "null");
+
+
         generarlista();
         if(lpeA!=null){
             lista = (ListView)getView().findViewById(R.id.listaporentregar);
@@ -54,27 +64,12 @@ public class GalleryFragment extends Fragment {
             final TextView textView = binding.textGallery;
             galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         }
-
-
    }
 
     private void generarlista() {
-        Pedidos n1 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
+        Pedidos n1 = new Pedidos(strnombre,strfolio,"MOVIL");
         lpeA.add(n1);
-        Pedidos n2 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n2);
-        Pedidos n3 = new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n3);
-        Pedidos n4= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n4);
-        Pedidos n5= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n5);
-        Pedidos n6= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n6);
-        Pedidos n7= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n7);
-        Pedidos n8= new Pedidos("Sofia Lizeth Jimenez serna","123445","MOVIL");
-        lpeA.add(n8);
+
     }
 
     @Override

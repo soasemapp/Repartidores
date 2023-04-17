@@ -40,18 +40,6 @@
             >
         </TextView>
 
-        <ImageButton
-            android:id="@+id/btnlpemap"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center"
-            android:layout_margin="12dp"
-            android:src="@drawable/ic_btnmap"
-            android:backgroundTint="@color/ColorRojoTenue"
-            android:onClick="irmapimb"
-            />
-
-
     </LinearLayout>
     </ScrollView>
     </LinearLayout>

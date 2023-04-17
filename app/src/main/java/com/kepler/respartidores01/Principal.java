@@ -1,16 +1,16 @@
 package com.kepler.respartidores01;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -35,10 +35,11 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     public EditText textfolio;
     public ArrayList<String> folios= new ArrayList<>();
     public String usa;
-   public ListView listporentregar;
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
-    Button iramap;
-
+    TextView namerepa;
+    private SharedPreferences preference;
+    private SharedPreferences.Editor editor;
+    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -88,8 +89,11 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             return super.onOptionsItemSelected(item);
         });
 
-        //Acceso al mapa desde los botones de la lista
+        preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
+        editor = preference.edit();
+        strname = preference.getString("name", "null");
 
+        namerepa=findViewById(R.id.txtmenuname);
     }
 
     //ESCANEAR LOS FOLIOS
@@ -139,6 +143,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
     }
 
+
     public void respuestascanner(View view){
 
         IntentIntegrator integrador= new IntentIntegrator(Principal.this);
@@ -153,16 +158,13 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
   public void guardarfolio(View v){
         usa=textfolio.getText().toString();
         if(!usa.equals("")){
+            editor.putString("escfolios", textfolio.getText().toString());
            folios.add(textfolio.getText().toString());
             Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
             textfolio.setText("");
         }else{
             Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
         }
-    }
-    public void irmapimb(View v){
-        Intent intetoa= new Intent(this, MapsActivity.class);
-        startActivity(intetoa);
     }
 
     @Override

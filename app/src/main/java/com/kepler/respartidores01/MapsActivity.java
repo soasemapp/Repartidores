@@ -66,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mMarker;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
+    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strdirecccion;
     Location location;
     List<Address> address;
     LatLng puntosdireccion = null;
@@ -89,7 +89,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        //LeerWs();
+       // LeerWs();
     }
     private void LeerWs(){
         String url =StrServer+"/consulfac";
@@ -97,6 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onResponse(String response) {
                 try {
+
                     JSONObject jsonObject = new JSONObject(response);
                     jsonObject=jsonObject.getJSONObject("Repartidores");
                     jsonObject.getString("k_Folio");
@@ -130,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal","01");
-                params.put("folio","0000629");
+               params.put("folio","0000629");
                 return params;
             }
         };
@@ -178,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
         }
-//
+
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setRotateGesturesEnabled(true);
@@ -275,7 +276,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                try {
                                    JSONObject jso = new JSONObject(response);
                                    trazarRuta(jso);
-                                   Log.i("JsonRuta", " " + response);
+                                  // Log.i("JsonRuta", " " + response);
                                } catch (JSONException e) {
                                    e.printStackTrace();
                                }
@@ -333,7 +334,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void entreado(View vi){
 
-        rutacorta();
     }
 
     //Para obtener la distania de cada direccion
