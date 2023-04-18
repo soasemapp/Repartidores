@@ -64,10 +64,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double Latitud=0, Longitud=0;
     private LocationManager locationManager;
     private Marker mMarker;
-    private SharedPreferences preference;
+
+    Location location;    private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strdirecccion;
-    Location location;
     List<Address> address;
     LatLng puntosdireccion = null;
     Address direcc;
@@ -90,7 +90,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-       // LeerWs();
+        //consultas de los folios y direcciones
+       LeerWs();
+
     }
     private void LeerWs(){
         String url =StrServer+"/consulfac";
@@ -106,9 +108,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     jsonObject.getString("k_Nombre");
                     jsonObject.getString("k_Numero1");
                     jsonObject.getString("k_Numero2");
-                    jsonObject.getString("k_Direccion");
+                  strdirecccion= jsonObject.getString("k_Direccion");
 
-                    Toast.makeText(MapsActivity.this, response, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MapsActivity.this, strdirecccion, Toast.LENGTH_LONG).show();
+
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -132,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal","01");
-               params.put("folio","0000629");
+               params.put("folio","0002251");
                 return params;
             }
         };
@@ -195,13 +198,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
 
-                    Latitud = location.getLatitude();
-                    Longitud = location.getLongitude();
+                    latitudorigen = location.getLatitude();
+                    longitudorigen = location.getLongitude();
 
                     if (mMarker != null) {
                         mMarker.remove();
                     }
-                    mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title(strname + " " + strlname).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_maprepartidor)));
+                    mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_maprepartidor)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(miUbicacion)
@@ -217,15 +220,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
 
 
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000, 0, locationListener);
-
-
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 2000, locationListener);
+       // LeerWs();
 
         //Metodo para Obtener las coordenadas por la direccion
        Geocoder coder = new Geocoder(this);
 
         try {
-            address = coder.getFromLocationName("Aguascalientes 462-484, Quinta del Cobre, 99090 Fresnillo, Zac.", 3);
+            address = coder.getFromLocationName("99000, Av. Enrique Estrada 521, Centro, Fresnillo, Zac.", 3);
             direcc = address.get(0);
             direcc.getLatitude();
             direcc.getLongitude();
@@ -259,7 +261,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                        String url =//"https://maps.googleapis.com/maps/api/directions/json?origin=23.172281128854596,%20-102.8708630775893&destination=23.172977863806704,%20-102.871723141316&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
                                "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
                        LatLng Origen = new LatLng(latitudorigen,longitudorigen );
-
 
                        LatLng miCliente = new LatLng(Latitud,Longitud);
                        //mMap.addMarker(new MarkerOptions().position(Origen).title( "Origen"));
@@ -310,7 +311,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     try {
                         JSONObject jso = new JSONObject(response);
                         obtenerdistancia(jso);
-                        distancia.add(obtenerdistancia(jso));
+                       distancia.add(obtenerdistancia(jso));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -324,17 +325,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Volley .newRequestQueue(this).add(trutac);
         }
 
-        for(int j=0; j<distancia.get(j); j++){
-            if(distancia.get(j)<distancia.get(j+1)){
-                distancia.get(j);
-            }
-
-        }
+//        for(int j=0; j<distancia.get(j); j++){
+//            if(distancia.get(j)<distancia.get(j+1)){
+//                distancia.get(j);
+//                //trazarRuta(jso);
+//            }
+//
+//        }
 
     }
 
     public void entreado(View vi){
-
+        rutacorta();
     }
 
     //Para obtener la distania de cada direccion
@@ -405,7 +407,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).create().show();
     }
-
-
 
 }

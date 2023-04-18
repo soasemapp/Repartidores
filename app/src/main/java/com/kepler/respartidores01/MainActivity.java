@@ -103,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void sendMessage(View view){
         LeerWs();
         //sesion();
-        Intent inteto= new Intent(MainActivity.this, Principal.class);
-        startActivity(inteto);
+//        Intent inteto= new Intent(MainActivity.this, Principal.class);
+//        startActivity(inteto);
     }
 
     public void sesion(){

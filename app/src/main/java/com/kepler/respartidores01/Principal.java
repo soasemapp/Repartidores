@@ -21,13 +21,24 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Principal extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private AppBarConfiguration mAppBarConfiguration;
@@ -91,9 +102,55 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
 
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
-        strname = preference.getString("name", "null");
+        StrServer = preference.getString("Server", "null");
+        //namerepa=findViewById(R.id.txtmenuname);
+    }
+    private void Consultas(){
+        String url =StrServer+"/consulfac";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
 
-        namerepa=findViewById(R.id.txtmenuname);
+                    JSONObject jsonObject = new JSONObject(response);
+                    jsonObject=jsonObject.getJSONObject("Repartidores");
+                    jsonObject.getString("k_Folio");
+                    jsonObject.getString("k_Clave");
+                    jsonObject.getString("k_Nombre");
+                    jsonObject.getString("k_Numero1");
+                    jsonObject.getString("k_Numero2");
+                    jsonObject.getString("k_Direccion");
+
+                    Toast.makeText(Principal.this, response, Toast.LENGTH_LONG).show();
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(Principal.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user","jared");
+                header.put("pass","jared");
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal","01");
+                params.put("folio",usa);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(postRequest);
     }
 
     //ESCANEAR LOS FOLIOS
@@ -158,8 +215,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
   public void guardarfolio(View v){
         usa=textfolio.getText().toString();
         if(!usa.equals("")){
-            editor.putString("escfolios", textfolio.getText().toString());
-           folios.add(textfolio.getText().toString());
+           Consultas();
             Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
             textfolio.setText("");
         }else{
