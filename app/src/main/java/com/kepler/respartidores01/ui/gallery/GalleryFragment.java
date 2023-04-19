@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -17,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -32,6 +36,7 @@ import com.kepler.respartidores01.Principal;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,10 +50,12 @@ public class GalleryFragment extends Fragment {
     ArrayList<Pedidos> lpeA=new ArrayList<>();
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strdirecccion;
+    String strfolio, strnombre, strtelefono;
+    String strcodBra, StrServer;
 
+    RecyclerView datosServer;
 
-   public View onCreateView(@NonNull LayoutInflater inflater,
+    public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
@@ -56,19 +63,28 @@ public class GalleryFragment extends Fragment {
 
         return root;
     }
+
+    /*public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.diseno_item);
+        datosServer= findViewById(R.id.datosConsul);
+        GridLayoutManager gl = new GridLayoutManager(this, 1);
+        datosServer.setLayoutManager(gl);
+
+    }*/
     @Override
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
-
-        preference = getContext().getSharedPreferences("consultas", Context.MODE_PRIVATE);
+        preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
 
-      // strfolio = preference.getString("escfolios", "null");
+        // strfolio = preference.getString("escfolios", "null");
 
-        generarlista();
+
+        // generarlista();
         if(lpeA!=null){
             lista = (ListView)getView().findViewById(R.id.listaporentregar);
             MiAdaptador miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
@@ -79,61 +95,66 @@ public class GalleryFragment extends Fragment {
             final TextView textView = binding.textGallery;
             galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         }
-   }
-    private void LeerWs(){
-        String url =StrServer+"/";
-
-        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-
-                    jsonObject = jsonObject.getJSONObject("UserInfo");
-
-                    editor.putString("name", jsonObject.getString("k_name"));
-                    editor.putString("lname", jsonObject.getString("k_lname"));
-                    editor.putString("type", jsonObject.getString("k_type"));
-                    editor.putString("branch", jsonObject.getString("k_branch"));
-                    editor.putString("email", jsonObject.getString("k_mail1"));
-                    editor.putString("codBra", jsonObject.getString("k_kcode"));
-                    editor.putString("NameBra", jsonObject.getString("k_dscr"));
-                    editor.putString("Server", StrServer);
-                    editor.commit();
-
-                    Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-
-                return header;
-            }
-        };
-        Volley.newRequestQueue(getContext()).add(postRequest);
+        LeerWs();
     }
 
+    /*private void generarlista() {
+        Pedidos n1 = new Pedidos(strnombre,strfolio,"MOVIL");
+        lpeA.add(n1);
 
-    private void generarlista() {
-        //Pedidos n1 = new Pedidos(strnombre,strfolio,"MOVIL");
-       // lpeA.add(n1);
-
-    }
+    }*/
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         //binding = null;
     }
+
+    private void LeerWs(){
+        String url =StrServer+"/consulxEn";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONObject jfacturas;
+                    JSONArray jitems;
+                    jfacturas=jsonObject.getJSONObject("Repartidores");
+                    for  (int i =0;i<jfacturas.length();i++){
+                        jfacturas.getString("k_Folio");
+
+                    }
+
+                    Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user","jared");
+                header.put("pass","jared");
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal","01");
+                params.put("id_repartidor","1");
+                return params;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
+}
+
 }
