@@ -111,6 +111,8 @@ public class GalleryFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONArray jitems;
+                    String res="";
+
 
                     JSONObject jsonObject = new JSONObject(response);
                     jsonObject=jsonObject.getJSONObject("Repartidores");
@@ -120,12 +122,12 @@ public class GalleryFragment extends Fragment {
                     //este es el que genera conflicto
                     //buscar la forma de obtener la posicion de un JSONobjeto
                     //ya que como todos los objetos dentro de repartidores se llaman igual
-                    //entra solo al ultimo}
+                    //entra solo al ultimo
 
 //                    jsonObject=jsonObject.getJSONObject("items");
 //                    String folio= jsonObject.getString("k_Folio");
 
-                    Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

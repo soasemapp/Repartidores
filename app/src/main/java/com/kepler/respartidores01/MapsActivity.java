@@ -248,7 +248,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         //Array de diferentes puntos en el map
 
-        puntos.add(puntosdireccion);
+        //puntos.add(puntosdireccion);
         puntos.add(new LatLng(Latitud=23.17487650092318, Longitud=-102.8778950998468));
         puntos.add(new LatLng(Latitud=23.172535411343105, Longitud=-102.87830236229395));
 
@@ -303,12 +303,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
            });
     }
 
-    public void rutacorta(){
+    public void rutacorta() {
 
-        ArrayList<String> distancias=new ArrayList<>();
-        for(int i=0; i<puntos.size(); i++) {
+        ArrayList<Double> distancias = new ArrayList<>();
+        for (int i = 0; i < puntos.size(); i++) {
             puntos.get(i);
-        }
 
             String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
             StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>() {
@@ -316,11 +315,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onResponse(String response) {
                     try {
                         JSONObject jso = new JSONObject(response);
-                        jso=jso.getJSONArray("routes").getJSONObject(0);
-                        jso=jso.getJSONArray("legs").getJSONObject(0);
-                        jso= jso.getJSONObject("distance");
-                        jso.getString("text");
-                       // distancias.add( jso.getString("text"));
+                        jso = jso.getJSONArray("routes").getJSONObject(0);
+                        jso = jso.getJSONArray("legs").getJSONObject(0);
+                        jso = jso.getJSONObject("distance");
+                        //jso.getString("text");
+                        distancias.add(Double.valueOf(jso.getString("text")));
+                        System.out.println(distancias.add(Double.valueOf(jso.getString("text"))));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -332,9 +332,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
             Volley.newRequestQueue(this).add(trutac);
-     //   Toast.makeText(this, distancias.get(0), Toast.LENGTH_SHORT).show();
 
+//            for (int j = 0; j < distancias.size(); j++) {
+//                if (distancias.get(j) < distancias.get(j + 1)) {
+//                    System.out.println(distancias.get(j));
+//                }
+//            }
         }
+    }
 
 
 //        for(int j=0; j<distancia.get(j); j++){
