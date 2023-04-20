@@ -1,26 +1,21 @@
 package com.kepler.respartidores01.ui.gallery;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.widget.Button;
-import android.widget.ImageButton;
+
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -28,11 +23,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.kepler.respartidores01.MainActivity;
-import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
-import com.kepler.respartidores01.Principal;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
@@ -42,6 +34,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class GalleryFragment extends Fragment {
@@ -116,17 +109,24 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 try {
-
-                    JSONObject jsonObject = new JSONObject(response);
                     JSONObject jfacturas;
                     JSONArray jitems;
-                    jfacturas=jsonObject.getJSONObject("Repartidores");
-                    for  (int i =0;i<jfacturas.length();i++){
-                        jfacturas.getString("k_Folio");
 
-                    }
+                    JSONObject jsonObject = new JSONObject(response);
+                    jsonObject=jsonObject.getJSONObject("Repartidores");
+
+                   // jsonObject.getJSONObject("items").toString();
+
+                    //este es el que genera conflicto
+                    //buscar la forma de obtener la posicion de un JSONobjeto
+                    //ya que como todos los objetos dentro de repartidores se llaman igual
+                    //entra solo al ultimo}
+
+//                    jsonObject=jsonObject.getJSONObject("items");
+//                    String folio= jsonObject.getString("k_Folio");
 
                     Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
+
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
