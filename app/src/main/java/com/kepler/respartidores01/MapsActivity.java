@@ -61,13 +61,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean actualposition = true;
     double longitudorigen;
     double latitudorigen;
-    double Latitud=0, Longitud=0;
+    double Latitud = 0, Longitud = 0;
     private LocationManager locationManager;
     private Marker mMarker;
     Geocoder coder;
-    ArrayList<LatLng> puntos=new ArrayList<LatLng>();
+    ArrayList<LatLng> puntos = new ArrayList<LatLng>();
 
-    Location location;    private SharedPreferences preference;
+    Location location;
+    private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strdirecccion;
     List<Address> address;
@@ -75,8 +76,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Address direcc;
     String dis;
     int diI;
-    ArrayList<Integer> hola= new ArrayList<>();
-    int di=0;
+    ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
+    int di = 0;
+    int clave=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,63 +98,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-        //consultas de los folios y direcciones
-      // LeerWs();
-
     }
 
     //Consulta los folios para obtener las direcciones
-    private void LeerWs(){
-        String url =StrServer+"/consulfac";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
 
-                    JSONObject jsonObject = new JSONObject(response);
-                    jsonObject=jsonObject.getJSONObject("Repartidores");
-                    jsonObject.getString("k_Folio");
-                    jsonObject.getString("k_Clave");
-                    jsonObject.getString("k_Nombre");
-                    jsonObject.getString("k_Numero1");
-                    jsonObject.getString("k_Numero2");
-                  strdirecccion= jsonObject.getString("k_Direccion");
-
-                    Toast.makeText(MapsActivity.this, strdirecccion, Toast.LENGTH_LONG).show();
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        },
-                new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-                header.put("user","jared");
-                header.put("pass","jared");
-                return header;
-            }
-            @Override
-            public Map<String, String> getParams() throws AuthFailureError {
-                HashMap params = new HashMap();
-                params.put("sucursal","01");
-               params.put("folio","0002251");
-                return params;
-            }
-        };
-        Volley .newRequestQueue(this).add(postRequest);
-    }
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (gpsActived()==true) {
+        if (gpsActived() == true) {
             if (requestCode == LOCATION_REQUEST_CODE) {
                 if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -164,16 +117,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(this, "Permisos no otorgados", Toast.LENGTH_LONG).show();
                 }
             }
-        }else{
+        } else {
             showAlertDialogNoGPS();
-                if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                        mMap.setMyLocationEnabled(true);
-                        mMap.getUiSettings().setZoomControlsEnabled(true);
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+                    mMap.setMyLocationEnabled(true);
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
 
-                    }
                 }
+            }
         }
     }
 
@@ -188,14 +141,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
-        }
-        else {
+        } else {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setRotateGesturesEnabled(true);
             mMap.getUiSettings().setMapToolbarEnabled(true);
+
+            puntos.add(new LatLng(Latitud = 23.17487650092318, Longitud = -102.8778950998468));
+            puntos.add(new LatLng(Latitud = 23.172535411343105, Longitud = -102.87830236229395));
+            puntos.add(new LatLng(Latitud = 23.170988833356812, Longitud = -102.86944172670869));
+            puntos.add(new LatLng(Latitud = 23.183933670029337, Longitud = -102.8636071452571));
 
 
             LocationManager locationManager = (LocationManager) MapsActivity.this.getSystemService(Context.LOCATION_SERVICE);
@@ -220,6 +177,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .bearing(90)
                                 .build();
                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        entreado();
+
 
                     }
 
@@ -232,8 +191,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-
-        coder= new Geocoder(this);
+        coder = new Geocoder(this);
         try {
 //            address = coder.getFromLocationName("99000, Av. Enrique Estrada 521, Centro, Fresnillo, Zac.", 3);
 //            address = coder.getFromLocationName("Francisco García Salinas 510, Centro, 98097 Fresnillo, Zac.", 3);
@@ -243,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             direcc.getLatitude();
             direcc.getLongitude();
 
-            puntosdireccion = new LatLng(direcc.getLatitude(), direcc.getLongitude() );
+            puntosdireccion = new LatLng(direcc.getLatitude(), direcc.getLongitude());
 
         } catch (Exception ex) {
 
@@ -252,79 +210,73 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Array de diferentes puntos en el map
 
         //puntos.add(puntosdireccion);
-        puntos.add(new LatLng(Latitud=23.17487650092318, Longitud=-102.8778950998468));
-        puntos.add(new LatLng(Latitud=23.172535411343105, Longitud=-102.87830236229395));
-        puntos.add(new LatLng(Latitud=23.170988833356812, Longitud=-102.86944172670869));
-        puntos.add(new LatLng(Latitud=23.183933670029337, Longitud=-102.8636071452571));
-
 
         //Dibuja todos los marcadores en el mapa
         for (int i = 0; i < puntos.size(); i++) {
             mMarker = mMap.addMarker(new MarkerOptions().position(puntos.get(i)).title("Cliente").draggable(true));
         }
-            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-               @Override
-               public void onMyLocationChange(@NonNull Location location) {
-                   if (actualposition) {
+        mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(@NonNull Location location) {
 
+                if (actualposition) {
 
-                       latitudorigen = location.getLatitude();
-                       longitudorigen = location.getLongitude();
-                       actualposition = false;
-                       String url =//"https://maps.googleapis.com/maps/api/directions/json?origin=23.172281128854596,%20-102.8708630775893&destination=23.172977863806704,%20-102.871723141316&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
-                               "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
-                       LatLng Origen = new LatLng(latitudorigen,longitudorigen );
+                }
+            }
+        });
 
-                       LatLng miCliente = new LatLng(Latitud,Longitud);
-                       //mMap.addMarker(new MarkerOptions().position(Origen).title( "Origen"));
-                       mMap.addMarker(new MarkerOptions().position(miCliente).title("Direccion Cliente"));
-                       CameraPosition cameraPosition = new CameraPosition.Builder()
-                               .target(new LatLng(latitudorigen, longitudorigen))
-                               .zoom(17)
-                               .bearing(90)
-                               .build();
-                       mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                       RequestQueue queue = Volley.newRequestQueue(MapsActivity.this);
-                       StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                           @Override
-                           public void onResponse(String response) {
-                               try {
-                                   JSONObject jso = new JSONObject(response);
-                                   trazarRuta(jso);
-                                  // Log.i("JsonRuta", " " + response);
-                               } catch (JSONException e) {
-                                   e.printStackTrace();
-                               }
-                           }
-                       }, new Response.ErrorListener() {
-                           @Override
-                           public void onErrorResponse(VolleyError volleyError) {
-
-                           }
-                       });
-                       queue.add(stringRequest);
-
-                   }
-               }
-           });
     }
 
-    //determiinar cual sera la ruta mas corta
-    public void rutacorta() {
-        for(int i=0; i<puntos.size(); i++) {
-            puntos.get(i);
+
+//    public void funcion(View vi) {
+//        int Valor = ClientesDis.get(0).getDistancia();
+//        for (int i = 1; i < ClientesDis.size(); i++) {
+//            if (Valor<ClientesDis.get(i).Distancia){
+//
+//            }else{
+//                Valor = ClientesDis.get(i).getDistancia();
+//            }
+//
+//
+//        }
+
+
+
+
+
+
+
+
+    public void entreado() {
+        for (int i = 0; i < puntos.size(); i++) {
+
             LatLng nuevo = puntos.get(i);
 
-            String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
-            StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>() {
+            String url =//"https://maps.googleapis.com/maps/api/directions/json?origin=23.172281128854596,%20-102.8708630775893&destination=23.172977863806704,%20-102.871723141316&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+                    "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+
+
+            RequestQueue queue = Volley.newRequestQueue(MapsActivity.this);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     try {
                         JSONObject jso = new JSONObject(response);
-                        di=obtenerdistancia(jso);
-                        //no se guarda la lista
-                        hola.add(di);
-                        System.out.println(hola);
+
+clave++;
+                        try {
+                            jso = jso.getJSONArray("routes").getJSONObject(0);
+                            jso = jso.getJSONArray("legs").getJSONObject(0);
+                            jso = jso.getJSONObject("distance");
+
+                            // Toast.makeText(MapsActivity.this, dis , Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+//                                       trazarRuta(jso);
+//                                       // Log.i("JsonRuta", " " + response);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -335,31 +287,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 }
             });
-            Volley.newRequestQueue(this).add(trutac);
+            queue.add(stringRequest);
+
         }
-        //System.out.println(hola.get(0).toString());
+
     }
-
-    public void entreado(View vi){
-
-        rutacorta();
-    }
-
-    //Para obtener la distania de cada direccion de envio
-    public int obtenerdistancia(JSONObject jsonObject) {
-
-                try {
-                    jsonObject = jsonObject.getJSONArray("routes").getJSONObject(0);
-                    jsonObject = jsonObject.getJSONArray("legs").getJSONObject(0);
-                    jsonObject = jsonObject.getJSONObject("distance");
-                     diI=  jsonObject.getInt("value");
-                   // Toast.makeText(MapsActivity.this, dis , Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return diI;
-            }
-
 
 
     private void trazarRuta(JSONObject jso) {
@@ -380,7 +312,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     for (int k = 0; k < jSteps.length(); k++) {
 
-                       String polyline = "" + ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
+                        String polyline = "" + ((JSONObject) ((JSONObject) jSteps.get(k)).get("polyline")).get("points");
                         Log.i("end", "" + polyline);
                         List<LatLng> list = PolyUtil.decode(polyline);
                         mMap.addPolyline(new PolylineOptions().addAll(list).color(Color.RED).width(6));

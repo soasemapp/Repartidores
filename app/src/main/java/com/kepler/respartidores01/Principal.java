@@ -49,6 +49,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
     TextView namerepa;
     private SharedPreferences preference;
+    ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
 
@@ -102,55 +103,10 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
 
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
+        strcodBra = preference.getString("branch", null);
+        strcode = preference.getString("code", null);
         StrServer = preference.getString("Server", "null");
         //namerepa=findViewById(R.id.txtmenuname);
-    }
-    private void Consultas(){
-        String url =StrServer+"/consulfac";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                try {
-
-                    JSONObject jsonObject = new JSONObject(response);
-                    jsonObject=jsonObject.getJSONObject("Repartidores");
-                    jsonObject.getString("k_Folio");
-                    jsonObject.getString("k_Clave");
-                    jsonObject.getString("k_Nombre");
-                    jsonObject.getString("k_Numero1");
-                    jsonObject.getString("k_Numero2");
-                    jsonObject.getString("k_Direccion");
-
-                    Toast.makeText(Principal.this, response, Toast.LENGTH_LONG).show();
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(Principal.this, error.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                })
-        {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-                header.put("user","jared");
-                header.put("pass","jared");
-                return header;
-            }
-            @Override
-            public Map<String, String> getParams() throws AuthFailureError {
-                HashMap params = new HashMap();
-                params.put("sucursal","01");
-                params.put("folio",usa);
-                return params;
-            }
-        };
-        Volley.newRequestQueue(this).add(postRequest);
     }
 
     //ESCANEAR LOS FOLIOS
@@ -212,12 +168,88 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         integrador.initiateScan();
     }
 
+
+
+    private void LeerWs() {
+        String url = StrServer + "/consulfac";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    String Clave,Nombre,Direccion;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    if(jsonObject.length()>0) {
+                        jsonObject = jsonObject.getJSONObject("Repartidores");
+                        jsonObject.getString("k_Folio");
+                        Clave = jsonObject.getString("k_Clave");
+                        Nombre = jsonObject.getString("k_Nombre");
+                        jsonObject.getString("k_Numero1");
+                        jsonObject.getString("k_Numero2");
+                        Direccion = jsonObject.getString("k_Direccion");
+                        ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                        alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Registro realizado");
+                        titulo.show();
+
+
+                    }else{
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                        alerta.setMessage("No se encontro folio").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("No existe");
+                        titulo.show();
+                    }
+
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(Principal.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user", "jared");
+                header.put("pass", "jared");
+                return header;
+            }
+
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal", strcodBra);
+                params.put("folio", usa);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(postRequest);
+    }
   public void guardarfolio(View v){
         usa=textfolio.getText().toString();
         if(!usa.equals("")){
-           Consultas();
+           LeerWs();
             Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
-            textfolio.setText("");
         }else{
             Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
         }

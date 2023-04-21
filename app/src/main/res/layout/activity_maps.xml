@@ -35,7 +35,7 @@
         android:layout_marginLeft="10dp"
         android:src="@drawable/ic_paquetependiente"
         android:backgroundTint="@color/ColorRojoTenue"
-        android:onClick="entreado"
+        android:onClick="funcion"
         />
 
 </LinearLayout>

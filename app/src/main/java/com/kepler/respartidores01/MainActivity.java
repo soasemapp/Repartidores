@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         editor.putString("type", jsonObject.getString("k_type"));
                         editor.putString("branch", jsonObject.getString("k_branch"));
                         editor.putString("email", jsonObject.getString("k_mail1"));
-                        editor.putString("codBra", jsonObject.getString("k_kcode"));
+                        editor.putString("code", jsonObject.getString("k_kcode"));
                         editor.putString("NameBra", jsonObject.getString("k_dscr"));
                         editor.putString("Server", urlEmpresa);
                         editor.commit();

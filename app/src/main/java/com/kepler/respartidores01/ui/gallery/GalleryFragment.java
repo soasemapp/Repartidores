@@ -88,7 +88,7 @@ public class GalleryFragment extends Fragment {
             final TextView textView = binding.textGallery;
             galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         }
-        LeerWs();
+        //LeerWs();
     }
 
     /*private void generarlista() {
@@ -103,7 +103,7 @@ public class GalleryFragment extends Fragment {
         //binding = null;
     }
 
-    private void LeerWs(){
+   /* private void LeerWs(){
         String url =StrServer+"/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -116,7 +116,8 @@ public class GalleryFragment extends Fragment {
 
                     JSONObject jsonObject = new JSONObject(response);
                     jsonObject=jsonObject.getJSONObject("Repartidores");
-
+                    jsonObject=jsonObject.getJSONObject("items");
+                    jsonObject=jsonObject.getJSONObject("Folio");
                    // jsonObject.getJSONObject("items").toString();
 
                     //este es el que genera conflicto
@@ -158,5 +159,5 @@ public class GalleryFragment extends Fragment {
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
 }
-
+*/
 }
