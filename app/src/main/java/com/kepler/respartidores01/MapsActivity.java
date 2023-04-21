@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private Marker mMarker;
     Geocoder coder;
-    List<LatLng> puntos=new ArrayList<LatLng>();
+    ArrayList<LatLng> puntos=new ArrayList<LatLng>();
 
     Location location;    private SharedPreferences preference;
     private SharedPreferences.Editor editor;
@@ -73,7 +73,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     List<Address> address;
     LatLng puntosdireccion = null;
     Address direcc;
-    Double dire;
+    String dis;
+    int diI;
+    ArrayList<Integer> hola= new ArrayList<>();
+    int di=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         try {
 //            address = coder.getFromLocationName("99000, Av. Enrique Estrada 521, Centro, Fresnillo, Zac.", 3);
 //            address = coder.getFromLocationName("Francisco García Salinas 510, Centro, 98097 Fresnillo, Zac.", 3);
-            address = coder.getFromLocationName("Av. Sonora, Centro, 99000 Fresnillo, Zac.", 3);
+            address = coder.getFromLocationName(strdirecccion, 3);
 
             direcc = address.get(0);
             direcc.getLatitude();
@@ -251,6 +254,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //puntos.add(puntosdireccion);
         puntos.add(new LatLng(Latitud=23.17487650092318, Longitud=-102.8778950998468));
         puntos.add(new LatLng(Latitud=23.172535411343105, Longitud=-102.87830236229395));
+        puntos.add(new LatLng(Latitud=23.170988833356812, Longitud=-102.86944172670869));
+        puntos.add(new LatLng(Latitud=23.183933670029337, Longitud=-102.8636071452571));
+
 
         //Dibuja todos los marcadores en el mapa
         for (int i = 0; i < puntos.size(); i++) {
@@ -303,24 +309,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
            });
     }
 
+    //determiinar cual sera la ruta mas corta
     public void rutacorta() {
-
-        ArrayList<Double> distancias = new ArrayList<>();
-        for (int i = 0; i < puntos.size(); i++) {
+        for(int i=0; i<puntos.size(); i++) {
             puntos.get(i);
+            LatLng nuevo = puntos.get(i);
 
-            String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + Latitud + "," + Longitud + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+            String ruta = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
             StringRequest trutac = new StringRequest(Request.Method.GET, ruta, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     try {
                         JSONObject jso = new JSONObject(response);
-                        jso = jso.getJSONArray("routes").getJSONObject(0);
-                        jso = jso.getJSONArray("legs").getJSONObject(0);
-                        jso = jso.getJSONObject("distance");
-                        //jso.getString("text");
-                        distancias.add(Double.valueOf(jso.getString("text")));
-                        System.out.println(distancias.add(Double.valueOf(jso.getString("text"))));
+                        di=obtenerdistancia(jso);
+                        //no se guarda la lista
+                        hola.add(di);
+                        System.out.println(hola);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -332,46 +336,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
             Volley.newRequestQueue(this).add(trutac);
-
-//            for (int j = 0; j < distancias.size(); j++) {
-//                if (distancias.get(j) < distancias.get(j + 1)) {
-//                    System.out.println(distancias.get(j));
-//                }
-//            }
         }
+        //System.out.println(hola.get(0).toString());
     }
-
-
-//        for(int j=0; j<distancia.get(j); j++){
-//            if(distancia.get(j)<distancia.get(j+1)){
-//                String estaes= distancia.get(j).toString();
-//                Toast.makeText(this, estaes, Toast.LENGTH_SHORT).show();
-//            }else{
-//
-//            }
-
-      //}
-
 
     public void entreado(View vi){
 
         rutacorta();
     }
 
-    //Para obtener la distania de cada direccion
-    private void obtenerdistancia(JSONObject jsonObject) {
+    //Para obtener la distania de cada direccion de envio
+    public int obtenerdistancia(JSONObject jsonObject) {
 
-        try{
-                    jsonObject=jsonObject.getJSONArray("routes").getJSONObject(0);
-                    jsonObject=jsonObject.getJSONArray("legs").getJSONObject(0);
-                    jsonObject= jsonObject.getJSONObject("distance");
-                    jsonObject.getString("text");
-
+                try {
+                    jsonObject = jsonObject.getJSONArray("routes").getJSONObject(0);
+                    jsonObject = jsonObject.getJSONArray("legs").getJSONObject(0);
+                    jsonObject = jsonObject.getJSONObject("distance");
+                     diI=  jsonObject.getInt("value");
+                   // Toast.makeText(MapsActivity.this, dis , Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-    }
+                    e.printStackTrace();
+                }
+                return diI;
+            }
 
 
 
