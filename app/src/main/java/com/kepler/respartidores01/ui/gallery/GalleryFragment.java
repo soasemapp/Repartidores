@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class GalleryFragment extends Fragment {
@@ -43,8 +44,9 @@ public class GalleryFragment extends Fragment {
     ArrayList<Pedidos> lpeA=new ArrayList<>();
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strfolio, strnombre, strtelefono;
+    String strfolio, strnombre, strtelefono1, strtelefono2, strsucursal;
     String strcodBra, StrServer;
+    List<String> folios= new ArrayList<>();
 
     RecyclerView datosServer;
 
@@ -73,11 +75,10 @@ public class GalleryFragment extends Fragment {
 
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
-
+        LeerWs();
         // strfolio = preference.getString("escfolios", "null");
 
-
-        // generarlista();
+       //generarlista();
         if(lpeA!=null){
             lista = (ListView)getView().findViewById(R.id.listaporentregar);
             MiAdaptador miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
@@ -88,14 +89,12 @@ public class GalleryFragment extends Fragment {
             final TextView textView = binding.textGallery;
             galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
         }
-        //LeerWs();
     }
 
-    /*private void generarlista() {
-        Pedidos n1 = new Pedidos(strnombre,strfolio,"MOVIL");
-        lpeA.add(n1);
-
-    }*/
+//    private void generarlista() {
+//        Pedidos n1=new Pedidos("sofi","2292882","92992929929292","29292992");
+//        lpeA.add(n1);
+//    }
 
     @Override
     public void onDestroyView() {
@@ -103,32 +102,28 @@ public class GalleryFragment extends Fragment {
         //binding = null;
     }
 
-   /* private void LeerWs(){
+    private void LeerWs(){
         String url =StrServer+"/consulxEn";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jfacturas;
-                    JSONArray jitems;
-                    String res="";
+                    JSONObject jitems;
 
+                    String res="{'Repartidores':{'items1':{'k_Folio':'','k_Sucursal':'','k_Nombre':'','k_Telefono1':'','k_Telefono2':''},'items2':{'k_Folio':'0207394','k_Sucursal':'CASAMATRIZ','k_Nombre':'EDGARZAMBRANOTEZMOL','k_Telefono1':'2213680931','k_Telefono2':'2213680931'},'items3':{'k_Folio':'0207394','k_Sucursal':'CASAMATRIZ','k_Nombre':'EDUARDODENICIAROJAS','k_Telefono1':'2221770602','k_Telefono2':''},'items4':{'k_Folio':'0207394','k_Sucursal':'CASAMATRIZ','k_Nombre':'COMERCIALIZADORARUBAMSADECV','k_Telefono1':'2229506756','k_Telefono2':'2225184402'},'items5':{'k_Folio':'0207394','k_Sucursal':'CASAMATRIZ','k_Nombre':'JOSEROBERTOESPINOZARODRIGUEZ','k_Telefono1':'2223503539','k_Telefono2':'2226923992'},'items6':{'k_Folio':'0207394','k_Sucursal':'CASAMATRIZ','k_Nombre':'DIANAGUADALUPEOLGUINHUMANA','k_Telefono1':'2383830461','k_Telefono2':'2381220426'},'items7':{'k_Folio':'0210066','k_Sucursal':'CASAMATRIZ','k_Nombre':'RUBENANRUBIOROSALES','k_Telefono1':'7313512310','k_Telefono2':''},'items8':{'k_Folio':'0210066','k_Sucursal':'CASAMATRIZ','k_Nombre':'MARIADELOURDESRANGELGARCIA','k_Telefono1':'2211858986','k_Telefono2':'2211858986'},'items9':{'k_Folio':'0210066','k_Sucursal':'CASAMATRIZ','k_Nombre':'ARMANDOPOMPOSODEJESUS','k_Telefono1':'2211747950','k_Telefono2':'2225648160'}}}";
 
-                    JSONObject jsonObject = new JSONObject(response);
-                    jsonObject=jsonObject.getJSONObject("Repartidores");
-                    jsonObject=jsonObject.getJSONObject("items");
-                    jsonObject=jsonObject.getJSONObject("Folio");
-                   // jsonObject.getJSONObject("items").toString();
+                    JSONObject jsonObject = new JSONObject(res);
+                    jfacturas=jsonObject.getJSONObject("Repartidores");
+                    for(int i=2; i<jfacturas.length(); i++){
+                        jitems= jfacturas.getJSONObject("items"+i);
+                       folios.add(jitems.getString("k_Folio"));
+                       strsucursal= jitems.getString("k_Sucursal");
+                       strnombre= jitems.getString("k_Nombre");
+                       strtelefono1= jitems.getString("k_Telefono1");
+                       strtelefono2= jitems.getString("k_Telefono2");
 
-                    //este es el que genera conflicto
-                    //buscar la forma de obtener la posicion de un JSONobjeto
-                    //ya que como todos los objetos dentro de repartidores se llaman igual
-                    //entra solo al ultimo
-
-//                    jsonObject=jsonObject.getJSONObject("items");
-//                    String folio= jsonObject.getString("k_Folio");
-
-                    //Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
+                    }
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -158,6 +153,7 @@ public class GalleryFragment extends Fragment {
             }
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
+        System.out.println(folios);
 }
-*/
+
 }

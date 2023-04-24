@@ -37,8 +37,22 @@
         android:backgroundTint="@color/ColorRojoTenue"
         android:onClick="funcion"
         />
-
 </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <Button
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:text="Actializar mejor ruta"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            />
+
+    </LinearLayout>
 
 </fragment>
 

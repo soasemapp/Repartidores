@@ -49,12 +49,14 @@ public class MiAdaptador extends BaseAdapter {
         Pedidos auxi = ap.get(position);
 
         TextView tvNombres = vistaDiseno.findViewById(R.id.txtNombre);
-        TextView tvtelefono =vistaDiseno.findViewById(R.id.txttelefono);
+        TextView tvtelefonouno =vistaDiseno.findViewById(R.id.txttelefono1);
+        TextView tvtelefodos =vistaDiseno.findViewById(R.id.txttelefonodos);
 
-        //TextView tvfolio = vistaDiseno.findViewById(R.id.movil);
 
         tvNombres.setText(auxi.Nombre);
-        tvtelefono.setText(auxi.Telefono);
+        tvtelefonouno.setText(auxi.Telefonouno);
+        tvtelefodos.setText(auxi.Telefonodos);
+
 
 
         return vistaDiseno;

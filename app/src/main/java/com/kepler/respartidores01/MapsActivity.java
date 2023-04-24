@@ -242,11 +242,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-
-
-
-
-
     public void entreado() {
         for (int i = 0; i < puntos.size(); i++) {
 

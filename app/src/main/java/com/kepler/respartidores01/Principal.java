@@ -188,6 +188,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                         jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
                         ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
+
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                         alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
@@ -249,7 +250,6 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         usa=textfolio.getText().toString();
         if(!usa.equals("")){
            LeerWs();
-            Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
         }
