@@ -21,10 +21,10 @@ import com.kepler.respartidores01.ui.gallery.GalleryViewModel;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    TextView nanmereparti, apellido_repartidor, descrepartidor;
+    TextView nanmereparti, apellido_repartidor, descrepartidor, textemailrepartidor;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
+    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, stremail;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,17 +42,20 @@ public class HomeFragment extends Fragment {
         preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
-        strname = preference.getString("name", "K_name");
-        strlname = preference.getString("lname", "k_lname");
-        strbran = preference.getString("NameBra", "k_dscr");
+        strname = preference.getString("name", "null");
+        strlname = preference.getString("lname", "null");
+        strbran = preference.getString("NameBra", "null");
+        stremail=preference.getString("email","null");
 
         nanmereparti = (TextView) getView().findViewById(R.id.name_repartidor);
         apellido_repartidor= (TextView) getView().findViewById(R.id.last_repartidor);
         descrepartidor= (TextView) getView().findViewById(R.id.descr);
+        textemailrepartidor=getView().findViewById(R.id.email);
 
         nanmereparti.setText(strname);
         apellido_repartidor.setText(strlname);
         descrepartidor.setText(strbran);
+        textemailrepartidor.setText(stremail);
 
     }
 

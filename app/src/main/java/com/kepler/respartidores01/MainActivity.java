@@ -1,10 +1,15 @@
 package com.kepler.respartidores01;
 
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -22,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         textcont =findViewById(R.id.txtinCla);
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
+
         spinner();
     }
 
@@ -101,29 +108,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
     public void sendMessage(View view){
-        LeerWs();
-        //sesion();
-//        Intent inteto= new Intent(MainActivity.this, Principal.class);
-//        startActivity(inteto);
-    }
-
-    public void sesion(){
-         usua = textusu.getText().toString();
+        usua = textusu.getText().toString();
         conta= textcont.getText().toString();
-
-        if(usua.equals("admin") && conta.equals("admin")){
-
-                Intent inteto= new Intent(this, Principal.class);
-                startActivity(inteto);
-
-        }else {
-            Toast tost= Toast.makeText(this, "Datos incorrectos", Toast.LENGTH_LONG);
-            tost.show();
-        }
+        LeerWs();
     }
+
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
 
         }
 
@@ -136,24 +127,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     try {
                         JSONObject jsonObject = new JSONObject(response);
 
-                        jsonObject = jsonObject.getJSONObject("UserInfo");
-                        editor.putString("user", "jared");
-                        editor.putString("pass", "jared");
+                       if(response.length()>60) {
+                           jsonObject = jsonObject.getJSONObject("UserInfo");
+                           editor.putString("user", usua);
+                           editor.putString("pass", conta);
 
-                        editor.putString("name", jsonObject.getString("k_name"));
-                        editor.putString("lname", jsonObject.getString("k_lname"));
-                        editor.putString("type", jsonObject.getString("k_type"));
-                        editor.putString("branch", jsonObject.getString("k_branch"));
-                        editor.putString("email", jsonObject.getString("k_mail1"));
-                        editor.putString("code", jsonObject.getString("k_kcode"));
-                        editor.putString("NameBra", jsonObject.getString("k_dscr"));
-                        editor.putString("Server", urlEmpresa);
-                        editor.commit();
+                           if (jsonObject.getString("k_type").equals("REPAR")) {
 
-                        Intent inteto= new Intent(MainActivity.this, Principal.class);
-                        startActivity(inteto);
+                               editor.putString("name", jsonObject.getString("k_name"));
+                               editor.putString("lname", jsonObject.getString("k_lname"));
+                               editor.putString("type", jsonObject.getString("k_type"));
+                               editor.putString("branch", jsonObject.getString("k_branch"));
+                               editor.putString("email", jsonObject.getString("k_mail1"));
+                               editor.putString("code", jsonObject.getString("k_kcode"));
+                               editor.putString("NameBra", jsonObject.getString("k_dscr"));
+                               editor.putString("Server", urlEmpresa);
+                               editor.commit();
 
-                        Toast.makeText(MainActivity.this, response, Toast.LENGTH_LONG).show();
+                               Intent inteto = new Intent(MainActivity.this, Principal.class);
+
+                               startActivity(inteto);
+
+
+                           } else {
+                               android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MainActivity.this);
+                               alerta.setMessage("Su rol no cuenta con los permisos para acceder").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialogInterface, int i) {
+                                       dialogInterface.cancel();
+                                   }
+                               });
+
+                               android.app.AlertDialog titulo = alerta.create();
+                               titulo.setTitle("Acceso Denegado");
+                               titulo.show();
+                           }
+                       }else{
+                           android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MainActivity.this);
+                           alerta.setMessage("Usuario y/o contraseña incorrecta").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                               @Override
+                               public void onClick(DialogInterface dialogInterface, int i) {
+                                   dialogInterface.cancel();
+                               }
+                           });
+
+                           android.app.AlertDialog titulo = alerta.create();
+                           titulo.setTitle("Datos incorrectos");
+                           titulo.show();
+                       }
+
 
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -169,8 +191,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     HashMap header = new HashMap();
-                    header.put("user","jared");
-                    header.put("pass","jared");
+                    header.put("user",usua);
+                    header.put("pass",conta);
                     return header;
                 }
             };

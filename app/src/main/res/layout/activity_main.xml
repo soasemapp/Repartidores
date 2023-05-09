@@ -135,13 +135,21 @@
                 android:drawableEnd="@drawable/ic_ingresar"
                 />
 
+            <ImageView
+                android:id="@+id/id_imagen"
+                android:layout_width="match_parent"
+                android:layout_height="100dp">
+
+            </ImageView>
 
         </LinearLayout>
 
 
     </LinearLayout>
 
+
     </ScrollView>
+
 
     <LinearLayout
         android:layout_width="match_parent"

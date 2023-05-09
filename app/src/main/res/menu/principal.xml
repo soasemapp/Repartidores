@@ -9,8 +9,9 @@
         app:showAsAction="never" /> -->
 
     <item android:id="@+id/action_scanner"
-        android:icon="@drawable/ic_escaneo"
+        android:icon="@drawable/ic_btnescaneoblanco"
         android:title="scanner"
         app:showAsAction="ifRoom"
         />
+
 </menu>

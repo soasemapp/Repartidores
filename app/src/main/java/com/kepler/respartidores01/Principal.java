@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +35,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
+import com.kepler.respartidores01.ui.gallery.GalleryFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,11 +51,11 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     public ArrayList<String> folios= new ArrayList<>();
     public String usa;
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
-    TextView namerepa;
+    TextView namerepa, correorepa;
     private SharedPreferences preference;
     ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode;
+    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo;
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -63,6 +67,8 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         binding = ActivityPrincipalBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarPrincipal.toolbar);
+        binding.appBarPrincipal.toolbar.setTitleTextColor(Color.WHITE);
+
         binding.appBarPrincipal.toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,12 +107,14 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             return super.onOptionsItemSelected(item);
         });
 
+
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
         strcodBra = preference.getString("branch", null);
         strcode = preference.getString("code", null);
         StrServer = preference.getString("Server", "null");
-        //namerepa=findViewById(R.id.txtmenuname);
+        strname=preference.getString("name","");
+        strcorreo=preference.getString("email","");
     }
 
     //ESCANEAR LOS FOLIOS
@@ -117,10 +125,20 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         if(result !=null){
 
             if(result.getContents()==null){
-                Toast.makeText(this, "Lectura Cancelada", Toast.LENGTH_SHORT).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Lectura Cancelada");
+                titulo.show();
             }else{
-               // folios.add(result.getContents());
-                Toast.makeText(this, result.getContents(), Toast.LENGTH_SHORT).show();
+                usa=result.getContents();
+                LeerWs();
             }
         }else{
             super.onActivityResult(requestCode, resultCode, data);
@@ -136,6 +154,10 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
+        namerepa= findViewById(R.id.txtmenuname);
+        correorepa=findViewById(R.id.textViewcorreo);
+        namerepa.setText(strname);
+        correorepa.setText(strcorreo);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
@@ -169,7 +191,6 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     }
 
 
-
     private void LeerWs() {
         String url = StrServer + "/consulfac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -177,17 +198,29 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             public void onResponse(String response) {
                 try {
                     String Clave,Nombre,Direccion;
+                    String telun, teld, folio;
                     JSONObject jsonObject = new JSONObject(response);
 
                     if(jsonObject.length()>0) {
                         jsonObject = jsonObject.getJSONObject("Repartidores");
-                        jsonObject.getString("k_Folio");
                         Clave = jsonObject.getString("k_Clave");
+                        folio=jsonObject.getString("k_Folio");
                         Nombre = jsonObject.getString("k_Nombre");
-                        jsonObject.getString("k_Numero1");
-                        jsonObject.getString("k_Numero2");
+                        telun=jsonObject.getString("k_Numero1");
+                        teld=jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
+
+
+                        editor.putString("folioescrito",folio);
+                        Clave = jsonObject.getString("k_Clave");
+                        editor.putString("Nombreescrito",  Nombre);
+                        editor.putString("Num1_escrito", telun);
+                        editor.putString("Num2escrito",teld);
+                        editor.putString("direccionescrito", Direccion );
+                        editor.commit();
+
                         ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
+                        lpeA.add(new Pedidos("","", "", Nombre,telun,teld,folio,Direccion,""));
 
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                         alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
@@ -220,6 +253,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+
             }
         },
                 new Response.ErrorListener() {
@@ -246,12 +280,25 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         };
         Volley.newRequestQueue(this).add(postRequest);
     }
+
+    //boton del alert para guardar el folio escrito
   public void guardarfolio(View v){
         usa=textfolio.getText().toString();
         if(!usa.equals("")){
            LeerWs();
+
         }else{
-            Toast.makeText(this, "Ingresa el folio porfavor", Toast.LENGTH_SHORT).show();
+            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+            alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            android.app.AlertDialog titulo = alerta.create();
+            titulo.setTitle("Ingrese el folio porfavor");
+            titulo.show();
         }
     }
 
@@ -259,4 +306,5 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
     }
+
 }

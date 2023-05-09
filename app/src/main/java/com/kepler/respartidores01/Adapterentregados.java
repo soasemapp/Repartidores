@@ -1,26 +1,22 @@
 package com.kepler.respartidores01;
 
-import static androidx.test.InstrumentationRegistry.getContext;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MiAdaptador extends BaseAdapter {
+public class Adapterentregados extends BaseAdapter {
     private Context c;
     private int diseno;
-    private ArrayList<Pedidos> ap;
+    private ArrayList<PedidosEntregados> ap;
 
-    public MiAdaptador(Context c, int diseno, ArrayList<Pedidos> ap) {
+    public Adapterentregados(Context c, int diseno, ArrayList<PedidosEntregados> ap) {
         this.c = c;
         this.diseno = diseno;
         this.ap = ap;
@@ -51,20 +47,20 @@ public class MiAdaptador extends BaseAdapter {
 
         }
 
-        Pedidos auxi = ap.get(position);
+        PedidosEntregados auxi = ap.get(position);
 
-        TextView tvNombres = vistaDiseno.findViewById(R.id.txtNombre);
-        TextView tvtelefonouno =vistaDiseno.findViewById(R.id.txttelefono1);
-        TextView tvtelefodos =vistaDiseno.findViewById(R.id.txttelefonodos);
-        ImageButton irmap=vistaDiseno.findViewById(R.id.btn_iramap_lis);
+        TextView tvNombres = vistaDiseno.findViewById(R.id.txtNombreentreado);
+        TextView tvtsuc =vistaDiseno.findViewById(R.id.id_suc);
+        TextView tvtrecibio =vistaDiseno.findViewById(R.id.id_quienrecibio);
+        TextView tvfolio=vistaDiseno.findViewById(R.id.id_foli_Entre);
         Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
 
 
-            tvNombres.setText(auxi.Nombre);
-            tvtelefonouno.setText(auxi.Telefonouno);
-            tvtelefodos.setText(auxi.Telefonodos);
-            irmap.setTag(position);
-            detafac.setTag(position);
+        tvNombres.setText(auxi.Nombre);
+        tvtrecibio.setText(auxi.recibio);
+        tvtsuc.setText(auxi.sucursal);
+        tvfolio.setText(auxi.Folio);
+        detafac.setTag(position);
 
         detafac.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,15 +69,7 @@ public class MiAdaptador extends BaseAdapter {
             }
         });
 
-        irmap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((ListView) parent).performItemClick(view, position, 0);
-            }
-        });
-
-
-
         return vistaDiseno;
     }
+
 }

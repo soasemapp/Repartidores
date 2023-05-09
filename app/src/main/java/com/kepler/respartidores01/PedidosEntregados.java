@@ -1,10 +1,6 @@
 package com.kepler.respartidores01;
 
-import android.widget.Button;
-
-import java.util.ArrayList;
-
-public class Pedidos {
+public class PedidosEntregados {
     String sucursal;
     String cliente;
     String numpaq;
@@ -13,9 +9,9 @@ public class Pedidos {
     String Telefonodos;
     String Folio;
     String direccion;
-    String distance;
+    String recibio;
 
-    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String distance) {
+    public PedidosEntregados(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String recibio) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -24,7 +20,7 @@ public class Pedidos {
         Telefonodos = telefonodos;
         Folio = folio;
         this.direccion = direccion;
-        this.distance=distance;
+        this.recibio = recibio;
     }
 
     public String getSucursal() {
@@ -90,11 +86,12 @@ public class Pedidos {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    public String getDistance() {
-        return distance;
+
+    public String getRecibio() {
+        return recibio;
     }
 
-    public void setDistance(String distance) {
-        this.distance = distance;
+    public void setRecibio(String recibio) {
+        this.recibio = recibio;
     }
 }
