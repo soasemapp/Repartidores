@@ -107,7 +107,6 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             return super.onOptionsItemSelected(item);
         });
 
-
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
         strcodBra = preference.getString("branch", null);
@@ -136,7 +135,9 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                 android.app.AlertDialog titulo = alerta.create();
                 titulo.setTitle("Lectura Cancelada");
                 titulo.show();
+
             }else{
+
                 usa=result.getContents();
                 LeerWs();
             }
@@ -180,7 +181,6 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
 
 
     public void respuestascanner(View view){
-
         IntentIntegrator integrador= new IntentIntegrator(Principal.this);
         integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
         integrador.setPrompt("Lector");

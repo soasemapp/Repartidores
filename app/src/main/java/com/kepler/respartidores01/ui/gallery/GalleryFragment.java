@@ -72,9 +72,7 @@ public class GalleryFragment extends Fragment {
 
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
-
-    RecyclerView datosServer;
-    String producto, descripcion, cantidad;
+    String producto, descripcion, cantidad, entregorc, entregofolio;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -90,15 +88,15 @@ public class GalleryFragment extends Fragment {
     public void onActivityCreated(Bundle state) {
         super.onActivityCreated(state);
 
-        preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
+        preference = getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
-        struser= preference.getString("user","");
-        strpass=preference.getString("pass","");
-        strbranch=preference.getString("branch","");
-        strcode=preference.getString("code","");
+        struser = preference.getString("user", "");
+        strpass = preference.getString("pass", "");
+        strbranch = preference.getString("branch", "");
+        strcode = preference.getString("code", "");
 
 
         escnombre = preference.getString("Nombreescrito", "null");
@@ -107,9 +105,11 @@ public class GalleryFragment extends Fragment {
         escnumdos = preference.getString("Num2escrito", "null");
         escdireccion = preference.getString("direccionescrito", "null");
 
+        entregorc= preference.getString("recibio","");
+        entregofolio= preference.getString("entregoFolio","");
+
 
         LeerWs();
-
 
     }
 
@@ -173,6 +173,14 @@ public class GalleryFragment extends Fragment {
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
+                }
+
+                if(entregofolio!="") {
+                    for (int i = 0; i < lpeA.size(); i++) {
+                        if(entregofolio==lpeA.get(i).getFolio()){
+                            lpeA.remove(i);
+                        }
+                    }
                 }
 
 

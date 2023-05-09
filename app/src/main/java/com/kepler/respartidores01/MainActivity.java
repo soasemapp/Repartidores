@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                editor.commit();
 
                                Intent inteto = new Intent(MainActivity.this, Principal.class);
-
                                startActivity(inteto);
 
 

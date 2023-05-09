@@ -12,7 +12,7 @@
         >
 
         <TextView
-            android:id="@+id/quienentrego"
+            android:id="@+id/cualeselmotivo"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -20,50 +20,17 @@
             android:textSize="20dp"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:text="Recibio el paquete:"
+            android:text="Motivo:"
             />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-        <TextView
-            android:id="@+id/foliipaqentre"
-            android:layout_width="190dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="20dp"
-            android:textAlignment="center"
-            android:textColor="@color/black"
-            android:text="Paquete a entregar:"
-            />
-            <TextView
-                android:id="@+id/foliipaqentrega"
-                android:layout_width="190dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:textSize="20dp"
-                android:textAlignment="textStart"
-                android:textColor="@color/black"
-                />
-        </LinearLayout>
 
         <EditText
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/quien_recibio"
+            android:id="@+id/motivo_pendiente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-
             android:layout_marginEnd="15dp"
             android:maxLines="1"
-            android:hint="Nombre:"
             app:boxBackgroundMode="outline"
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
@@ -73,10 +40,10 @@
         </EditText>
 
         <Button
-            android:id="@+id/btentre"
+            android:id="@+id/btn_pendientemot"
             android:layout_width="140dp"
             android:layout_height="40dp"
-            android:text="Entregado"
+            android:text="Aceptar"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_gravity="center"

@@ -51,6 +51,8 @@ public class SlideshowFragment extends Fragment {
     TextView fol,cli,nom,npac,tun,tdos,di;
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
+    String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis, entregorc;
+
 
 
     private FragmentSlideshowBinding binding;
@@ -76,6 +78,18 @@ public class SlideshowFragment extends Fragment {
         struser= preference.getString("user","");
         strpass=preference.getString("pass","");
         strcode=preference.getString("code","");
+
+        //entregado y es quien lo recibio
+        entregorc= preference.getString("recibio","");
+        entregosucu= preference.getString("entregoSucursal","");
+        entregocliente= preference.getString("entregoCliente","");
+        entregonombre= preference.getString("entregoNombre","");
+        entregoteluno= preference.getString("entregonumteluno","");
+        entregonumdos= preference.getString("entregonumteldos","");
+        entregofolio= preference.getString("entregoFolio","");
+        entregodirec= preference.getString("entregoDirec","");
+        entregonumpaq= preference.getString("entregoNumpaq","");
+
 
 
         LeerWs();
@@ -125,6 +139,11 @@ public class SlideshowFragment extends Fragment {
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+
+                if(entregorc!=""){
+                    lpE.add(new PedidosEntregados(entregosucu,entregocliente,entregonumpaq, entregonombre, entregoteluno, entregonumdos, entregofolio, entregodirec,entregorc));
+                }
+
                 if(lpE.size()!=0){
                     listapacentregados = (ListView)getView().findViewById(R.id.listaentregados);
                     Adapterentregados miAdaptador = new Adapterentregados(getActivity(), R.layout.diseno_entregados, lpE);

@@ -19,6 +19,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -88,10 +91,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String direclis, nombrelist =null;
     String value=null;
     String dircort=null;
+    String fol=null;
     Double latcrta = 0.0;
     Double longcort=0.0;
     Boolean bandera =false;
     ArrayList<Marker> identmarkers = null;
+    Pedidos pedentregado = null;
     int identificador = 0;
 
 
@@ -365,6 +370,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int Valor = Integer.parseInt(listV.get(0));
         lpeA.set(0,new Pedidos("",listC.get(0),"",listN.get(0),"","","",listD.get(0),listV.get(0)));
         dircort=lpeA.get(0).direccion;
+        fol=lpeA.get(0).Folio;
 
         for (int i = 1; i < listV.size(); i++) {
             if (Valor < Integer.parseInt((listV.get(i)))) {
@@ -373,6 +379,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Valor = Integer.parseInt(listV.get(i));;
                 lpeA.set(i,new Pedidos("",listC.get(i),"",listN.get(i),"","","",listD.get(i),listV.get(i)));
                 dircort=lpeA.get(i).direccion;
+                fol=lpeA.get(i).Folio;
+
             }
         }
 
@@ -470,7 +478,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private void trazarRuta(JSONObject jso) {
-
         JSONArray jRoutes;
         JSONArray jLegs;
         JSONArray jSteps;
@@ -522,22 +529,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void entregado(View v) {
+        TextView entregarfolio;
+        entregarfolio=findViewById(R.id.foliipaqentrega);
 
-
-
+        for (int i=0; i<=lpeA.size(); i++){
+            if(fol==lpeA.get(i).getFolio()){
+                pedentregado =new Pedidos(lpeA.get(i).getSucursal(),lpeA.get(i).getCliente(),lpeA.get(i).getNumpaq(),lpeA.get(i).getNombre(),lpeA.get(i).getTelefonouno(),lpeA.get(i).getTelefonodos(),lpeA.get(i).getFolio(),lpeA.get(i).getDireccion(),lpeA.get(i).getDistance());
+            }
+        }
       AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
+        entregarfolio.setText(fol);
         builder.setView(inflater.inflate(R.layout.recibio_, null))
-                .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
+               .create().show();
+
+        Button acaepar=findViewById(R.id.btentre);
+
+        acaepar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String recibio;
+                EditText rec;
+                rec=findViewById(R.id.quien_recibio);
+                recibio=rec.getText().toString();
+
+                editor.putString("folioentregado",fol);
+                editor.putString("entregoSucursal",pedentregado.getSucursal());
+                editor.putString("entregoCliente",pedentregado.getCliente());
+                editor.putString("entregoNumpaq",pedentregado.getNumpaq());
+                editor.putString("entregoNombre",pedentregado.getNombre());
+                editor.putString("entregonumteluno",pedentregado.getTelefonouno());
+                editor.putString("entregonumteldos",pedentregado.getTelefonodos());
+                editor.putString("entregoFolio",pedentregado.getFolio());
+                editor.putString("entregoDirec",pedentregado.getDireccion());
+                editor.putString("recibio",recibio);
+                editor.commit();
+
+            }
+        });
+
+    }
+
+    public void pendiente(View vi){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        builder.setView(inflater.inflate(R.layout.diseno_pendiente, null))
+                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // sign in the user ...
                     }
                 }).create().show();
-    }
-
-    public void pendiente(View vi){
-
-
     }
 }
