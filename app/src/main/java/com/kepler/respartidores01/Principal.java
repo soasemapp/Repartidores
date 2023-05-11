@@ -55,7 +55,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
     private SharedPreferences preference;
     ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo;
+    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo, struser, strbranch;
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -114,6 +114,10 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         StrServer = preference.getString("Server", "null");
         strname=preference.getString("name","");
         strcorreo=preference.getString("email","");
+        strbranch = preference.getString("branch", "");
+
+        struser = preference.getString("user", "");
+        strpass = preference.getString("pass", "");
     }
 
     //ESCANEAR LOS FOLIOS
@@ -265,15 +269,15 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user", "jared");
-                header.put("pass", "jared");
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
 
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal", strcodBra);
+                params.put("sucursal", strbranch);
                 params.put("folio", usa);
                 return params;
             }

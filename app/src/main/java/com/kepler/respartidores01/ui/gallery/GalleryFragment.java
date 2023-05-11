@@ -72,7 +72,7 @@ public class GalleryFragment extends Fragment {
 
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
-    String producto, descripcion, cantidad, entregorc, entregofolio;
+    String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -106,7 +106,7 @@ public class GalleryFragment extends Fragment {
         escdireccion = preference.getString("direccionescrito", "null");
 
         entregorc= preference.getString("recibio","");
-        entregofolio= preference.getString("entregoFolio","");
+        entregodirec=preference.getString("entregoDirec","");
 
 
         LeerWs();
@@ -175,25 +175,21 @@ public class GalleryFragment extends Fragment {
                     throw new RuntimeException(e);
                 }
 
-                if(entregofolio!="") {
+                if(entregodirec!="") {
                     for (int i = 0; i < lpeA.size(); i++) {
-                        if(entregofolio==lpeA.get(i).getFolio()){
+                        if(entregodirec==lpeA.get(i).getDireccion()){
                             lpeA.remove(i);
                         }
                     }
                 }
 
-
                 if (escfolio.length() == 7) {
                     lpeA.add(new Pedidos("", "", "", escnombre, escnumun, escnumdos, escfolio, escdireccion,""));
+                    insertarfolioesc();
                 }
-//                Set<Pedidos>hashSet= new HashSet(lpeA);
-//                lpeA.clear();
-//                lpeA.addAll(hashSet);
 
                 //crea la lista
                 if (lpeA.size() != 0) {
-
                     lista = (ListView) getView().findViewById(R.id.listaporentregar);
                     MiAdaptador miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
                     lista.setAdapter(miAdaptador);
@@ -378,6 +374,52 @@ public class GalleryFragment extends Fragment {
                 params.put("sucursal",strbranch);
                 params.put("cliente",DFcliente);
                 params.put("folio",DFfolio);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
+    }
+
+
+    private void insertarfolioesc(){
+
+        String url =StrServer+"/registroR";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    } catch (JSONException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("folio",escfolio);
+//                params.put("id_repartidor",);
+//                params.put("numcajas",);
+
                 return params;
             }
         };

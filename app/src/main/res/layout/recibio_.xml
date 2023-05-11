@@ -71,7 +71,6 @@
             app:counterMaxLength="18">
 
         </EditText>
-
         <Button
             android:id="@+id/btentre"
             android:layout_width="140dp"

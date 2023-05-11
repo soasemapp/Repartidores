@@ -24,8 +24,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.kepler.respartidores01.AdapeterDetallefac;
 import com.kepler.respartidores01.Adapterentregados;
 import com.kepler.respartidores01.MapsActivity;
+import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
 import com.kepler.respartidores01.PedidosEntregados;
@@ -42,6 +44,7 @@ import java.util.Map;
 
 public class SlideshowFragment extends Fragment {
     ListView listapacentregados;
+    ListView lisdf;
     ArrayList<PedidosEntregados> lpE=new ArrayList<>();
 
     private SharedPreferences preference;
@@ -51,8 +54,11 @@ public class SlideshowFragment extends Fragment {
     TextView fol,cli,nom,npac,tun,tdos,di;
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
-    String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis, entregorc;
+    String DFfolio, DFsucursal, DFcliente, DFnombre;
+    String producto, descripcion, cantidad, entregorc;
+    String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis;
 
+    public ArrayList<Mdestallefac> ldf=new ArrayList<>();
 
 
     private FragmentSlideshowBinding binding;
@@ -186,7 +192,15 @@ public class SlideshowFragment extends Fragment {
                                             }).setNegativeButton("Ver mas ", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
+                                                    editor.putString("Sucursal", lpE.get(position).getSucursal());
+                                                    editor.putString("Clientes",lpE.get(position).getCliente());
+                                                    editor.putString("Folios",lpE.get(position).getFolio());
+                                                    editor.putString("Nombres",lpE.get(position).getNombre());
+                                                    editor.putInt("posicion",position);
+                                                    editor.commit();
+                                                    editor.apply();
 
+                                                    detalleFactura();
                                                 }
                                             });
                                     dialog = builder.create();
@@ -198,9 +212,6 @@ public class SlideshowFragment extends Fragment {
                             }
                         }
                     });
-
-                }else
-                {
                 }
             }
         },
@@ -223,6 +234,88 @@ public class SlideshowFragment extends Fragment {
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
                 params.put("id_repartidor",strcode);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
+    }
+
+    private void detalleFactura(){
+        int pos;
+        ldf.clear();
+
+        preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
+        editor = preference.edit();
+
+        DFsucursal=preference.getString("Sucursal","");
+        DFcliente=preference.getString("Clientes","");
+        DFfolio=preference.getString("Folios","");
+        DFnombre=preference.getString("Nombres","");
+        pos=preference.getInt("posicion",0);
+
+        String url =StrServer+"/detafactuR";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    jfacturas = jsonObject.getJSONObject("Repartidores");
+                    for (int i = 0; i <jfacturas.length(); i++) {
+                        jitems = jfacturas.getJSONObject("items"+i);
+                        producto = jitems.getString("k_Producto");
+                        descripcion = jitems.getString("k_Descripcion");
+                        cantidad = jitems.getString("k_Cantidad");
+                        ldf.add(new Mdestallefac(producto,descripcion,cantidad));
+                    }
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+                builder = new AlertDialog.Builder(getContext());
+                LayoutInflater inflater = getLayoutInflater();
+                View dialogVieww = inflater.inflate(R.layout.ver_mas_df, null);
+
+                lisdf = (ListView) dialogVieww.findViewById(R.id.lis_detfac);
+                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf);
+                lisdf.setAdapter(miAdaptador);
+
+                builder.setView(dialogVieww)
+                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                dialog = builder.create();
+                dialog.show();
+                editor.remove("Clientes");
+                editor.remove("Folios");
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("cliente",DFcliente);
+                params.put("folio",DFfolio);
                 return params;
             }
         };
