@@ -28,5 +28,10 @@
         android:label="activity_maps"
         tools:layout="@layout/activity_maps" />
 
+    <activity
+        android:id="@+id/cerrarsecion"
+        android:name="com.kepler.respartidores01.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main"/>
 
 </navigation>

@@ -58,6 +58,8 @@ public class MiAdaptador extends BaseAdapter {
         TextView tvtelefodos =vistaDiseno.findViewById(R.id.txttelefonodos);
         ImageButton irmap=vistaDiseno.findViewById(R.id.btn_iramap_lis);
         Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
+        Button entreado=vistaDiseno.findViewById(R.id.btnntregar);
+        Button pendiente=vistaDiseno.findViewById(R.id.btnpendiente);
 
 
             tvNombres.setText(auxi.Nombre);
@@ -65,6 +67,15 @@ public class MiAdaptador extends BaseAdapter {
             tvtelefodos.setText(auxi.Telefonodos);
             irmap.setTag(position);
             detafac.setTag(position);
+            entreado.setTag(position);
+            pendiente.setTag(position);
+
+        irmap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((ListView) parent).performItemClick(view, position, 0);
+            }
+        });
 
         detafac.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +84,14 @@ public class MiAdaptador extends BaseAdapter {
             }
         });
 
-        irmap.setOnClickListener(new View.OnClickListener() {
+        entreado.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((ListView) parent).performItemClick(view, position, 0);
+            }
+        });
+
+        pendiente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ((ListView) parent).performItemClick(view, position, 0);

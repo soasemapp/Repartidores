@@ -32,17 +32,27 @@
         android:layout_height="wrap_content">
     </Toolbar>
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="20dp"
-            >
+            android:layout_marginBottom="20dp">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:showAsAction="never"
+                android:id="@+id/swipeRefresh"
+                >
+
             <ListView
                 android:id="@+id/listaporentregar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         </LinearLayout>
 

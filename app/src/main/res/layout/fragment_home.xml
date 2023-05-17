@@ -7,15 +7,14 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.home.HomeFragment"
     >
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         >
-    <Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"></Toolbar>
-
 
 <ScrollView
     android:layout_width="match_parent"
@@ -25,15 +24,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="40dp"
         >
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="19dp"
+            android:gravity="center"
+            android:text="Nombre"
+            android:textSize="20dp"
+            android:textColor="@color/ColorRojoTenue"
+            android:textStyle="italic|bold"
+            android:layout_marginBottom="15dp"
+            android:background="@color/rojitoclaro"
+            />
 
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_marginBottom="15dp"
+    >
         <ImageView
-            android:layout_width="30dp"
+            android:layout_width="40dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_repar"
             android:layout_gravity="center"
@@ -72,12 +87,23 @@
        </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Sucursal"
+            android:textSize="20dp"
+            android:textColor="@color/ColorRojoTenue"
+            android:textStyle="bold|italic"
+            android:layout_marginBottom="15dp"
+            android:background="@color/rojitoclaro"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="15dp"
+           android:layout_marginBottom="15dp"
             >
 
         <ImageView
@@ -93,12 +119,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:layout_gravity="center"
             android:textSize="20dp"
             android:textColor="@color/black"
             />
             </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:text="Correo"
+            android:textColor="@color/ColorRojoTenue"
+            android:textSize="20dp"
+            android:textStyle="bold|italic"
+            android:background="@color/rojitoclaro"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"

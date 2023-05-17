@@ -17,19 +17,75 @@
         android:background="@color/ColorRojoTenue"
         />
 
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/lis_detfac"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content">-->
+<!--    </androidx.recyclerview.widget.RecyclerView>-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <com.google.android.material.textview.MaterialTextView
+
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Producto: "
+            android:textSize="15dp"
+            />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Descripción: "
+            android:textSize="15dp"
+            />
+        <com.google.android.material.textview.MaterialTextView
+
+            android:layout_width="99dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="Cantidad:"
+            android:textSize="15dp"
+            />
+
+    </LinearLayout>
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <ListView
             android:id="@+id/lis_detfac"
             android:layout_width="match_parent"
             android:layout_height="300dp">
-
         </ListView>
+
+
+        </LinearLayout>
 
     </ScrollView>
 
-
+    </LinearLayout>
 
 </LinearLayout>

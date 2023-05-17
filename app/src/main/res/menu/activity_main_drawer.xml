@@ -21,5 +21,11 @@
             android:title="@string/menu_mapa"
             android:icon="@drawable/ic_mapa"
             />
+        <item
+            android:id="@+id/cerrarsecion"
+            android:title="@string/cerrarsesion"
+            android:icon="@drawable/ic_cerrarsesion"
+
+            />
     </group>
 </menu>

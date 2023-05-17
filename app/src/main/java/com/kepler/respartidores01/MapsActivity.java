@@ -41,6 +41,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -70,10 +71,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Set<String> setD = new HashSet<>();
     Set<String> setN = new HashSet<>();
     Set<String> setC = new HashSet<>();
-    Set<String> setV = new HashSet<>();
-    Set<String> setVa = new HashSet<>();
+
+    AlertDialog.Builder builder;
+   AlertDialog dialog = null;
+    String[] listaDato = null;
 int controlador=0;
-    ArrayList<String> listD;
+    ArrayList<String> listD=null;
     ArrayList<String> listN;
     ArrayList<String> listC;
     ArrayList<String> listV;
@@ -96,15 +99,9 @@ int controlador=0;
     String direclis, nombrelist =null;
     String value=null;
     String dircort=null;
-    String fol=null;
     Double latcrta = 0.0;
     Double longcort=0.0;
-    Boolean bandera =true;
-    ArrayList<Marker> identmarkers = null;
-    Pedidos pedentregado = null;
-    int identificador = 0;
     ArrayList<String> urls=new ArrayList<>();
-
     JSONObject routes;
     JSONObject legs;
     JSONObject distance;
@@ -129,13 +126,14 @@ int controlador=0;
         strcode=preference.getString("code","");
 
          setD = preference.getStringSet("Direcciones",null);
-         setN = preference.getStringSet("Nombres",null);
-        setC = preference.getStringSet("Clientes",null);
+//         setN = preference.getStringSet("Nombres",null);
+//        setC = preference.getStringSet("Clientes",null);
 
 
-        listD = new ArrayList<String>(setD);
-        listN=new ArrayList<String>(setN);
-        listC=new ArrayList<String>(setC);
+        if(setD!=null){
+        listD = new ArrayList<String>(setD);}
+//        listN=new ArrayList<String>(setN);
+//        listC=new ArrayList<String>(setC);
 
 
         direclis =null;
@@ -147,9 +145,11 @@ int controlador=0;
         nombrelist=parametros.getString("nombre_direccion");
 
 
-            for(int j=0; j<listN.size(); j++){
-            lpeA.add(new Pedidos("",listC.get(j),"",listN.get(j),"","","",listD.get(j),""));
-        }
+//            for(int j=0; j<listN.size(); j++){
+//            lpeA.add(new Pedidos("",listC.get(j),"",listN.get(j),"","","",listD.get(j),""));
+//        }
+
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -180,8 +180,7 @@ int controlador=0;
                                         if (mMarker != null) {
                                             mMarker.remove();
                                         }
-                                        obtdistanc();
-                                        mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion));
+                                        mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                                         CameraPosition cameraPositio = new CameraPosition.Builder()
                                                 .target(miUbicacion)
@@ -189,11 +188,10 @@ int controlador=0;
                                                 .bearing(90)
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
-                                        for (int i = 0; i <puntosdireccion.size(); i++) {
-                                            LatLng nuevo = puntosdireccion.get(i);
-                                            urls.add(i,"https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI");
-                                        }
-                                        obtdistanc();
+
+                                        if(listD!=null){
+                                            obtdistanc();}
+
                                     }
                                     else {
                                         Double dircelisLAT;
@@ -209,8 +207,14 @@ int controlador=0;
                                             throw new RuntimeException(e);
                                         }
 
+                                        LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
+                                        latitudorigen = location.getLatitude();
+                                        longitudorigen = location.getLongitude();
+
                                         LatLng marcadr = new LatLng(dircelisLAT, dircelisLONG);
-                                        mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist));
+
+                                        mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicación").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
+                                        mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                                 .target(marcadr)
@@ -218,6 +222,7 @@ int controlador=0;
                                                 .bearing(90)
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                        obtdistanc();
                                     }
                                     direclis=null;
                                 }
@@ -256,29 +261,28 @@ int controlador=0;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        values.clear();
 
         mMap = googleMap;
 
-        //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
-        coder = new Geocoder(MapsActivity.this);
-        for(int i = 0; i< listD.size(); i++) {
-            try {
-                address = coder.getFromLocationName(listD.get(i), 3);
-                Address resultadoscode= address.get(0);
-                resultadoscode.getLatitude();
-                resultadoscode.getLongitude();
-                puntosdireccion.add(i,new LatLng(resultadoscode.getLatitude(), resultadoscode.getLongitude()));
+            //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
+            coder = new Geocoder(MapsActivity.this);
+            for (int i = 0; i < listD.size(); i++) {
+                try {
+                    address = coder.getFromLocationName(listD.get(i), 3);
+                    Address resultadoscode = address.get(0);
+                    resultadoscode.getLatitude();
+                    resultadoscode.getLongitude();
+                    puntosdireccion.add(i, new LatLng(resultadoscode.getLatitude(), resultadoscode.getLongitude()));
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
+            //Dibuja todos los marcadores en el mapa
+            for (int i = 0; i < puntosdireccion.size(); i++) {
+                mMap.addMarker(new MarkerOptions().position(puntosdireccion.get(i)).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
+            }
 
-        //Dibuja todos los marcadores en el mapa
-        for (int i = 0; i < puntosdireccion.size(); i++) {
-            mMap.addMarker(new MarkerOptions().position(puntosdireccion.get(i)));
-        }
 
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -311,7 +315,7 @@ int controlador=0;
                                 mMarker.remove();
                             }
 
-                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion));
+                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                             CameraPosition cameraPositio = new CameraPosition.Builder()
                                     .target(miUbicacion)
@@ -320,7 +324,8 @@ int controlador=0;
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-                            obtdistanc();
+                            if(listD!=null){
+                            obtdistanc();}
 
 
                         } else {
@@ -337,8 +342,15 @@ int controlador=0;
                                 throw new RuntimeException(e);
                             }
 
+                            latitudorigen = location.getLatitude();
+                            longitudorigen = location.getLongitude();
+
                             LatLng marcadr = new LatLng(dircelisLAT, dircelisLONG);
-                            mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist));
+
+                            LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
+
+                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
+                            mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(marcadr)
@@ -346,6 +358,7 @@ int controlador=0;
                                     .bearing(90)
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                            obtdistanc();
 
                         }
                         direclis = null;
@@ -367,39 +380,25 @@ int controlador=0;
 
     public void funcion() {
 
-        int Valor =Integer.parseInt(values.get(0));
-        lpeA.set(0,new Pedidos("","","","","","","",listD.get(0),values.get(0)));
+        int Valor = Integer.parseInt(listaDato[0]);
+       // lpeA.set(0,new Pedidos("","","","","","","",listD.get(0),listaDato[0]));
         dircort=listD.get(0);
         latcrta=puntosdireccion.get(0).latitude;
         longcort=puntosdireccion.get(0).longitude;
 
-        for (int i = 1; i < values.size(); i++) {
+        for (int i = 1; i < listaDato.length; i++) {
 
-            if (Valor < Integer.parseInt((values.get(i)))) {
+            if (Valor < Integer.parseInt(listaDato[i])) {
 
             } else {
-                Valor = Integer.parseInt(values.get(i));
-                lpeA.set(i,new Pedidos("","","","","","","",listD.get(i),values.get(i)));
+                Valor = Integer.parseInt(listaDato[i]);
+               // lpeA.set(i,new Pedidos("","","","","","","",listD.get(i),listaDato[i]));
+                dircort=listD.get(i);
                 latcrta=puntosdireccion.get(i).latitude;
                 longcort=puntosdireccion.get(i).longitude;
 
             }
         }
-        System.out.println(dircort);
-        System.out.println(values);
-        System.out.println(puntosdireccion);
-
-        //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
-//        coder = new Geocoder(MapsActivity.this);
-//            try {
-//                address = coder.getFromLocationName(dircort, 3);
-//                Address locationcrt = address.get(0);
-//               latcrta= locationcrt.getLatitude();
-//                longcort=locationcrt.getLongitude();
-//
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
 
         String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + latcrta +"," + longcort + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
 
@@ -425,76 +424,15 @@ int controlador=0;
 
     }
 
-    public void obtdistanc() {
-        StringRequest stringRequesttt = null;
-        RequestQueue queueE = Volley.newRequestQueue(MapsActivity.this);
+    public void obtdistanc()
+    {
+        listaDato = new String[puntosdireccion.size()];
 
-        for (int i = 0; i <puntosdireccion.size(); i++) {
-
+        for (int i = 0; i < puntosdireccion.size(); i++) {
             LatLng nuevo = puntosdireccion.get(i);
-
-            String url= "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
-
-              stringRequesttt = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                  @Override
-                  public void onResponse(String response) {
-
-                      try {
-
-                          JSONObject jso = new JSONObject(response);
-                          routes = jso.getJSONArray("routes").getJSONObject(0);
-                          legs = routes.getJSONArray("legs").getJSONObject(0);
-                          distance= legs.getJSONObject("distance");
-                          value = distance.getString("value");
-
-                          values.add(value);
-
-                      } catch (JSONException e) {
-                          e.printStackTrace();
-                      }
-
-                      clave++;
-                      if (controlador==clave){
-                          funcion();
-                      }
-
-                  }
-
-              }, new Response.ErrorListener() {
-                  @Override
-                  public void onErrorResponse(VolleyError volleyError) {
-                  }
-              });
-
-             queueE.add(stringRequesttt);
-            controlador++;
+            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+            ingresarDatos(i,url);
         }
-
-        }
-
-
-    public void value(JSONObject jso){
-      JSONObject routes;
-      JSONObject legs;
-      JSONObject distance;
-
-        try {
-            routes = jso.getJSONArray("routes").getJSONObject(0);
-            legs = routes.getJSONArray("legs").getJSONObject(0);
-            distance= legs.getJSONObject("distance");
-            value = distance.getString("value");
-
-            values.add(value);
-
-            setV.add(value);
-            editor.putStringSet("Values",setV);
-            editor.commit();
-            editor.apply();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
     }
 
 
@@ -555,115 +493,75 @@ int controlador=0;
         builder.setView(inflater.inflate(R.layout.recibio_, null))
                 .create().show();
 
-
     }
 
-
-    public void entregado(View ver) {
-        TextView entregarfolio;
-        entregarfolio=findViewById(R.id.foliipaqentrega);
-
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        entregarfolio.setText(fol);
-        builder.setView(inflater.inflate(R.layout.recibio_, null))
-               .create().show();
-
-        Button acaepar=findViewById(R.id.btentre);
-        acaepar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String recibio;
-                EditText rec;
-                rec=findViewById(R.id.quien_recibio);
-                recibio=rec.getText().toString();
-
-                for (int i=0; i<=lpeA.size(); i++){
-                    if(dircort==lpeA.get(i).getDireccion()){
-                        puntosdireccion.remove(i);
-                    }
-
-                }
-
-                editor.putString("entregoDirec",pedentregado.getDireccion());
-                editor.putString("recibio",recibio);
-                editor.commit();
-
-
-            }
-        });
-
-    }
-
-    public void pendiente(View vi){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.diseno_pendiente, null))
-                .setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
-                    }
-                }).create().show();
-    }
-
-
-    private void LeerWs(){
-        String url =StrServer+"/updatefirma";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+    public void ingresarDatos(int pos, String url)
+    {
+        StringRequest stringRequesttt = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
-                    JSONObject jfacturas;
-                    JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
-
-                    JSONObject jsonObject = new JSONObject(response);
-
-                        jfacturas = jsonObject.getJSONObject("Repartidores");
-                        for (int i = 0; i <jfacturas.length(); i++) {
-                            jitems = jfacturas.getJSONObject("items" + i);
-                            sucu = jitems.getString("k_Sucursal");
-                            folio = jitems.getString("k_Folio");
-                            cliente = jitems.getString("k_Cliente");
-                            Nombre = jitems.getString("k_Nombre");
-                            numpaq = jitems.getString("k_nPaquetes");
-                            direccion = jitems.getString("k_Direccion");
-                            telun = jitems.getString("k_Telefono1");
-                            teld = jitems.getString("k_Telefono2");
-                        }
+                    JSONObject jso = new JSONObject(response);
+                    routes = jso.getJSONArray("routes").getJSONObject(0);
+                    legs = routes.getJSONArray("legs").getJSONObject(0);
+                    distance = legs.getJSONObject("distance");
+                    value = distance.getString("value");
+                    values.add(value);
+                    listaDato[pos] = value;
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
 
+                clave++;
+                if (controlador == clave) {
+                    funcion();
+                }
             }
-        },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                })
-        {
+
+        }, new Response.ErrorListener() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
-                return header;
+            public void onErrorResponse(VolleyError volleyError)
+            {
+
             }
-            @Override
-            public Map<String, String> getParams() throws AuthFailureError {
-                HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("folio",fol);
-                params.put("cliente",fol);
-                return params;
-            }
-        };
-        Volley.newRequestQueue(MapsActivity.this).add(postRequest);
+        });
+        Volley.newRequestQueue(this).add(stringRequesttt);
+        controlador++;
     }
 
+    public void entregado()
+    {
+//        builder = new AlertDialog.Builder(this);
+//        LayoutInflater inflaterentrega = getLayoutInflater();
+//        View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+//        builder.setView(dialogViewww);
+//        EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
+//        Button enttegar=dialogViewww.findViewById(R.id.btentre);
+//        enttegar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                recibio.getText().toString();
+//                //folioconfirma=lpeA.get(position).getFolio();
+//                //sucursalonfrima=lpeA.get(position).getSucursal();
+//
+//                editor.putString("recibio",recibio.getText().toString());
+//                editor.putString("entregoSucursal",lpeA.get().getSucursal());
+//                editor.putString("entregoCliente",lpeA.get().getCliente());
+//                editor.putString("entregoNombre",lpeA.get().getNombre());
+//                editor.putString("entregonumteluno",lpeA.get().getTelefonouno());
+//                editor.putString("entregonumteldos",lpeA.get().getTelefonodos());
+//                editor.putString("entregoFolio",lpeA.get().getFolio());
+//                editor.putString("entregoDirec",lpeA.get().getDireccion());
+//                editor.putString("entregoNumpaq",lpeA.get().getNumpaq());
+//                editor.commit();
+//                editor.apply();
+//
+//            }
+//        });
+//
+//        dialog = builder.create();
+//        dialog.show();
+    }
 
 }

@@ -8,18 +8,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/cajatextfolio"
-        android:hint="@string/dialog_hint"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="10dp"
-        android:inputType="number"
-        />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/cajatextonumc"
+        android:id="@+id/cajatextonumcescaner"
         android:hint="Numero de cajas"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -31,15 +20,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         >
-    <Button
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/guardarfolio"
-        android:layout_margin="10dp"
-        android:text="@string/agregarfoio"
-        android:onClick="guardarfolio"
-        android:drawableEnd="@drawable/icguardarfolio"
-        />
+        <Button
+            android:layout_width="140dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/guardarfolioescaner"
+            android:layout_margin="10dp"
+            android:text="@string/agregarfoio"
+            android:onClick="guardarcajasescaner"
+            android:drawableEnd="@drawable/icguardarfolio"
+            />
 
     </LinearLayout>
 

@@ -53,6 +53,7 @@ public class Adapterentregados extends BaseAdapter {
         TextView tvtsuc =vistaDiseno.findViewById(R.id.id_suc);
         TextView tvtrecibio =vistaDiseno.findViewById(R.id.id_quienrecibio);
         TextView tvfolio=vistaDiseno.findViewById(R.id.id_foli_Entre);
+        TextView tvfecha=vistaDiseno.findViewById(R.id.id_fecha);
         Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
 
 

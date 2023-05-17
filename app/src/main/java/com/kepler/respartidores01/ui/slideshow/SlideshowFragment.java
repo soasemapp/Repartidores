@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -33,6 +36,7 @@ import com.kepler.respartidores01.Pedidos;
 import com.kepler.respartidores01.PedidosEntregados;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentSlideshowBinding;
+import com.kepler.respartidores01.ui.gallery.GalleryFragment;
 import com.kepler.respartidores01.ui.gallery.GalleryViewModel;
 
 import org.json.JSONException;
@@ -40,11 +44,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SlideshowFragment extends Fragment {
     ListView listapacentregados;
     ListView lisdf;
+    RecyclerView lisdff;
     ArrayList<PedidosEntregados> lpE=new ArrayList<>();
 
     private SharedPreferences preference;
@@ -58,6 +64,7 @@ public class SlideshowFragment extends Fragment {
     String producto, descripcion, cantidad, entregorc;
     String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis;
 
+    private SwipeRefreshLayout refreshLayout;
     public ArrayList<Mdestallefac> ldf=new ArrayList<>();
 
 
@@ -96,13 +103,60 @@ public class SlideshowFragment extends Fragment {
         entregodirec= preference.getString("entregoDirec","");
         entregonumpaq= preference.getString("entregoNumpaq","");
 
-
-
+        lpE.clear();
         LeerWs();
 
+        refreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefresh);
+
+// Iniciar la tarea asíncrona al revelar el indicador
+        refreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        new HackingBackgroundTaskken().execute();
+                        //refreshLayout.setRefreshing(false);
+                    }
+
+                }
+        );
+        refreshLayout.setColorSchemeResources(R.color.ColorRojoTenue);
+
     }
+
+    public class HackingBackgroundTaskken extends AsyncTask<Void, Void, Void> {
+
+        static final int DURACION = 4 * 1000; // 4 segundo de carga
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Simulación de la carga de items
+            try {
+                Thread.sleep(DURACION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // Retornar en nuevos elementos para el adaptador
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+            LeerWs();
+
+            // Parar la animación del indicador
+            refreshLayout.setRefreshing(false);
+        }
+
+    }
+
+
+
     private void LeerWs(){
+
         String url =StrServer+"/pEntregados";
+
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -129,25 +183,22 @@ public class SlideshowFragment extends Fragment {
                             lpE.add(new PedidosEntregados(sucursal,cliente,"",Nombre,telun,teld,folio,direccion,recibio));
                         }
                     }else{
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                        alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
+                        if(lpE.size()==0) {
+                            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                            alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+                                }
+                            });
 
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Sin paquetes etregados");
-                        titulo.show();
-
+                            android.app.AlertDialog titulo = alerta.create();
+                            titulo.setTitle("Sin paquetes etregados");
+                            titulo.show();
+                        }
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
-                }
-
-                if(entregorc!=""){
-                    lpE.add(new PedidosEntregados(entregosucu,entregocliente,entregonumpaq, entregonombre, entregoteluno, entregonumdos, entregofolio, entregodirec,entregorc));
                 }
 
                 if(lpE.size()!=0){
@@ -279,7 +330,9 @@ public class SlideshowFragment extends Fragment {
                 LayoutInflater inflater = getLayoutInflater();
                 View dialogVieww = inflater.inflate(R.layout.ver_mas_df, null);
 
-                lisdf = (ListView) dialogVieww.findViewById(R.id.lis_detfac);
+
+               // lisdff=dialogVieww.findViewById(R.id.lis_detfac);
+                lisdf = dialogVieww.findViewById(R.id.lis_detfac);
                 AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf);
                 lisdf.setAdapter(miAdaptador);
 
@@ -293,7 +346,6 @@ public class SlideshowFragment extends Fragment {
                 dialog.show();
                 editor.remove("Clientes");
                 editor.remove("Folios");
-
             }
         },
                 new Response.ErrorListener() {

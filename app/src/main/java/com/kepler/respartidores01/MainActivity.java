@@ -46,16 +46,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private SharedPreferences.Editor editor;
     String usua, conta;
     EditText textusu, textcont;
+    String usuraio, contrasena;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textusu = findViewById(R.id.txtinUsu);
         textcont =findViewById(R.id.txtinCla);
         preference = getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
+        usuraio = preference.getString("user", null);
+        contrasena = preference.getString("pass", null);
 
+        verificacion();
         spinner();
     }
 
@@ -198,6 +203,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Volley .newRequestQueue(this).add(postRequest);
         }
 
+        public void verificacion(){
+        if(usuraio!=null && contrasena!=null){
+            Intent inteto = new Intent(this, Principal.class);
+            startActivity(inteto);
+
+            textusu.setText(usuraio);
+            textcont.setText(contrasena);
+        }
+    }
 
 
     }

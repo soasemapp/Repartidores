@@ -6,13 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +34,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
-import com.kepler.respartidores01.ui.gallery.GalleryFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,12 +42,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Principal extends AppCompatActivity implements AdapterView.OnItemClickListener{
+public class Principal extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
-    public EditText textfolio;
+    public EditText textfolio, textonumcajas, textocajasescaner;
     public ArrayList<String> folios= new ArrayList<>();
-    public String usa;
+    public String usaFolio;
+        String numcajas="1" ;
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
     TextView namerepa, correorepa;
     private SharedPreferences preference;
@@ -81,17 +80,26 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity, R.id.cerrarsecion)
                 .setOpenableLayout(drawer)
                 .build();
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+
+
+
         NavigationUI.setupWithNavController(navigationView, navController);
-        //AgregarFolios();
 
         //ACCESO A ESCRIBIR O ESCANEAR EL FOLIO DESDE UN DIALOGO
         binding.appBarPrincipal.toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_scanner) {
+
+                Time today=new Time(Time.getCurrentTimezone());
+                today.setToNow();
+                int dia= today.monthDay;
+                int mes=today.month;
+                int ao=today.year;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 LayoutInflater inflater = this.getLayoutInflater();
@@ -141,9 +149,8 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                 titulo.show();
 
             }else{
-
-                usa=result.getContents();
-                LeerWs();
+                usaFolio =result.getContents();
+                    LeerWs();
             }
         }else{
             super.onActivityResult(requestCode, resultCode, data);
@@ -162,7 +169,10 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         namerepa= findViewById(R.id.txtmenuname);
         correorepa=findViewById(R.id.textViewcorreo);
         namerepa.setText(strname);
+        namerepa.setTextSize(18);
         correorepa.setText(strcorreo);
+        correorepa.setTextSize(15);
+
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
@@ -172,7 +182,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.escribirfolio, null);
-        builder.setView(dialogView).setTitle("Introduce Folio")
+        builder.setView(dialogView).setTitle("Introduce Folio y Numero de cajas")
                 .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -180,7 +190,9 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                 });
         dialog = builder.create();
         dialog.show();
+
         textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
+        textonumcajas=(EditText) dialogView.findViewById(R.id.cajatextonumc);
     }
 
 
@@ -214,18 +226,19 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
                         teld=jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
 
-
                         editor.putString("folioescrito",folio);
                         Clave = jsonObject.getString("k_Clave");
                         editor.putString("Nombreescrito",  Nombre);
                         editor.putString("Num1_escrito", telun);
                         editor.putString("Num2escrito",teld);
                         editor.putString("direccionescrito", Direccion );
+                        editor.putString("numc",numcajas);
                         editor.commit();
 
                         ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
                         lpeA.add(new Pedidos("","", "", Nombre,telun,teld,folio,Direccion,""));
 
+                        insertarfolioesc();
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                         alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
@@ -278,7 +291,7 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal", strbranch);
-                params.put("folio", usa);
+                params.put("folio", usaFolio);
                 return params;
             }
         };
@@ -287,8 +300,9 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
 
     //boton del alert para guardar el folio escrito
   public void guardarfolio(View v){
-        usa=textfolio.getText().toString();
-        if(!usa.equals("")){
+        usaFolio =textfolio.getText().toString();
+        numcajas=textonumcajas.getText().toString();
+        if(!usaFolio.equals("")){
            LeerWs();
 
         }else{
@@ -306,9 +320,52 @@ public class Principal extends AppCompatActivity implements AdapterView.OnItemCl
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    private void insertarfolioesc(){
+
+        String url =StrServer+"/registroR";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                     jsonObject.getString("Repartidores");
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(Principal.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("folio",usaFolio);
+                params.put("repartidor",strcode);
+                params.put("numC",numcajas);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(this).add(postRequest);
 
     }
+
 
 }

@@ -29,6 +29,7 @@
             android:layout_margin="10dp"
             android:textSize="20dp"
             android:textAlignment="center"
+            android:textColor="@color/black"
             />
 
         <TextView
@@ -39,6 +40,7 @@
             android:textSize="15dp"
             android:textAlignment="center"
             android:drawableStart="@drawable/ic_telefonouno"
+            android:textColor="@color/black"
             >
         </TextView>
 
@@ -51,6 +53,7 @@
             android:textSize="15dp"
             android:textAlignment="center"
             android:drawableStart="@drawable/ic_telefonodos"
+            android:textColor="@color/black"
             >
         </TextView>
 
@@ -113,6 +116,7 @@
                 android:layout_marginLeft="10dp"
                 android:backgroundTint="#B3FFFFFF"
                 android:textColor="@color/ColorRojoTenue"
+
                 />
 
 

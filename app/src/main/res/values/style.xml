@@ -1,6 +1,11 @@
 <resources>
     <!-- Base application theme. -->
 
+    <style name="CampoTEXBlanco" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#F7F3F2</item>
+        <item name="colorControlActivated">#FFFFFF</item>
+        <item name="android:textColorHighlight">#F5EFEF</item>
+    </style>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here. -->

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -28,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
+import com.kepler.respartidores01.HackingBackgroundTask;
 import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
@@ -46,17 +51,19 @@ import java.util.Map;
 import java.util.Set;
 
 public class GalleryFragment extends Fragment {
+    MiAdaptador miAdaptador;
     private FragmentGalleryBinding binding;
     ListView lista;
     ListView lisdf;
     int j;
     public ArrayList<Pedidos> lpeA=new ArrayList<>();
     public ArrayList<Mdestallefac> ldf=new ArrayList<>();
+    String mensajes;
 
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strfolio, strnombre, strtelefono1, strtelefono2, strsucursal, struser, strcode, strbranch, strpass;
-    String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos =null;
+    String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc =null;
     List<String> folios= new ArrayList<>();
     Button detfac;
     AlertDialog.Builder builder;
@@ -69,10 +76,13 @@ public class GalleryFragment extends Fragment {
     Set<String> setD = new HashSet<>();
     Set<String> setN = new HashSet<>();
     Set<String> setC = new HashSet<>();
+    String mensaje = "entregoSucursal";
 
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
     String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec;
+    String folioconfirma, sucursalonfrima, recibiofir;
+    private SwipeRefreshLayout refreshLayout;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -104,12 +114,56 @@ public class GalleryFragment extends Fragment {
         escnumun = preference.getString("Num1_escrito", "null");
         escnumdos = preference.getString("Num2escrito", "null");
         escdireccion = preference.getString("direccionescrito", "null");
+        escnumc=preference.getString("numc","");
+
 
         entregorc= preference.getString("recibio","");
         entregodirec=preference.getString("entregoDirec","");
 
-
+        lpeA.clear();
         LeerWs();
+
+        // Obtener el refreshLayout
+        refreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefresh);
+
+// Iniciar la tarea asíncrona al revelar el indicador
+        refreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        new HackingBackgroundTaskk().execute();
+                         //refreshLayout.setRefreshing(false);
+                    }
+
+                }
+        );
+        refreshLayout.setColorSchemeResources(R.color.ColorRojoTenue);
+       // refreshLayout.setRefreshing(false);
+ }
+
+    public class HackingBackgroundTaskk extends AsyncTask<Void, Void, Void> {
+
+        static final int DURACION = 4 * 1000; // 3 segundos de carga
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // Simulación de la carga de items
+            try {
+                Thread.sleep(DURACION);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+           return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            LeerWs();
+
+            refreshLayout.setRefreshing(false);
+        }
 
     }
 
@@ -121,6 +175,7 @@ public class GalleryFragment extends Fragment {
     }
 
     private void LeerWs(){
+
         String url =StrServer+"/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -146,7 +201,6 @@ public class GalleryFragment extends Fragment {
                             teld = jitems.getString("k_Telefono2");
 
                             lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,""));
-                            int v= lpeA.size();
                             setD.add(direccion);
                             setN.add(Nombre);
                             setC.add(cliente);
@@ -175,23 +229,10 @@ public class GalleryFragment extends Fragment {
                     throw new RuntimeException(e);
                 }
 
-                if(entregodirec!="") {
-                    for (int i = 0; i < lpeA.size(); i++) {
-                        if(entregodirec==lpeA.get(i).getDireccion()){
-                            lpeA.remove(i);
-                        }
-                    }
-                }
-
-                if (escfolio.length() == 7) {
-                    lpeA.add(new Pedidos("", "", "", escnombre, escnumun, escnumdos, escfolio, escdireccion,""));
-                    insertarfolioesc();
-                }
-
                 //crea la lista
                 if (lpeA.size() != 0) {
                     lista = (ListView) getView().findViewById(R.id.listaporentregar);
-                    MiAdaptador miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
+                     miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
                     lista.setAdapter(miAdaptador);
 
                     //para el detlle de factura
@@ -254,9 +295,7 @@ public class GalleryFragment extends Fragment {
 
                                 case R.id.btn_iramap_lis:
                                     String ok = lpeA.get(position).getDireccion();
-
                                     Bundle extras = new Bundle();
-
                                     extras.putString("directlista", ok);
                                     extras.putString("nombre_direccion", lpeA.get(position).getNombre());
                                     Intent intent = new Intent(getContext(), MapsActivity.class);
@@ -264,6 +303,53 @@ public class GalleryFragment extends Fragment {
                                     startActivity(intent);
 
                                     break;
+
+                                case R.id.btnntregar:
+
+                                    builder = new AlertDialog.Builder(getContext());
+                                    LayoutInflater inflaterentrega = getLayoutInflater();
+                                    View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+                                    builder.setView(dialogViewww);
+                                    EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
+                                    Button enttegar=dialogViewww.findViewById(R.id.btentre);
+                                    enttegar.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            recibio.getText().toString();
+
+                                            editor.putString("recibio",recibio.getText().toString());
+                                            editor.putString("entregoSucursal",lpeA.get(position).getSucursal());
+                                            editor.putString("entregoCliente",lpeA.get(position).getCliente());
+                                            editor.putString("entregoNombre",lpeA.get(position).getNombre());
+                                            editor.putString("entregonumteluno",lpeA.get(position).getTelefonouno());
+                                            editor.putString("entregonumteldos",lpeA.get(position).getTelefonodos());
+                                            editor.putString("entregoFolio",lpeA.get(position).getFolio());
+                                            editor.putString("entregoDirec",lpeA.get(position).getDireccion());
+                                            editor.putString("entregoNumpaq",lpeA.get(position).getNumpaq());
+                                            editor.commit();
+                                            editor.apply();
+
+                                            actualizarfirma();
+                                            dialog.dismiss();
+                                            lpeA.remove(position);
+
+
+
+                                        }
+                                    });
+
+                                    dialog = builder.create();
+                                    dialog.show();
+
+
+                                    break;
+                                case R.id.btnpendiente:
+                                    android.app.AlertDialog.Builder builderepen = new android.app.AlertDialog.Builder(getContext());
+                                    LayoutInflater inflaterep = getLayoutInflater();
+                                    builderepen.setView(inflaterep.inflate(R.layout.diseno_pendiente, null))
+                                            .create().show();
+                                    break;
+
                                 default:
                                     break;
                             }
@@ -381,9 +467,15 @@ public class GalleryFragment extends Fragment {
     }
 
 
-    private void insertarfolioesc(){
 
-        String url =StrServer+"/registroR";
+    private void actualizarfirma(){
+
+        sucursalonfrima=preference.getString("entregoSucursal","");
+        folioconfirma=preference.getString("entregoFolio","");
+        recibiofir=preference.getString("recibio","");
+
+        String url =StrServer+"/recibeR";
+
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -392,9 +484,25 @@ public class GalleryFragment extends Fragment {
                     JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
 
-                    } catch (JSONException ex) {
-                    throw new RuntimeException(ex);
+                    mensajes= jsonObject.getString("Repartidores");
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
+
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                alerta.setMessage(mensajes).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("");
+                titulo.show();
+
+
 
             }
         },
@@ -416,13 +524,12 @@ public class GalleryFragment extends Fragment {
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
-                params.put("folio",escfolio);
-//                params.put("id_repartidor",);
-//                params.put("numcajas",);
-
+                params.put("folio",folioconfirma);
+                params.put("recibe",recibiofir);
                 return params;
             }
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
+
 }
