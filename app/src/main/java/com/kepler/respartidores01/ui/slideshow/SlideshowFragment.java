@@ -151,8 +151,6 @@ public class SlideshowFragment extends Fragment {
 
     }
 
-
-
     private void LeerWs(){
 
         String url =StrServer+"/pEntregados";

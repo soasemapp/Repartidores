@@ -47,28 +47,28 @@
         </EditText>
 
 
-<!--        <EditText-->
-<!--            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-<!--            android:id="@+id/id_comentario"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="15dp"-->
-<!--            android:layout_marginEnd="15dp"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:textColorHint="@color/DividerColor"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:maxLines="1"-->
-<!--            android:textSize="15dp"-->
-<!--            android:hint="Comentario:"-->
-<!--            app:boxBackgroundMode="outline"-->
-<!--            app:boxCornerRadiusTopEnd="10dp"-->
-<!--            app:boxCornerRadiusTopStart="10dp"-->
-<!--            app:counterEnabled="true"-->
-<!--            android:theme="@style/CampoTEXBlanco"-->
-<!--            android:maxLength="20"-->
-<!--            >-->
+        <EditText
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:id="@+id/id_comentario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="10dp"
+            android:textColorHint="@color/DividerColor"
+            android:textColor="@color/white"
+            android:maxLines="1"
+            android:textSize="15dp"
+            android:hint="Comentario:"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:counterEnabled="true"
+            android:theme="@style/CampoTEXBlanco"
+            android:maxLength="20"
+            >
 
-<!--        </EditText>-->
+        </EditText>
 
         <Button
             android:id="@+id/btentre"

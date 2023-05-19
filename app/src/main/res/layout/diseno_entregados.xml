@@ -60,6 +60,7 @@
                     android:text="Folio: "
                     android:textSize="15dp"
                     android:textAlignment="center"
+                    android:drawableStart="@drawable/ic_fol"
 
                     >
                 </TextView>

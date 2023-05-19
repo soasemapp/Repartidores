@@ -37,6 +37,7 @@ import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
+import com.kepler.respartidores01.Principal;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
@@ -311,28 +312,45 @@ public class GalleryFragment extends Fragment {
                                     View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
                                     builder.setView(dialogViewww);
                                     EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
+                                    EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
                                     Button enttegar=dialogViewww.findViewById(R.id.btentre);
                                     enttegar.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
                                             recibio.getText().toString();
+                                            comentario.getText().toString();
 
-                                            editor.putString("recibio",recibio.getText().toString());
-                                            editor.putString("entregoSucursal",lpeA.get(position).getSucursal());
-                                            editor.putString("entregoCliente",lpeA.get(position).getCliente());
-                                            editor.putString("entregoNombre",lpeA.get(position).getNombre());
-                                            editor.putString("entregonumteluno",lpeA.get(position).getTelefonouno());
-                                            editor.putString("entregonumteldos",lpeA.get(position).getTelefonodos());
-                                            editor.putString("entregoFolio",lpeA.get(position).getFolio());
-                                            editor.putString("entregoDirec",lpeA.get(position).getDireccion());
-                                            editor.putString("entregoNumpaq",lpeA.get(position).getNumpaq());
-                                            editor.commit();
-                                            editor.apply();
 
-                                            actualizarfirma();
-                                            dialog.dismiss();
-                                            lpeA.remove(position);
+                                            if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
+                                                editor.putString("recibio", recibio.getText().toString());
+                                                editor.putString("entregoSucursal", lpeA.get(position).getSucursal());
+                                                editor.putString("entregoCliente", lpeA.get(position).getCliente());
+                                                editor.putString("entregoNombre", lpeA.get(position).getNombre());
+                                                editor.putString("entregonumteluno", lpeA.get(position).getTelefonouno());
+                                                editor.putString("entregonumteldos", lpeA.get(position).getTelefonodos());
+                                                editor.putString("entregoFolio", lpeA.get(position).getFolio());
+                                                editor.putString("entregoDirec", lpeA.get(position).getDireccion());
+                                                editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
+                                                editor.commit();
+                                                editor.apply();
+
+                                                actualizarfirma();
+                                                dialog.dismiss();
+                                                lpeA.remove(position);
+                                            }else{
+                                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.cancel();
+                                                    }
+                                                });
+
+                                                android.app.AlertDialog titulo = alerta.create();
+                                                titulo.setTitle("Faltan casillas por rellenar");
+                                                titulo.show();
+                                            }
 
 
                                         }

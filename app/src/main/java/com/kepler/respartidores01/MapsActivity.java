@@ -75,6 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     AlertDialog.Builder builder;
    AlertDialog dialog = null;
     String[] listaDato = null;
+    String[] listtiempo = null;
 int controlador=0;
     ArrayList<String> listD=null;
     ArrayList<String> listN;
@@ -98,6 +99,7 @@ int controlador=0;
     ArrayList<String> values=new ArrayList<>();
     String direclis, nombrelist =null;
     String value=null;
+    String tiempo=null;
     String dircort=null;
     Double latcrta = 0.0;
     Double longcort=0.0;
@@ -105,6 +107,7 @@ int controlador=0;
     JSONObject routes;
     JSONObject legs;
     JSONObject distance;
+    JSONObject duration;
 
 
     @Override
@@ -189,8 +192,8 @@ int controlador=0;
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-                                        if(listD!=null){
-                                            obtdistanc();}
+
+                                            obtdistanc();
 
                                     }
                                     else {
@@ -324,8 +327,8 @@ int controlador=0;
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-                            if(listD!=null){
-                            obtdistanc();}
+
+                            obtdistanc();
 
 
                         } else {
@@ -509,6 +512,10 @@ int controlador=0;
                     values.add(value);
                     listaDato[pos] = value;
 
+                    duration=legs.getJSONObject("duration");
+                    tiempo=duration.getString("text");
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -564,4 +571,64 @@ int controlador=0;
 //        dialog.show();
     }
 
+    private void LeerWs(){
+
+        String url =StrServer+"/consulxEn";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                        jfacturas = jsonObject.getJSONObject("Repartidores");
+                        for (int i = 0; i <jfacturas.length(); i++) {
+                            jitems = jfacturas.getJSONObject("items" + i);
+                            sucu = jitems.getString("k_Sucursal");
+                            folio = jitems.getString("k_Folio");
+                            cliente = jitems.getString("k_Cliente");
+                            Nombre = jitems.getString("k_Nombre");
+                            numpaq = jitems.getString("k_nPaquetes");
+                            direccion = jitems.getString("k_Direccion");
+                            telun = jitems.getString("k_Telefono1");
+                            teld = jitems.getString("k_Telefono2");
+
+                            if(listD.get(i)==direccion){
+
+                            }
+
+                        }
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("id_repartidor",strcode);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(MapsActivity.this).add(postRequest);
+    }
 }

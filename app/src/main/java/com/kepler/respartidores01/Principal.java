@@ -7,18 +7,21 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.Time;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -75,6 +78,8 @@ public class Principal extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
@@ -87,19 +92,30 @@ public class Principal extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
 
-
-
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        MenuItem menuItem = navigationView.getMenu().getItem(4);
+
+        menuItem.setOnMenuItemClickListener(item ->{
+            if (item.getItemId() == R.id.cerrarsecion) {
+
+             editor.remove("user");
+             editor.remove("pass");
+             editor.commit();
+             editor.apply();
+                Intent inteto = new Intent(this, MainActivity.class);
+                startActivity(inteto);
+
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        });
+
+
 
         //ACCESO A ESCRIBIR O ESCANEAR EL FOLIO DESDE UN DIALOGO
         binding.appBarPrincipal.toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.action_scanner) {
-
-                Time today=new Time(Time.getCurrentTimezone());
-                today.setToNow();
-                int dia= today.monthDay;
-                int mes=today.month;
-                int ao=today.year;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 LayoutInflater inflater = this.getLayoutInflater();
@@ -193,6 +209,7 @@ public class Principal extends AppCompatActivity {
 
         textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
         textonumcajas=(EditText) dialogView.findViewById(R.id.cajatextonumc);
+
     }
 
 
