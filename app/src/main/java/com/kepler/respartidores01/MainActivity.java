@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private String[] lista;
     private ArrayAdapter<String> adapter;
     private ImageView foto;
-    String Usuario,Contraseña,Nombre,Apellidos,urlEmpresa;
+    String urlEmpresa;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String usua, conta;
@@ -65,11 +65,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
-        lista = new String[]{"Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
+        lista = new String[]{"Autodis","Vipla","Jacve", "Cecra0", "Guvi", "Pressa"};
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
         sempresas.setAdapter(adapter);
 
@@ -104,7 +103,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     urlEmpresa="http://cedistabasco.ddns.net:9085";
                 }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -149,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                editor.putString("Server", urlEmpresa);
                                editor.commit();
 
-                               Intent inteto = new Intent(MainActivity.this, Principal.class);
+                               Intent inteto = new Intent(MainActivity.this, Splash.class);
                                startActivity(inteto);
 
 
@@ -205,14 +203,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         public void verificacion(){
         if(usuraio!=null && contrasena!=null){
-            Intent inteto = new Intent(this, Principal.class);
+            Intent inteto = new Intent(this, Splash.class);
             startActivity(inteto);
 
             textusu.setText(usuraio);
             textcont.setText(contrasena);
         }
     }
-
 
     }
 

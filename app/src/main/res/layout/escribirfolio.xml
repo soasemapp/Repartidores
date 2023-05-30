@@ -10,13 +10,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/cajatextfolio"
         android:hint="@string/dialog_hint"
-        android:text="000"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:inputType="number"
         android:maxLength="7"
+        android:imeOptions="actionNext"
         />
+
 
     <EditText
         android:layout_width="match_parent"
@@ -27,6 +28,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:inputType="number"
+        android:imeOptions="actionNext"
         />
     <LinearLayout
         android:layout_width="155dp"

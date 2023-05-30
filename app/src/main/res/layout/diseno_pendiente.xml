@@ -39,6 +39,7 @@
             app:boxCornerRadiusTopEnd="10dp"
             app:boxCornerRadiusTopStart="10dp"
             app:counterEnabled="true"
+            android:textColor="@color/white"
             app:counterMaxLength="18">
 
         </EditText>

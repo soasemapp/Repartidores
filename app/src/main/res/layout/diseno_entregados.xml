@@ -29,6 +29,7 @@
                     android:textSize="20dp"
                     android:textAlignment="center"
                     android:textColor="@color/black"
+                    android:textStyle="bold"
                     />
 
                 <TextView
@@ -40,6 +41,7 @@
                     android:layout_marginBottom="10dp"
                     android:textAlignment="center"
                     android:textColor="@color/black"
+                    android:textStyle="bold"
                     >
                 </TextView>
 
@@ -101,6 +103,38 @@
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:id="@+id/id_fecha"
+                        android:textSize="15dp"
+                        android:textAlignment="textStart"
+                        android:textColor="@color/black"
+                        >
+                    </TextView>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/trxhora"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="55dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="Hora: "
+                        android:textSize="15dp"
+                        android:textAlignment="center"
+                        android:drawableStart="@drawable/ic_hora"
+                        >
+                    </TextView>
+                    <TextView
+                        android:layout_marginTop="5dp"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/id_hora"
                         android:textSize="15dp"
                         android:textAlignment="textStart"
                         android:textColor="@color/black"

@@ -50,12 +50,10 @@ import java.util.Map;
 public class SlideshowFragment extends Fragment {
     ListView listapacentregados;
     ListView lisdf;
-    RecyclerView lisdff;
     ArrayList<PedidosEntregados> lpE=new ArrayList<>();
 
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strfolio, strnombre, strtelefono1, strtelefono2, strsucursal;
     String strcodBra, StrServer, strbranch, struser, strpass, strcode;
     TextView fol,cli,nom,npac,tun,tdos,di;
     AlertDialog.Builder builder;
@@ -125,7 +123,7 @@ public class SlideshowFragment extends Fragment {
 
     public class HackingBackgroundTaskken extends AsyncTask<Void, Void, Void> {
 
-        static final int DURACION = 4 * 1000; // 4 segundo de carga
+        static final int DURACION = 5 * 1000; // 4 segundo de carga
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -135,13 +133,13 @@ public class SlideshowFragment extends Fragment {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // Retornar en nuevos elementos para el adaptador
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            lpE.clear();
 
             LeerWs();
 
@@ -154,14 +152,13 @@ public class SlideshowFragment extends Fragment {
     private void LeerWs(){
 
         String url =StrServer+"/pEntregados";
-
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente;
+                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, hora;
 
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -177,8 +174,10 @@ public class SlideshowFragment extends Fragment {
                             teld = jitems.getString("k_Telefono2");
                             direccion=jitems.getString("k_Direccion");
                             recibio = jitems.getString("k_recibo");
+                            fecha = jitems.getString("k_Fecha");
+                            hora = jitems.getString("k_Hora");
 
-                            lpE.add(new PedidosEntregados(sucursal,cliente,"",Nombre,telun,teld,folio,direccion,recibio));
+                            lpE.add(new PedidosEntregados(sucursal,cliente,"",Nombre,telun,teld,folio,direccion,recibio,fecha,hora));
                         }
                     }else{
                         if(lpE.size()==0) {

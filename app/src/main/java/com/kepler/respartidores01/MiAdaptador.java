@@ -56,6 +56,7 @@ public class MiAdaptador extends BaseAdapter {
         TextView tvNombres = vistaDiseno.findViewById(R.id.txtNombre);
         TextView tvtelefonouno =vistaDiseno.findViewById(R.id.txttelefono1);
         TextView tvtelefodos =vistaDiseno.findViewById(R.id.txttelefonodos);
+        TextView tvtfolio=vistaDiseno.findViewById(R.id.txtfol);
         ImageButton irmap=vistaDiseno.findViewById(R.id.btn_iramap_lis);
         Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
         Button entreado=vistaDiseno.findViewById(R.id.btnntregar);
@@ -65,6 +66,7 @@ public class MiAdaptador extends BaseAdapter {
             tvNombres.setText(auxi.Nombre);
             tvtelefonouno.setText(auxi.Telefonouno);
             tvtelefodos.setText(auxi.Telefonodos);
+            tvtfolio.setText(auxi.Folio);
             irmap.setTag(position);
             detafac.setTag(position);
             entreado.setTag(position);

@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.format.Time;
-import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -49,7 +46,7 @@ public class Principal extends AppCompatActivity {
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
     public EditText textfolio, textonumcajas, textocajasescaner;
-    public ArrayList<String> folios= new ArrayList<>();
+
     public String usaFolio;
         String numcajas="1" ;
    public ArrayList<Pedidos> lpeA=new ArrayList<>();
@@ -210,6 +207,60 @@ public class Principal extends AppCompatActivity {
         textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
         textonumcajas=(EditText) dialogView.findViewById(R.id.cajatextonumc);
 
+
+        textfolio.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                usaFolio =textfolio.getText().toString();
+                numcajas=textonumcajas.getText().toString();
+
+                if(!usaFolio.equals("")) {
+                    if (usaFolio.length() < 7) {
+                        int fo = usaFolio.length();
+                        switch (fo) {
+                            case 1:
+                                usaFolio = "000000" + usaFolio;
+                                break;
+                            case 2:
+                                usaFolio = "00000" + usaFolio;
+                                break;
+                            case 3:
+                                usaFolio ="0000" + usaFolio;
+                                break;
+                            case 4:
+                                usaFolio ="000" + usaFolio;
+                                break;
+                            case 5:
+                                usaFolio ="00" + usaFolio;
+                                break;
+                            case 6:
+                                usaFolio = "0" + usaFolio;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    textfolio.setText(usaFolio);
+                }else{
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                    alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Ingrese el folio porfavor");
+                    titulo.show();
+                }
+
+                return false;
+            }
+        });
+
     }
 
 
@@ -256,11 +307,14 @@ public class Principal extends AppCompatActivity {
                         lpeA.add(new Pedidos("","", "", Nombre,telun,teld,folio,Direccion,""));
 
                         insertarfolioesc();
+
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                         alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+                                textfolio.setText(null);
+                                textonumcajas.setText(null);
                             }
                         });
 
@@ -281,6 +335,9 @@ public class Principal extends AppCompatActivity {
                         android.app.AlertDialog titulo = alerta.create();
                         titulo.setTitle("No existe");
                         titulo.show();
+
+                        usaFolio="";
+
                     }
 
 
@@ -317,9 +374,41 @@ public class Principal extends AppCompatActivity {
 
     //boton del alert para guardar el folio escrito
   public void guardarfolio(View v){
-        usaFolio =textfolio.getText().toString();
-        numcajas=textonumcajas.getText().toString();
-        if(!usaFolio.equals("")){
+
+      usaFolio =textfolio.getText().toString();
+      numcajas=textonumcajas.getText().toString();
+
+      if(!usaFolio.equals("")) {
+          if (usaFolio.length() < 7) {
+              int fo = usaFolio.length();
+              switch (fo) {
+                  case 1:
+                      usaFolio = "000000" + usaFolio;
+                      break;
+                  case 2:
+                      usaFolio = "00000" + usaFolio;
+                      break;
+                  case 3:
+                      usaFolio = "0000" + usaFolio;
+                      break;
+                  case 4:
+                      usaFolio = "000" + usaFolio;
+                      break;
+                  case 5:
+                      usaFolio = "00" + usaFolio;
+                      break;
+                  case 6:
+                      usaFolio = "0" + usaFolio;
+                      break;
+
+                  default:
+                      break;
+              }
+          }
+          textfolio.setText(usaFolio);
+      }
+
+        if(!usaFolio.equals("") && !numcajas.equals("")){
            LeerWs();
 
         }else{
@@ -332,7 +421,7 @@ public class Principal extends AppCompatActivity {
             });
 
             android.app.AlertDialog titulo = alerta.create();
-            titulo.setTitle("Ingrese el folio porfavor");
+            titulo.setTitle("Ingrese el folio y el numero de cajas porfavor");
             titulo.show();
         }
     }
@@ -381,8 +470,6 @@ public class Principal extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(postRequest);
-
     }
-
 
 }

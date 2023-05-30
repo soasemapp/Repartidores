@@ -35,12 +35,25 @@
         <TextView
             android:layout_width="200dp"
             android:layout_height="wrap_content"
+            android:id="@+id/txtfol"
+            android:layout_gravity="center"
+            android:textSize="15dp"
+            android:textAlignment="center"
+            android:drawableStart="@drawable/ic_fol"
+            android:textColor="@color/black"
+            >
+        </TextView>
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
             android:id="@+id/txttelefono1"
             android:layout_gravity="center"
             android:textSize="15dp"
             android:textAlignment="center"
             android:drawableStart="@drawable/ic_telefonouno"
             android:textColor="@color/black"
+            android:layout_marginTop="5dp"
             >
         </TextView>
 
@@ -56,6 +69,7 @@
             android:textColor="@color/black"
             >
         </TextView>
+
 
         <LinearLayout
             android:layout_width="250dp"
@@ -116,7 +130,6 @@
                 android:layout_marginLeft="10dp"
                 android:backgroundTint="#B3FFFFFF"
                 android:textColor="@color/ColorRojoTenue"
-
                 />
 
 

@@ -6,13 +6,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -32,12 +30,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
-import com.kepler.respartidores01.HackingBackgroundTask;
 import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
-import com.kepler.respartidores01.Principal;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
@@ -63,17 +59,14 @@ public class GalleryFragment extends Fragment {
 
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strfolio, strnombre, strtelefono1, strtelefono2, strsucursal, struser, strcode, strbranch, strpass;
+    String  struser, strcode, strbranch, strpass;
     String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc =null;
-    List<String> folios= new ArrayList<>();
-    Button detfac;
+
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
     private TextView sucur;
     TextView fol,cli,nom,npac,tun,tdos,di;
-    TextView vmpro, vmcan, vmdes;
 
-    Bundle datosescfolio;
     Set<String> setD = new HashSet<>();
     Set<String> setN = new HashSet<>();
     Set<String> setC = new HashSet<>();
@@ -82,8 +75,9 @@ public class GalleryFragment extends Fragment {
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
     String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec;
-    String folioconfirma, sucursalonfrima, recibiofir;
+    String folioconfirma, sucursalonfrima, recibiofir, comentariog;
     private SwipeRefreshLayout refreshLayout;
+    String estatus;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -117,7 +111,6 @@ public class GalleryFragment extends Fragment {
         escdireccion = preference.getString("direccionescrito", "null");
         escnumc=preference.getString("numc","");
 
-
         entregorc= preference.getString("recibio","");
         entregodirec=preference.getString("entregoDirec","");
 
@@ -133,18 +126,16 @@ public class GalleryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
                         new HackingBackgroundTaskk().execute();
-                         //refreshLayout.setRefreshing(false);
                     }
 
                 }
         );
         refreshLayout.setColorSchemeResources(R.color.ColorRojoTenue);
-       // refreshLayout.setRefreshing(false);
  }
 
     public class HackingBackgroundTaskk extends AsyncTask<Void, Void, Void> {
 
-        static final int DURACION = 4 * 1000; // 3 segundos de carga
+        static final int DURACION = 5 * 1000; // 3 segundos de carga
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -161,6 +152,7 @@ public class GalleryFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            lpeA.clear();
             LeerWs();
 
             refreshLayout.setRefreshing(false);
@@ -172,10 +164,10 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        //binding = null;
     }
 
     private void LeerWs(){
+
 
         String url =StrServer+"/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -203,12 +195,7 @@ public class GalleryFragment extends Fragment {
 
                             lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,""));
                             setD.add(direccion);
-                            setN.add(Nombre);
-                            setC.add(cliente);
-                            int b= setN.size();
                             editor.putStringSet("Direcciones", setD);
-                            editor.putStringSet("Nombres", setN);
-                            editor.putStringSet("Clientes", setC);
                             editor.commit();
                             editor.apply();
 
@@ -306,6 +293,8 @@ public class GalleryFragment extends Fragment {
                                     break;
 
                                 case R.id.btnntregar:
+                                    comentariog=null;
+                                    estatus=null;
 
                                     builder = new AlertDialog.Builder(getContext());
                                     LayoutInflater inflaterentrega = getLayoutInflater();
@@ -317,6 +306,7 @@ public class GalleryFragment extends Fragment {
                                     enttegar.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
+                                            estatus="E";
                                             recibio.getText().toString();
                                             comentario.getText().toString();
 
@@ -332,6 +322,7 @@ public class GalleryFragment extends Fragment {
                                                 editor.putString("entregoFolio", lpeA.get(position).getFolio());
                                                 editor.putString("entregoDirec", lpeA.get(position).getDireccion());
                                                 editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
+                                                editor.putString("Comentario", comentario.getText().toString());
                                                 editor.commit();
                                                 editor.apply();
 
@@ -362,10 +353,54 @@ public class GalleryFragment extends Fragment {
 
                                     break;
                                 case R.id.btnpendiente:
-                                    android.app.AlertDialog.Builder builderepen = new android.app.AlertDialog.Builder(getContext());
-                                    LayoutInflater inflaterep = getLayoutInflater();
-                                    builderepen.setView(inflaterep.inflate(R.layout.diseno_pendiente, null))
-                                            .create().show();
+                                    comentariog=null;
+                                    estatus=null;
+
+                                    builder = new AlertDialog.Builder(getContext());
+                                    LayoutInflater inflatependi = getLayoutInflater();
+                                    View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
+                                    builder.setView(dialogVie);
+
+                                    EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
+                                    Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
+
+                                    pendiente.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View view) {
+                                            estatus="P";
+                                            compendiente.getText().toString();
+
+                                            if(!compendiente.getText().toString().equals("")) {
+
+                                                editor.putString("entregoFolio", lpeA.get(position).getFolio());
+                                                editor.putString("Comentario", compendiente.getText().toString());
+                                                editor.commit();
+                                                editor.apply();
+
+                                                actualizarfirma();
+                                                dialog.dismiss();
+
+                                            }else{
+                                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        dialogInterface.cancel();
+                                                    }
+                                                });
+
+                                                android.app.AlertDialog titulo = alerta.create();
+                                                titulo.setTitle("Faltan casillas por rellenar");
+                                                titulo.show();
+                                            }
+
+                                        }
+                                    });
+
+                                    dialog = builder.create();
+                                    dialog.show();
+
+
                                     break;
 
                                 default:
@@ -488,9 +523,10 @@ public class GalleryFragment extends Fragment {
 
     private void actualizarfirma(){
 
-        sucursalonfrima=preference.getString("entregoSucursal","");
         folioconfirma=preference.getString("entregoFolio","");
         recibiofir=preference.getString("recibio","");
+        comentariog=preference.getString("Comentario","");
+
 
         String url =StrServer+"/recibeR";
 
@@ -498,8 +534,6 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 try {
-                    JSONObject jfacturas;
-                    JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
 
                     mensajes= jsonObject.getString("Repartidores");
@@ -519,8 +553,6 @@ public class GalleryFragment extends Fragment {
                 android.app.AlertDialog titulo = alerta.create();
                 titulo.setTitle("");
                 titulo.show();
-
-
 
             }
         },
@@ -544,6 +576,8 @@ public class GalleryFragment extends Fragment {
                 params.put("sucursal",strbranch);
                 params.put("folio",folioconfirma);
                 params.put("recibe",recibiofir);
+                params.put("status",estatus);
+                params.put("comentario",comentariog);
                 return params;
             }
         };

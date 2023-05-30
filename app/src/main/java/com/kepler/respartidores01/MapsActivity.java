@@ -19,10 +19,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
@@ -67,20 +67,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ActivityMapsBinding binding;
     private final static int LOCATION_REQUEST_CODE = 1;
     private final static int SETTINGS_REQUEST_CODE = 2;
-    public ArrayList<Pedidos> lpeA=new ArrayList<>();
     Set<String> setD = new HashSet<>();
-    Set<String> setN = new HashSet<>();
-    Set<String> setC = new HashSet<>();
+
+    String mensajes;
 
     AlertDialog.Builder builder;
    AlertDialog dialog = null;
     String[] listaDato = null;
     String[] listtiempo = null;
+    String[] linombres=null;
+    String[] lifolio=null;
+    String estatus;
+
 int controlador=0;
     ArrayList<String> listD=null;
-    ArrayList<String> listN;
-    ArrayList<String> listC;
-    ArrayList<String> listV;
 
     private boolean actualposition = true;
     double longitudorigen;
@@ -91,7 +91,7 @@ int controlador=0;
     Geocoder coddirmap;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strdirecccion, struser,
+    String strusr, strpass,  StrServer, strcodBra, strcode,  struser,
     strbranch;
     List<Address> address= new ArrayList<>();
     ArrayList<LatLng> puntosdireccion = new ArrayList<>();
@@ -102,12 +102,14 @@ int controlador=0;
     String tiempo=null;
     String dircort=null;
     Double latcrta = 0.0;
+    String tiempocorto=null;
     Double longcort=0.0;
-    ArrayList<String> urls=new ArrayList<>();
     JSONObject routes;
     JSONObject legs;
     JSONObject distance;
     JSONObject duration;
+    String direccortaparaentregar, folioparaentregar;
+    String nombrequienrecibio, comentarioentre;
 
 
     @Override
@@ -129,15 +131,10 @@ int controlador=0;
         strcode=preference.getString("code","");
 
          setD = preference.getStringSet("Direcciones",null);
-//         setN = preference.getStringSet("Nombres",null);
-//        setC = preference.getStringSet("Clientes",null);
 
 
         if(setD!=null){
         listD = new ArrayList<String>(setD);}
-//        listN=new ArrayList<String>(setN);
-//        listC=new ArrayList<String>(setC);
-
 
         direclis =null;
         nombrelist =null;
@@ -146,11 +143,6 @@ int controlador=0;
 
         direclis= parametros.getString("directlista");
         nombrelist=parametros.getString("nombre_direccion");
-
-
-//            for(int j=0; j<listN.size(); j++){
-//            lpeA.add(new Pedidos("",listC.get(j),"",listN.get(j),"","","",listD.get(j),""));
-//        }
 
 
 
@@ -187,13 +179,13 @@ int controlador=0;
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                                         CameraPosition cameraPositio = new CameraPosition.Builder()
                                                 .target(miUbicacion)
-                                                .zoom(17)
+                                                .zoom(15)
                                                 .bearing(90)
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-
-                                            obtdistanc();
+                                        if (listD!=null){
+                                            obtdistanc();}
 
                                     }
                                     else {
@@ -221,10 +213,11 @@ int controlador=0;
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                                         CameraPosition cameraPosition = new CameraPosition.Builder()
                                                 .target(marcadr)
-                                                .zoom(17)
+                                                .zoom(15)
                                                 .bearing(90)
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                                         obtdistanc();
                                     }
                                     direclis=null;
@@ -267,24 +260,8 @@ int controlador=0;
 
         mMap = googleMap;
 
-            //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
-            coder = new Geocoder(MapsActivity.this);
-            for (int i = 0; i < listD.size(); i++) {
-                try {
-                    address = coder.getFromLocationName(listD.get(i), 3);
-                    Address resultadoscode = address.get(0);
-                    resultadoscode.getLatitude();
-                    resultadoscode.getLongitude();
-                    puntosdireccion.add(i, new LatLng(resultadoscode.getLatitude(), resultadoscode.getLongitude()));
-
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            //Dibuja todos los marcadores en el mapa
-            for (int i = 0; i < puntosdireccion.size(); i++) {
-                mMap.addMarker(new MarkerOptions().position(puntosdireccion.get(i)).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
-            }
+        if (listD!=null){
+        nombre();}
 
 
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -322,14 +299,13 @@ int controlador=0;
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                             CameraPosition cameraPositio = new CameraPosition.Builder()
                                     .target(miUbicacion)
-                                    .zoom(17)
+                                    .zoom(15)
                                     .bearing(90)
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-
-                            obtdistanc();
-
+                            if (listD!=null){
+                            obtdistanc();}
 
                         } else {
                             Double dircelisLAT;
@@ -357,21 +333,20 @@ int controlador=0;
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(marcadr)
-                                    .zoom(17)
+                                    .zoom(15)
                                     .bearing(90)
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                             obtdistanc();
 
                         }
                         direclis = null;
-
                     }
                 }
 
             };
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 3000, locationListener);
-
         }
 //        mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
 //            @Override
@@ -382,12 +357,18 @@ int controlador=0;
     }
 
     public void funcion() {
+        TextView tiempoc= findViewById(R.id.tiempo_id);
 
         int Valor = Integer.parseInt(listaDato[0]);
-       // lpeA.set(0,new Pedidos("","","","","","","",listD.get(0),listaDato[0]));
+
         dircort=listD.get(0);
         latcrta=puntosdireccion.get(0).latitude;
         longcort=puntosdireccion.get(0).longitude;
+        tiempocorto=listtiempo[0];
+
+        editor.putString("dircort", listD.get(0));
+        editor.commit();
+        editor.apply();
 
         for (int i = 1; i < listaDato.length; i++) {
 
@@ -395,11 +376,19 @@ int controlador=0;
 
             } else {
                 Valor = Integer.parseInt(listaDato[i]);
-               // lpeA.set(i,new Pedidos("","","","","","","",listD.get(i),listaDato[i]));
+
                 dircort=listD.get(i);
                 latcrta=puntosdireccion.get(i).latitude;
                 longcort=puntosdireccion.get(i).longitude;
+                tiempocorto=listtiempo[i];
 
+                editor.remove("dircort");
+                editor.commit();
+                editor.apply();
+
+                editor.putString("dircort", listD.get(i));
+                editor.commit();
+                editor.apply();
             }
         }
 
@@ -416,6 +405,10 @@ int controlador=0;
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                tiempoc.setVisibility(View.VISIBLE);
+                tiempoc.setText("Tiempo: "+tiempocorto);
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -430,6 +423,7 @@ int controlador=0;
     public void obtdistanc()
     {
         listaDato = new String[puntosdireccion.size()];
+        listtiempo = new String[puntosdireccion.size()];
 
         for (int i = 0; i < puntosdireccion.size(); i++) {
             LatLng nuevo = puntosdireccion.get(i);
@@ -437,7 +431,6 @@ int controlador=0;
             ingresarDatos(i,url);
         }
     }
-
 
     private void trazarRuta(JSONObject jso) {
         JSONArray jRoutes;
@@ -490,14 +483,6 @@ int controlador=0;
                 }).create().show();
     }
 
-    public void estaentregado(View vi){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        builder.setView(inflater.inflate(R.layout.recibio_, null))
-                .create().show();
-
-    }
-
     public void ingresarDatos(int pos, String url)
     {
         StringRequest stringRequesttt = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -515,6 +500,7 @@ int controlador=0;
                     duration=legs.getJSONObject("duration");
                     tiempo=duration.getString("text");
 
+                    listtiempo[pos]=tiempo;
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -537,41 +523,58 @@ int controlador=0;
         controlador++;
     }
 
-    public void entregado()
+    public void entregado(View v)
     {
-//        builder = new AlertDialog.Builder(this);
-//        LayoutInflater inflaterentrega = getLayoutInflater();
-//        View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
-//        builder.setView(dialogViewww);
-//        EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
-//        Button enttegar=dialogViewww.findViewById(R.id.btentre);
-//        enttegar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                recibio.getText().toString();
-//                //folioconfirma=lpeA.get(position).getFolio();
-//                //sucursalonfrima=lpeA.get(position).getSucursal();
-//
-//                editor.putString("recibio",recibio.getText().toString());
-//                editor.putString("entregoSucursal",lpeA.get().getSucursal());
-//                editor.putString("entregoCliente",lpeA.get().getCliente());
-//                editor.putString("entregoNombre",lpeA.get().getNombre());
-//                editor.putString("entregonumteluno",lpeA.get().getTelefonouno());
-//                editor.putString("entregonumteldos",lpeA.get().getTelefonodos());
-//                editor.putString("entregoFolio",lpeA.get().getFolio());
-//                editor.putString("entregoDirec",lpeA.get().getDireccion());
-//                editor.putString("entregoNumpaq",lpeA.get().getNumpaq());
-//                editor.commit();
-//                editor.apply();
-//
-//            }
-//        });
-//
-//        dialog = builder.create();
-//        dialog.show();
+        builder = new AlertDialog.Builder(this);
+        LayoutInflater inflaterentrega = getLayoutInflater();
+        View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+        builder.setView(dialogViewww);
+        EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
+        EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
+        Button enttegar=dialogViewww.findViewById(R.id.btentre);
+        enttegar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                estatus="E";
+                recibio.getText().toString();
+                comentario.getText().toString();
+
+
+                if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+
+                    editor.putString("recibio", recibio.getText().toString());
+                    editor.putString("comentario", comentario.getText().toString());
+                    editor.commit();
+                    editor.apply();
+
+                    rec();
+
+
+                }else{
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                    alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Faltan casillas por rellenar");
+                    titulo.show();
+                }
+
+
+            }
+        });
+
+        dialog = builder.create();
+        dialog.show();
+
     }
 
-    private void LeerWs(){
+    private void nombre(){
+        linombres = new String[listD.size()];
 
         String url =StrServer+"/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -595,8 +598,11 @@ int controlador=0;
                             telun = jitems.getString("k_Telefono1");
                             teld = jitems.getString("k_Telefono2");
 
-                            if(listD.get(i)==direccion){
-
+                            for (int j=0; j<listD.size(); j++) {
+                                String ok=listD.get(j);
+                                if (Objects.equals(ok, direccion)) {
+                                    linombres[j] = Nombre;
+                                }
                             }
 
                         }
@@ -604,6 +610,8 @@ int controlador=0;
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
+
+                agregarnombres();
 
             }
         },
@@ -626,6 +634,150 @@ int controlador=0;
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
                 params.put("id_repartidor",strcode);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(MapsActivity.this).add(postRequest);
+    }
+    public void agregarnombres(){
+
+        //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
+        coder = new Geocoder(MapsActivity.this);
+        for (int i = 0; i < listD.size(); i++) {
+            try {
+                address = coder.getFromLocationName(listD.get(i), 3);
+                Address resultadoscode = address.get(0);
+                resultadoscode.getLatitude();
+                resultadoscode.getLongitude();
+                puntosdireccion.add(i, new LatLng(resultadoscode.getLatitude(), resultadoscode.getLongitude()));
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        //Dibuja todos los marcadores en el mapa
+        for (int i = 0; i < puntosdireccion.size(); i++) {
+            mMap.addMarker(new MarkerOptions().position(puntosdireccion.get(i)).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)).title(linombres[i]));
+        }
+    }
+
+    public void rec(){
+        direccortaparaentregar=preference.getString("dircort","");
+
+        String url =StrServer+"/consulxEn";
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    jfacturas = jsonObject.getJSONObject("Repartidores");
+                    for (int i = 0; i <jfacturas.length(); i++) {
+                        jitems = jfacturas.getJSONObject("items" + i);
+                        sucu = jitems.getString("k_Sucursal");
+                        folio = jitems.getString("k_Folio");
+                        cliente = jitems.getString("k_Cliente");
+                        Nombre = jitems.getString("k_Nombre");
+                        numpaq = jitems.getString("k_nPaquetes");
+                        direccion = jitems.getString("k_Direccion");
+                        telun = jitems.getString("k_Telefono1");
+                        teld = jitems.getString("k_Telefono2");
+
+                            if (Objects.equals(direccortaparaentregar, direccion)) {
+                               folioparaentregar=folio;
+                            }
+                    }
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+                actualizarfirma();
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("id_repartidor",strcode);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(MapsActivity.this).add(postRequest);
+    }
+    private void actualizarfirma(){
+        nombrequienrecibio=preference.getString("recibio","");
+        comentarioentre=preference.getString("comentario","");
+
+        String url =StrServer+"/recibeR";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jfacturas;
+                    JSONObject jitems;
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    mensajes= jsonObject.getString("Repartidores");
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+                android.app.AlertDialog.Builder alerta = new AlertDialog.Builder(MapsActivity.this);
+                alerta.setMessage(mensajes).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("");
+                titulo.show();
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("folio",folioparaentregar);
+                params.put("recibe",nombrequienrecibio);
+                params.put("status", estatus);
+                params.put("comentario",comentarioentre);
                 return params;
             }
         };
