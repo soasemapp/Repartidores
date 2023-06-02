@@ -70,7 +70,7 @@ public class SlideshowFragment extends Fragment {
 
     Button fechas;
     Boolean banderafecha=false;
-    Adapterentregados miAdaptador;
+    Adapterentregados miAdaptador = null;
     TextView fechatex;
 
 
@@ -140,7 +140,6 @@ public class SlideshowFragment extends Fragment {
 
 
         fechas=getView().findViewById(R.id.btm_fecha);
-        int ultimoAnio = 0, ultimoMes = 0, ultimoDiaDelMes = 0;
 
         fechas.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,9 +187,34 @@ public class SlideshowFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+
+
+
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH) ;
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            int mes= month + 1;
+            String fecha= year + "-" + mes + "-"+day;
+
+            SimpleDateFormat sdff = new SimpleDateFormat("yyyy-MM-dd");
+            Date dates;
+            try {
+                dates = new Date(sdff.parse(fecha).getTime());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            fechaselec=sdff.format(dates);
+
             lpE.clear();
 
             LeerWs();
+
+            String nommes= meeses(mes);
+
+            String nomfec= day +" de " +nommes+ " de "+ year;
+            fechatex.setText(nomfec);
 
             // Parar la animación del indicador
             refreshLayout.setRefreshing(false);
@@ -238,7 +262,9 @@ public class SlideshowFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     dialogInterface.cancel();
-                                    miAdaptador.notifyDataSetChanged();
+                                    if(miAdaptador!=null) {
+                                        miAdaptador.notifyDataSetChanged();
+                                    }
                                 }
                             });
 
