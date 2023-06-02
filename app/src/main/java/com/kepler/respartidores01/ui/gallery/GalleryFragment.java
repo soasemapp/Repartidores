@@ -323,6 +323,7 @@ public class GalleryFragment extends Fragment {
                                                 editor.putString("entregoDirec", lpeA.get(position).getDireccion());
                                                 editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
                                                 editor.putString("Comentario", comentario.getText().toString());
+                                                editor.putInt("posicion", position);
                                                 editor.commit();
                                                 editor.apply();
 
@@ -526,6 +527,7 @@ public class GalleryFragment extends Fragment {
         folioconfirma=preference.getString("entregoFolio","");
         recibiofir=preference.getString("recibio","");
         comentariog=preference.getString("Comentario","");
+        int posi= preference.getInt("posicion",0);
 
 
         String url =StrServer+"/recibeR";
@@ -547,6 +549,8 @@ public class GalleryFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
+//                        lpeA.remove(posi);
+
                     }
                 });
 

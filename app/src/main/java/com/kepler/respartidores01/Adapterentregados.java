@@ -14,7 +14,8 @@ import java.util.ArrayList;
 public class Adapterentregados extends BaseAdapter {
     private Context c;
     private int diseno;
-    private ArrayList<PedidosEntregados> ap;
+    private ArrayList<PedidosEntregados> ap=null;
+
 
     public Adapterentregados(Context c, int diseno, ArrayList<PedidosEntregados> ap) {
         this.c = c;

@@ -1,8 +1,9 @@
 package com.kepler.respartidores01.ui.slideshow;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,15 +11,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.AuthFailureError;
@@ -29,41 +31,47 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
 import com.kepler.respartidores01.Adapterentregados;
-import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.Mdestallefac;
-import com.kepler.respartidores01.MiAdaptador;
-import com.kepler.respartidores01.Pedidos;
 import com.kepler.respartidores01.PedidosEntregados;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentSlideshowBinding;
-import com.kepler.respartidores01.ui.gallery.GalleryFragment;
-import com.kepler.respartidores01.ui.gallery.GalleryViewModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class SlideshowFragment extends Fragment {
     ListView listapacentregados;
     ListView lisdf;
-    ArrayList<PedidosEntregados> lpE=new ArrayList<>();
+    ArrayList<PedidosEntregados> lpE = new ArrayList<>();
 
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strcodBra, StrServer, strbranch, struser, strpass, strcode;
-    TextView fol,cli,nom,npac,tun,tdos,di;
+    TextView fol, cli, nom, npac, tun, tdos, di;
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
     String DFfolio, DFsucursal, DFcliente, DFnombre;
     String producto, descripcion, cantidad, entregorc;
     String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis;
 
+    String fechaselec=null;
+    private String fec;
     private SwipeRefreshLayout refreshLayout;
     public ArrayList<Mdestallefac> ldf=new ArrayList<>();
+
+    Button fechas;
+    Boolean banderafecha=false;
+    Adapterentregados miAdaptador;
+    TextView fechatex;
 
 
     private FragmentSlideshowBinding binding;
@@ -101,8 +109,49 @@ public class SlideshowFragment extends Fragment {
         entregodirec= preference.getString("entregoDirec","");
         entregonumpaq= preference.getString("entregoNumpaq","");
 
+        fechatex=getView().findViewById(R.id.fechatext);
+
+        //para obtener la fecha actual
+
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH) ;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        int mes= month + 1;
+        String fecha= year + "-" + mes + "-"+day;
+
+        SimpleDateFormat sdff = new SimpleDateFormat("yyyy-MM-dd");
+        Date dates;
+        try {
+            dates = new Date(sdff.parse(fecha).getTime());
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        fechaselec=sdff.format(dates);
+
         lpE.clear();
         LeerWs();
+
+       String nommes= meeses(mes);
+
+        String nomfec= day +" de " +nommes+ " de "+ year;
+        fechatex.setText(nomfec);
+
+
+        fechas=getView().findViewById(R.id.btm_fecha);
+        int ultimoAnio = 0, ultimoMes = 0, ultimoDiaDelMes = 0;
+
+        fechas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // Le pasamos lo que haya en las globales
+                DatePickerDialog dialogoFecha = new DatePickerDialog(getContext(), listenerDeDatePicker,  year, month,  day);
+                dialogoFecha.show();
+            }
+        });
+
 
         refreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefresh);
 
@@ -149,7 +198,9 @@ public class SlideshowFragment extends Fragment {
 
     }
 
-    private void LeerWs(){
+    public void LeerWs(){
+        lpE.clear();
+        listapacentregados = (ListView)getView().findViewById(R.id.listaentregados);
 
         String url =StrServer+"/pEntregados";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -158,7 +209,7 @@ public class SlideshowFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, hora;
+                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, horas;
 
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -175,9 +226,10 @@ public class SlideshowFragment extends Fragment {
                             direccion=jitems.getString("k_Direccion");
                             recibio = jitems.getString("k_recibo");
                             fecha = jitems.getString("k_Fecha");
-                            hora = jitems.getString("k_Hora");
+                            horas = jitems.getString("k_Hora");
 
-                            lpE.add(new PedidosEntregados(sucursal,cliente,"",Nombre,telun,teld,folio,direccion,recibio,fecha,hora));
+                                lpE.add(new PedidosEntregados(sucursal, cliente, "", Nombre, telun, teld, folio, direccion, recibio, fecha, horas));
+
                         }
                     }else{
                         if(lpE.size()==0) {
@@ -186,23 +238,26 @@ public class SlideshowFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     dialogInterface.cancel();
+                                    miAdaptador.notifyDataSetChanged();
                                 }
                             });
 
                             android.app.AlertDialog titulo = alerta.create();
                             titulo.setTitle("Sin paquetes etregados");
                             titulo.show();
+
                         }
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
 
+
                 if(lpE.size()!=0){
-                    listapacentregados = (ListView)getView().findViewById(R.id.listaentregados);
-                    Adapterentregados miAdaptador = new Adapterentregados(getActivity(), R.layout.diseno_entregados, lpE);
+                     miAdaptador = new Adapterentregados(getActivity(), R.layout.diseno_entregados, lpE);
                     listapacentregados.setAdapter(miAdaptador);
 
+                    banderafecha=false;
                     listapacentregados.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -282,6 +337,7 @@ public class SlideshowFragment extends Fragment {
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
                 params.put("id_repartidor",strcode);
+                params.put("fecha",fechaselec);
                 return params;
             }
         };
@@ -371,9 +427,89 @@ public class SlideshowFragment extends Fragment {
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
     }
+
+    public DatePickerDialog.OnDateSetListener listenerDeDatePicker = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int anio, int mes, int diaDelMes) {
+
+            int y=   view.getYear();
+            int m=  view.getMonth() ;
+            int d=  view.getDayOfMonth();
+
+            int mess= m+1;
+
+            String fecha= y + "-" +mess + "-"+d;
+            Date date;
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            try {
+                date = new Date(sdf.parse(fecha).getTime());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+            fec=sdf.format(date);
+
+            fechaselec=fec;
+
+            LeerWs();
+
+            String nommes= meeses(mess);
+
+            String nomfec= d +" de " +nommes+ " de "+ y;
+            fechatex.setText(nomfec);
+        }
+    };
+
+    public String meeses(int valor){
+        String nombremes = null;
+        switch (valor){
+
+            case 1:
+                nombremes="Ene .";
+                break;
+            case 2:
+                nombremes="Feb.";
+                break;
+            case 3:
+                nombremes="Mar.";
+                break;
+            case 4:
+                nombremes="Abr.";
+                break;
+            case 5:
+                nombremes="May.";
+                break;
+            case 6:
+                nombremes="Jun.";
+                break;
+            case 7:
+                nombremes="Jul.";
+                break;
+            case 8:
+                nombremes="Agto.";
+                break;
+            case 9:
+                nombremes="Sept.";
+                break;
+            case 10:
+                nombremes="Oct.";
+                break;
+            case 11:
+                nombremes="Nov.";
+                break;
+            case 12:
+                nombremes="Dic.";
+                break;
+        }
+        return nombremes;
+    }
+
 }
