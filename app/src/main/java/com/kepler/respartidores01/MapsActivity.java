@@ -208,7 +208,8 @@ int controlador=0;
 
                                         LatLng marcadr = new LatLng(dircelisLAT, dircelisLONG);
 
-                                        mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicación").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
+                                        mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicación")
+                                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
                                         mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
                                         mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                                         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -743,7 +744,7 @@ int controlador=0;
                 }
 
                 android.app.AlertDialog.Builder alerta = new AlertDialog.Builder(MapsActivity.this);
-                alerta.setMessage(mensajes).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                alerta.setMessage(mensajes + " con folio: "+ folioparaentregar).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
