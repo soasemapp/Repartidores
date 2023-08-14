@@ -1,11 +1,13 @@
 package com.kepler.respartidores01;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -21,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -80,6 +83,7 @@ public class Principal extends AppCompatActivity {
         setSupportActionBar(binding.appBarPrincipal.toolbar);
         binding.appBarPrincipal.toolbar.setTitleTextColor(Color.WHITE);
 
+
         binding.appBarPrincipal.toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,13 +92,22 @@ public class Principal extends AppCompatActivity {
             }
         });
 
+        if (ActivityCompat.checkSelfPermission(Principal.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(Principal.this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+            } else {
+                ActivityCompat.requestPermissions(Principal.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+        }
+
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity, R.id.cerrarsecion)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity,R.id.mapsActivityTodos, R.id.cerrarsecion)
                 .setOpenableLayout(drawer)
                 .build();
 
@@ -103,18 +116,17 @@ public class Principal extends AppCompatActivity {
 
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        MenuItem menuItem = navigationView.getMenu().getItem(4);
+        MenuItem menuItem = navigationView.getMenu().getItem(5);
 
         menuItem.setOnMenuItemClickListener(item ->{
             if (item.getItemId() == R.id.cerrarsecion) {
 
-             editor.remove("user");
-             editor.remove("pass");
-             editor.commit();
-             editor.apply();
-                Intent inteto = new Intent(this, MainActivity.class);
-                startActivity(inteto);
-
+                editor.clear().commit();
+                editor.apply();
+                Intent cerrar = new Intent(this, MainActivity.class);
+                startActivity(cerrar);
+                System.exit(0);
+                finish();
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -316,7 +328,8 @@ public class Principal extends AppCompatActivity {
                         editor.commit();
 
                         ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                        lpeA.add(new Pedidos("","", "", Nombre,telun,teld,folio,Direccion,""));
+                        lpeA.add(new Pedidos("","","", Nombre, telun, teld, folio, Direccion,"","","",0.0,0.0,0,"",0,""));
+
 
                         insertarfolioesc();
 
@@ -482,6 +495,27 @@ public class Principal extends AppCompatActivity {
             }
         };
         Volley.newRequestQueue(this).add(postRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        android.app.AlertDialog.Builder mensaje = new android.app.AlertDialog.Builder(this);
+        mensaje.setTitle("¿Desea salir de la aplicacion?");
+        mensaje.setCancelable(false);
+        mensaje.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+                System.exit(0);
+
+            }
+        });
+        mensaje.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        mensaje.show();
     }
 
 

@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,15 +60,27 @@ public class MiAdaptador extends BaseAdapter {
         TextView tvtelefodos =vistaDiseno.findViewById(R.id.txttelefonodos);
         TextView tvtfolio=vistaDiseno.findViewById(R.id.txtfol);
         ImageButton irmap=vistaDiseno.findViewById(R.id.btn_iramap_lis);
-        Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
+        LinearLayout detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
         Button entreado=vistaDiseno.findViewById(R.id.btnntregar);
         Button pendiente=vistaDiseno.findViewById(R.id.btnpendiente);
-
+        LinearLayout viewcomentario = vistaDiseno.findViewById(R.id.viewcomentario);
+        ImageView img = vistaDiseno.findViewById(R.id.imgpendiente);
+        TextView id_comentario = vistaDiseno.findViewById(R.id.id_comentario);
 
             tvNombres.setText(auxi.Nombre);
             tvtelefonouno.setText(auxi.Telefonouno);
             tvtelefodos.setText(auxi.Telefonodos);
             tvtfolio.setText(auxi.Folio);
+            id_comentario.setText(auxi.comentario);
+
+            if (auxi.status.equals("P")){
+                viewcomentario.setVisibility(View.VISIBLE);
+                img.setVisibility(View.VISIBLE);
+            }else{
+                viewcomentario.setVisibility(View.GONE);
+                img.setVisibility(View.GONE);
+            }
+
             irmap.setTag(position);
             detafac.setTag(position);
             entreado.setTag(position);

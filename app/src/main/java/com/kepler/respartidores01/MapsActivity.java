@@ -1,5 +1,7 @@
 package com.kepler.respartidores01;
 
+import static androidx.test.InstrumentationRegistry.getContext;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -92,7 +94,7 @@ int controlador=0;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
     String strusr, strpass,  StrServer, strcodBra, strcode,  struser,
-    strbranch;
+    strbranch,strname, strlname;;
     List<Address> address= new ArrayList<>();
     ArrayList<LatLng> puntosdireccion = new ArrayList<>();
     int clave=0;
@@ -129,6 +131,16 @@ int controlador=0;
         strpass=preference.getString("pass","");
         strbranch=preference.getString("branch","");
         strcode=preference.getString("code","");
+
+
+        strcodBra = preference.getString("codBra", "null");
+        StrServer = preference.getString("Server", "null");
+        struser = preference.getString("user", "");
+        strpass = preference.getString("pass", "");
+        strname = preference.getString("name", "null");
+        strlname = preference.getString("lname", "null");
+        strbranch = preference.getString("branch", "");
+        strcode = preference.getString("code", "");
 
          setD = preference.getStringSet("Direcciones",null);
 
@@ -185,7 +197,8 @@ int controlador=0;
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
                                         if (listD!=null){
-                                            obtdistanc();}
+                                            obtdistanc();
+                                        }
 
                                     }
                                     else {
@@ -262,7 +275,8 @@ int controlador=0;
         mMap = googleMap;
 
         if (listD!=null){
-        nombre();}
+        nombre();
+        }
 
 
         if (ActivityCompat.checkSelfPermission(MapsActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -296,7 +310,7 @@ int controlador=0;
                                 mMarker.remove();
                             }
 
-                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
+                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.drawable.repartidor2)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
                             CameraPosition cameraPositio = new CameraPosition.Builder()
                                     .target(miUbicacion)
@@ -329,8 +343,8 @@ int controlador=0;
 
                             LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
 
-                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title("Mi ubicacion").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_mimarkpin)));
-                            mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist).icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_markrojo)));
+                            mMarker = mMap.addMarker(new MarkerOptions().position(miUbicacion).title(strname).icon(BitmapDescriptorFactory.fromResource(R.drawable.repartidor2)));
+                            mMarker = mMap.addMarker(new MarkerOptions().position(marcadr).title(nombrelist).icon(BitmapDescriptorFactory.fromResource(R.drawable.local2)));
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(marcadr));
                             CameraPosition cameraPosition = new CameraPosition.Builder()
                                     .target(marcadr)
@@ -356,6 +370,12 @@ int controlador=0;
 //            }
 //        });
     }
+
+
+
+
+
+
 
     public void funcion() {
         TextView tiempoc= findViewById(R.id.tiempo_id);
@@ -393,7 +413,7 @@ int controlador=0;
             }
         }
 
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + latcrta +"," + longcort + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + latcrta +"," + longcort + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
 
         RequestQueue queue = Volley.newRequestQueue(MapsActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -428,7 +448,7 @@ int controlador=0;
 
         for (int i = 0; i < puntosdireccion.size(); i++) {
             LatLng nuevo = puntosdireccion.get(i);
-            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyAOjhQhJdgBE8AtwovY0_2reTUniizC5xI";
+            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
             ingresarDatos(i,url);
         }
     }
@@ -490,7 +510,7 @@ int controlador=0;
             @Override
             public void onResponse(String response) {
                 try {
-                    JSONObject jso = new JSONObject(response);
+                  JSONObject jso = new JSONObject(response);
                     routes = jso.getJSONArray("routes").getJSONObject(0);
                     legs = routes.getJSONArray("legs").getJSONObject(0);
                     distance = legs.getJSONObject("distance");
@@ -517,7 +537,7 @@ int controlador=0;
             @Override
             public void onErrorResponse(VolleyError volleyError)
             {
-
+                Toast.makeText(MapsActivity.this, volleyError.toString(), Toast.LENGTH_SHORT).show();
             }
         });
         Volley.newRequestQueue(this).add(stringRequesttt);
@@ -587,17 +607,14 @@ int controlador=0;
                     String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
                     JSONObject jsonObject = new JSONObject(response);
 
+                    int json=response.length();
+
+                    if (json != 6) {
                         jfacturas = jsonObject.getJSONObject("Repartidores");
                         for (int i = 0; i <jfacturas.length(); i++) {
                             jitems = jfacturas.getJSONObject("items" + i);
-                            sucu = jitems.getString("k_Sucursal");
-                            folio = jitems.getString("k_Folio");
-                            cliente = jitems.getString("k_Cliente");
                             Nombre = jitems.getString("k_Nombre");
-                            numpaq = jitems.getString("k_nPaquetes");
                             direccion = jitems.getString("k_Direccion");
-                            telun = jitems.getString("k_Telefono1");
-                            teld = jitems.getString("k_Telefono2");
 
                             for (int j=0; j<listD.size(); j++) {
                                 String ok=listD.get(j);
@@ -607,12 +624,32 @@ int controlador=0;
                             }
 
                         }
+                        agregarnombres();
+
+                    }else{
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                        alerta.setMessage("No hay entregas pendientes por realizar").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                                Intent regresa = new Intent(MapsActivity.this,Principal.class);
+                                startActivity(regresa);
+                                finish();
+
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Entregas");
+                        titulo.show();
+                    }
+
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
 
-                agregarnombres();
+
 
             }
         },
@@ -748,6 +785,9 @@ int controlador=0;
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
+                        Intent regresar = new Intent(MapsActivity.this,Principal.class);
+                        startActivity(regresar);
+                        finish();
                     }
                 });
 
@@ -784,4 +824,7 @@ int controlador=0;
         };
         Volley.newRequestQueue(MapsActivity.this).add(postRequest);
     }
+
+
+
 }

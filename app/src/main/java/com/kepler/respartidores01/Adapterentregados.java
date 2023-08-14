@@ -56,6 +56,7 @@ public class Adapterentregados extends BaseAdapter {
         TextView tvfolio=vistaDiseno.findViewById(R.id.id_foli_Entre);
         TextView tvfecha=vistaDiseno.findViewById(R.id.id_fecha);
         TextView tvhora=vistaDiseno.findViewById(R.id.id_hora);
+        TextView Comentarios=vistaDiseno.findViewById(R.id.id_comentario);
         Button detafac= vistaDiseno.findViewById(R.id.btn_detallefac);
 
 
@@ -65,6 +66,7 @@ public class Adapterentregados extends BaseAdapter {
         tvfolio.setText(auxi.Folio);
         tvfecha.setText(auxi.fecha);
         tvhora.setText(auxi.hora);
+        Comentarios.setText(auxi.Comentarios);
         detafac.setTag(position);
 
         detafac.setOnClickListener(new View.OnClickListener() {

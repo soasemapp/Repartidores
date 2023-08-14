@@ -35,5 +35,10 @@
         tools:layout="@layout/activity_main"
 
         />
+    <activity
+        android:id="@+id/mapsActivityTodos"
+        android:name="com.kepler.respartidores01.MapsTodos"
+        android:label="activity_maps_todos"
+        tools:layout="@layout/activity_maps_todos" />
 
 </navigation>

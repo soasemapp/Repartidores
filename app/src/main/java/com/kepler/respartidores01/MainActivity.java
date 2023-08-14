@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         usuraio = preference.getString("user", null);
         contrasena = preference.getString("pass", null);
 
-        verificacion();
+        //verificacion();
         spinner();
     }
 
@@ -68,9 +68,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
-        lista = new String[]{"Autodis","Vipla","Jacve", "Cecra0", "Guvi", "Pressa"};
+       //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR","DEMO"};
+      lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
+
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
         sempresas.setAdapter(adapter);
+
+//        sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//
+//                String selection = (String) adapterView.getItemAtPosition(i);
+//
+//                if(selection=="AUTOTOP"){
+//                    foto.setImageResource(R.drawable.autotop);
+//                    urlEmpresa="http://autotop.ath.cx:9090";
+//
+//                }else if (selection=="TOTALCAR"){
+//                    foto.setImageResource(R.drawable.totalcar);
+//                    urlEmpresa="http://autotop.ath.cx:9085";
+//
+//                } else if (selection=="DEMO") {
+//                    foto.setImageResource(R.drawable.logo);
+//                    urlEmpresa="http://autotop.ath.cx:9080";
+//
+//                } else {
+//                    foto.setImageResource(R.drawable.logo);
+//                    urlEmpresa="";
+//                }
+//            }
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
 
         sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -84,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 }else if (selection=="Vipla"){
                     foto.setImageResource(R.drawable.vipla);
-                    urlEmpresa="";
+                    urlEmpresa="http://sprautomotive.servehttp.com:9085";
 
                 } else if (selection=="Jacve") {
                     foto.setImageResource(R.drawable.jacve);
@@ -101,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }else if (selection=="Pressa"){
                     foto.setImageResource(R.drawable.pressa);
                     urlEmpresa="http://cedistabasco.ddns.net:9085";
+                }else {
+                    foto.setImageResource(R.drawable.logo);
+                    urlEmpresa="";
                 }
             }
             @Override
@@ -109,17 +143,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-    }
+   }
     public void sendMessage(View view){
         usua = textusu.getText().toString();
         conta= textcont.getText().toString();
-        LeerWs();
+
+        if(!urlEmpresa.equals("")){
+            LeerWs();
+        }else{
+            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MainActivity.this);
+            alerta.setMessage("No se ah seleccionado ningun Servidor porfavor seleccione alguno").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            android.app.AlertDialog titulo = alerta.create();
+            titulo.setTitle("Seleccione un Servidor");
+            titulo.show();
+        }
+
     }
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         }
+
 
         private void LeerWs(){
         String url =urlEmpresa+"/loginr";
@@ -129,13 +180,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 public void onResponse(String response) {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-
-                       if(response.length()>60) {
+var tamaño =response.length();
+                       if(tamaño>71) {
                            jsonObject = jsonObject.getJSONObject("UserInfo");
                            editor.putString("user", usua);
                            editor.putString("pass", conta);
 
                            if (jsonObject.getString("k_type").equals("REPAR")) {
+
+
+                             String Nombre = jsonObject.getString("k_name");
+                             String lname= jsonObject.getString("k_lname");
+                             String tipo= jsonObject.getString("k_type");
+                             String branch=  jsonObject.getString("k_branch");
+                             String mail=  jsonObject.getString("k_mail1");
+                             String code=  jsonObject.getString("k_kcode");
+                             String desc= jsonObject.getString("k_dscr");
+
+
+
 
                                editor.putString("name", jsonObject.getString("k_name"));
                                editor.putString("lname", jsonObject.getString("k_lname"));
@@ -149,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                Intent inteto = new Intent(MainActivity.this, Splash.class);
                                startActivity(inteto);
+                               finish();
 
 
                            } else {
@@ -201,14 +265,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Volley .newRequestQueue(this).add(postRequest);
         }
 
-        public void verificacion(){
-        if(usuraio!=null && contrasena!=null){
-            Intent inteto = new Intent(this, Splash.class);
-            startActivity(inteto);
+//        public void verificacion(){
+//        if(usuraio!=null && contrasena!=null){
+//            Intent inteto = new Intent(this, Splash.class);
+//            startActivity(inteto);
+//            finish();
+//
+//            textusu.setText(usuraio);
+//            textcont.setText(contrasena);
+//        }
+//    }
 
-            textusu.setText(usuraio);
-            textcont.setText(contrasena);
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (preference.contains("user") && preference.contains("pass")) {
+            Intent perfil = new Intent(this, Splash.class);
+            startActivity(perfil);
+            finish();
         }
+
     }
 
     }

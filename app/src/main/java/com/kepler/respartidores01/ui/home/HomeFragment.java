@@ -47,6 +47,8 @@ public class HomeFragment extends Fragment {
         strbran = preference.getString("NameBra", "null");
         stremail=preference.getString("email","null");
 
+
+
         nanmereparti = (TextView) getView().findViewById(R.id.name_repartidor);
         apellido_repartidor= (TextView) getView().findViewById(R.id.last_repartidor);
         descrepartidor= (TextView) getView().findViewById(R.id.descr);

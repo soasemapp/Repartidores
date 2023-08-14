@@ -16,11 +16,13 @@ public class AdapeterDetallefac extends BaseAdapter {
     private Context c;
     private int diseno;
     private ArrayList<Mdestallefac> ap;
+    String StrServer;
 
-    public AdapeterDetallefac(Context c, int diseno, ArrayList<Mdestallefac> ap) {
+    public AdapeterDetallefac(Context c, int diseno, ArrayList<Mdestallefac> ap,String StrServer) {
         this.c = c;
         this.diseno = diseno;
         this.ap = ap;
+        this.StrServer=StrServer;
     }
 
     @Override
@@ -54,9 +56,21 @@ public class AdapeterDetallefac extends BaseAdapter {
         TextView tvdescripcion =vistaDiseno.findViewById(R.id.id_descripcion_dfvm);
         TextView tvcantidad =vistaDiseno.findViewById(R.id.id_cantidad_dfvm);
 
+
         tvproducto.setText(auxi.producto);
         tvdescripcion.setText(auxi.descripcion);
         tvcantidad.setText(auxi.cantidad);
+
+
+        if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+
+            TextView preciouni =vistaDiseno.findViewById(R.id.id_preciou_dfvm);
+            TextView preciototal =vistaDiseno.findViewById(R.id.id_total_dfvm);
+            preciouni.setVisibility(View.VISIBLE);
+            preciototal.setVisibility(View.VISIBLE);
+            preciouni.setText(auxi.getPreciou());
+            preciototal.setText(auxi.getPrecioTotal());
+        }
 
         return vistaDiseno;
     }

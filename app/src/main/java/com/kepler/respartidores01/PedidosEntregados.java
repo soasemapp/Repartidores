@@ -12,8 +12,9 @@ public class PedidosEntregados {
     String recibio;
     String fecha;
     String hora;
+    String Comentarios;
 
-    public PedidosEntregados(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String recibio, String fecha, String hora) {
+    public PedidosEntregados(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String recibio, String fecha, String hora, String comentarios) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -25,6 +26,7 @@ public class PedidosEntregados {
         this.recibio = recibio;
         this.fecha = fecha;
         this.hora = hora;
+        Comentarios = comentarios;
     }
 
     public String getSucursal() {
@@ -94,13 +96,32 @@ public class PedidosEntregados {
     public String getRecibio() {
         return recibio;
     }
+
     public void setRecibio(String recibio) {
         this.recibio = recibio;
     }
+
     public String getFecha() {
         return fecha;
     }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getHora() {
+        return hora;
+    }
+
     public void setHora(String hora) {
         this.hora = hora;
+    }
+
+    public String getComentarios() {
+        return Comentarios;
+    }
+
+    public void setComentarios(String comentarios) {
+        Comentarios = comentarios;
     }
 }

@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     buildFeatures {
         viewBinding true
@@ -45,10 +45,12 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'androidx.test:monitor:1.5.0'
     implementation 'androidx.test.ext:junit:1.1.5'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.27'
     //noinspection GradleDynamicVersion
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation "androidx.core:core-splashscreen:1.0.0"
 

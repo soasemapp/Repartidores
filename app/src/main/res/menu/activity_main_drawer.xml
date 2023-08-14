@@ -22,6 +22,12 @@
             android:id="@+id/mapsActivity"
             android:title="@string/menu_mapa"
             android:icon="@drawable/ic_mapa"
+            android:visible="false"
+            />
+        <item
+            android:id="@+id/mapsActivityTodos"
+            android:title="Mapa"
+            android:icon="@drawable/ic_mapa"
             />
         <item
             android:id="@+id/cerrarsecion"

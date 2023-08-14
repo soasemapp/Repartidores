@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ import java.util.Objects;
 public class SlideshowFragment extends Fragment {
     ListView listapacentregados;
     ListView lisdf;
+    TextView txtpu,txtpt;
     ArrayList<PedidosEntregados> lpE = new ArrayList<>();
 
     private SharedPreferences preference;
@@ -61,7 +63,7 @@ public class SlideshowFragment extends Fragment {
     AlertDialog dialog = null;
     String DFfolio, DFsucursal, DFcliente, DFnombre;
     String producto, descripcion, cantidad, entregorc;
-    String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis;
+    String entregosucu, entregofolio, entregonombre, entregocliente, entregonumpaq, entregoteluno, entregonumdos, entregodirec, entregodis,preciounitario="",preciototal="";;
 
     String fechaselec=null;
     private String fec;
@@ -72,6 +74,9 @@ public class SlideshowFragment extends Fragment {
     Boolean banderafecha=false;
     Adapterentregados miAdaptador = null;
     TextView fechatex;
+    String Sucursal,Folios,Nombres;
+    android.app.AlertDialog.Builder builder6;
+    android.app.AlertDialog dialog6 = null;
 
 
     private FragmentSlideshowBinding binding;
@@ -131,6 +136,10 @@ public class SlideshowFragment extends Fragment {
         fechaselec=sdff.format(dates);
 
         lpE.clear();
+        builder6 = new android.app.AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.pantallacarga, null);
+
         LeerWs();
 
        String nommes= meeses(mes);
@@ -233,7 +242,7 @@ public class SlideshowFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, horas;
+                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, horas,Comentarios;
 
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -251,8 +260,8 @@ public class SlideshowFragment extends Fragment {
                             recibio = jitems.getString("k_recibo");
                             fecha = jitems.getString("k_Fecha");
                             horas = jitems.getString("k_Hora");
-
-                                lpE.add(new PedidosEntregados(sucursal, cliente, "", Nombre, telun, teld, folio, direccion, recibio, fecha, horas));
+                            Comentarios =jitems.getString("k_Comentario");
+                                lpE.add(new PedidosEntregados(sucursal, cliente, "", Nombre, telun, teld, folio, direccion, recibio, fecha, horas,Comentarios));
 
                         }
                     }else{
@@ -287,6 +296,8 @@ public class SlideshowFragment extends Fragment {
                     listapacentregados.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
                             int viewId = view.getId();
                             switch (viewId) {
 
@@ -321,15 +332,14 @@ public class SlideshowFragment extends Fragment {
                                             }).setNegativeButton("Ver mas ", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                                    editor.putString("Sucursal", lpE.get(position).getSucursal());
-                                                    editor.putString("Clientes",lpE.get(position).getCliente());
-                                                    editor.putString("Folios",lpE.get(position).getFolio());
-                                                    editor.putString("Nombres",lpE.get(position).getNombre());
-                                                    editor.putInt("posicion",position);
-                                                    editor.commit();
-                                                    editor.apply();
 
-                                                    detalleFactura();
+
+                                                            Sucursal =lpE.get(position).getSucursal();
+                                                            Folios =lpE.get(position).getFolio();
+                                                            Nombres=lpE.get(position).getCliente();
+
+
+                                                    detalleFactura(Sucursal,Folios,Nombres);
                                                 }
                                             });
                                     dialog = builder.create();
@@ -370,20 +380,14 @@ public class SlideshowFragment extends Fragment {
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
-    private void detalleFactura(){
+    private void detalleFactura(String Sucursal,String Folios,String Nombres){
         int pos;
         ldf.clear();
 
-        preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
-        editor = preference.edit();
 
-        DFsucursal=preference.getString("Sucursal","");
-        DFcliente=preference.getString("Clientes","");
-        DFfolio=preference.getString("Folios","");
-        DFnombre=preference.getString("Nombres","");
-        pos=preference.getInt("posicion",0);
 
-        String url =StrServer+"/detafactuR";
+
+        String url =StrServer+"/detallefac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -398,7 +402,11 @@ public class SlideshowFragment extends Fragment {
                         producto = jitems.getString("k_Producto");
                         descripcion = jitems.getString("k_Descripcion");
                         cantidad = jitems.getString("k_Cantidad");
-                        ldf.add(new Mdestallefac(producto,descripcion,cantidad));
+                        if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+                            preciounitario = jitems.getString("k_preciou");
+                            preciototal = jitems.getString("k_preciototal");
+                        }
+                        ldf.add(new Mdestallefac(producto,descripcion,cantidad,preciounitario,preciototal));
                     }
 
                 } catch (JSONException e) {
@@ -412,11 +420,18 @@ public class SlideshowFragment extends Fragment {
 
                // lisdff=dialogVieww.findViewById(R.id.lis_detfac);
                 lisdf = dialogVieww.findViewById(R.id.lis_detfac);
-                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf);
+
+                txtpu=(TextView)dialogVieww.findViewById(R.id.txvpru);
+                txtpt=(TextView)dialogVieww.findViewById(R.id.txvprt);
+                if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+                    txtpu.setVisibility(View.VISIBLE);
+                    txtpt.setVisibility(View.VISIBLE);
+                }
+                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf,StrServer);
                 lisdf.setAdapter(miAdaptador);
 
                 builder.setView(dialogVieww)
-                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                             }
@@ -445,8 +460,8 @@ public class SlideshowFragment extends Fragment {
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
-                params.put("cliente",DFcliente);
-                params.put("folio",DFfolio);
+                params.put("cliente",Nombres);
+                params.put("folio",Folios);
                 return params;
             }
         };
@@ -499,7 +514,7 @@ public class SlideshowFragment extends Fragment {
         switch (valor){
 
             case 1:
-                nombremes="Ene .";
+                nombremes="Ene.";
                 break;
             case 2:
                 nombremes="Feb.";

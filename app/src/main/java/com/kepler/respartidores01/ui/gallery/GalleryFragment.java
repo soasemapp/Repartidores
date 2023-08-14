@@ -1,11 +1,13 @@
 package com.kepler.respartidores01.ui.gallery;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
 import com.kepler.respartidores01.MapsActivity;
+import com.kepler.respartidores01.MapsSolo;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
@@ -39,11 +42,11 @@ import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +55,7 @@ public class GalleryFragment extends Fragment {
     private FragmentGalleryBinding binding;
     ListView lista;
     ListView lisdf;
+    TextView txtpu,txtpt;
     int j;
     public ArrayList<Pedidos> lpeA=new ArrayList<>();
     public ArrayList<Mdestallefac> ldf=new ArrayList<>();
@@ -74,10 +78,15 @@ public class GalleryFragment extends Fragment {
 
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
-    String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec;
+    String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec,preciounitario="",preciototal="";
     String folioconfirma, sucursalonfrima, recibiofir, comentariog;
     private SwipeRefreshLayout refreshLayout;
     String estatus;
+
+    String Sucursal,Folios,Nombres;
+    android.app.AlertDialog.Builder builder6;
+    android.app.AlertDialog dialog6 = null;
+
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -113,8 +122,12 @@ public class GalleryFragment extends Fragment {
 
         entregorc= preference.getString("recibio","");
         entregodirec=preference.getString("entregoDirec","");
-
+        setD.clear();
         lpeA.clear();
+        builder6 = new android.app.AlertDialog.Builder(getActivity());
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.pantallacarga, null);
+
         LeerWs();
 
         // Obtener el refreshLayout
@@ -167,8 +180,8 @@ public class GalleryFragment extends Fragment {
     }
 
     private void LeerWs(){
-
-
+        lpeA.clear();
+        setD.clear();
         String url =StrServer+"/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -176,7 +189,8 @@ public class GalleryFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq,comentario,status,direccionclave;
+                    Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
 
 
@@ -192,20 +206,28 @@ public class GalleryFragment extends Fragment {
                             direccion = jitems.getString("k_Direccion");
                             telun = jitems.getString("k_Telefono1");
                             teld = jitems.getString("k_Telefono2");
+                            comentario = jitems.getString("k_Comentario");
+                            status = jitems.getString("k_Status");
+                            direccionclave = jitems.getString("k_direccionCla");
+                            latitud = jitems.getDouble("k_Latitud");
+                            longitud = jitems.getDouble("k_Longitud");
 
-                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,""));
+
+                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,comentario,status,direccionclave,latitud,longitud,0,"",0,""));
                             setD.add(direccion);
-                            editor.putStringSet("Direcciones", setD);
-                            editor.commit();
-                            editor.apply();
+
 
                         }
+
+
                     } else {
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                         alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
+
                             }
                         });
 
@@ -266,15 +288,13 @@ public class GalleryFragment extends Fragment {
                                             }).setNegativeButton("ver mas", new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                                    editor.putString("Sucursal", lpeA.get(position).getSucursal());
-                                                    editor.putString("Clientes",lpeA.get(position).getCliente());
-                                                    editor.putString("Folios",lpeA.get(position).getFolio());
-                                                    editor.putString("Nombres",lpeA.get(position).getNombre());
-                                                    editor.putInt("posicion",position);
-                                                    editor.commit();
-                                                    editor.apply();
 
-                                                    detalleFactura();
+                                                    Sucursal =lpeA.get(position).getSucursal();
+                                                    Folios =lpeA.get(position).getFolio();
+                                                    Nombres=lpeA.get(position).getCliente();
+
+
+                                                    detalleFactura(Sucursal,Folios,Nombres);
                                                 }
                                             });
                                     dialog = builder.create();
@@ -282,14 +302,30 @@ public class GalleryFragment extends Fragment {
                                     break;
 
                                 case R.id.btn_iramap_lis:
-                                    String ok = lpeA.get(position).getDireccion();
+                                   /* String ok = lpeA.get(position).getDireccion();
                                     Bundle extras = new Bundle();
                                     extras.putString("directlista", ok);
                                     extras.putString("nombre_direccion", lpeA.get(position).getNombre());
                                     Intent intent = new Intent(getContext(), MapsActivity.class);
                                     intent.putExtras(extras);
-                                    startActivity(intent);
+                                    startActivity(intent);*/
 
+
+
+                                    Bundle extras = new Bundle();
+                                    extras.putString("directlista",  lpeA.get(position).getDireccion());
+                                    extras.putString("nombre_direccion", lpeA.get(position).getNombre());
+                                    extras.putString("clave_cliente", lpeA.get(position).getCliente());
+                                    extras.putDouble("latitud", lpeA.get(position).getLatitud());
+                                    extras.putDouble("longitud", lpeA.get(position).getLongitud());
+                                    extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
+                                    extras.putString("folios", lpeA.get(position).getFolio());
+
+
+
+                                    Intent intent = new Intent(getContext(), MapsSolo.class);
+                                    intent.putExtras(extras);
+                                    startActivity(intent);
                                     break;
 
                                 case R.id.btnntregar:
@@ -438,21 +474,15 @@ public class GalleryFragment extends Fragment {
         Volley.newRequestQueue(getActivity()).add(postRequest);
 }
 
-    private void detalleFactura(){
+    private void detalleFactura(String Sucursal,String Folios,String Nombres){
         int pos;
         ldf.clear();
 
-        preference= getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
-        editor = preference.edit();
 
-        DFsucursal=preference.getString("Sucursal","");
-        DFcliente=preference.getString("Clientes","");
-        DFfolio=preference.getString("Folios","");
-        DFnombre=preference.getString("Nombres","");
-        pos=preference.getInt("posicion",0);
 
-        String url =StrServer+"/detafactuR";
+        String url =StrServer+"/detallefac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @SuppressLint("MissingInflatedId")
             @Override
             public void onResponse(String response) {
                 try {
@@ -466,7 +496,12 @@ public class GalleryFragment extends Fragment {
                         producto = jitems.getString("k_Producto");
                         descripcion = jitems.getString("k_Descripcion");
                         cantidad = jitems.getString("k_Cantidad");
-                        ldf.add(new Mdestallefac(producto,descripcion,cantidad));
+                       if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+                           preciounitario = jitems.getString("k_preciou");
+                           preciototal = jitems.getString("k_preciototal");
+                       }
+
+                        ldf.add(new Mdestallefac(producto,descripcion,cantidad,preciounitario,preciototal));
                     }
 
                 } catch (JSONException e) {
@@ -478,11 +513,18 @@ public class GalleryFragment extends Fragment {
                 View dialogVieww = inflater.inflate(R.layout.ver_mas_df, null);
 
                 lisdf = (ListView) dialogVieww.findViewById(R.id.lis_detfac);
-                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf);
+
+                txtpu=(TextView)dialogVieww.findViewById(R.id.txvpru);
+                txtpt=(TextView)dialogVieww.findViewById(R.id.txvprt);
+                if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+                    txtpu.setVisibility(View.VISIBLE);
+                    txtpt.setVisibility(View.VISIBLE);
+                }
+                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf,StrServer);
                 lisdf.setAdapter(miAdaptador);
 
                 builder.setView(dialogVieww)
-                        .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                             }
@@ -512,8 +554,8 @@ public class GalleryFragment extends Fragment {
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
                 params.put("sucursal",strbranch);
-                params.put("cliente",DFcliente);
-                params.put("folio",DFfolio);
+                params.put("cliente",Nombres);
+                params.put("folio",Folios);
                 return params;
             }
         };

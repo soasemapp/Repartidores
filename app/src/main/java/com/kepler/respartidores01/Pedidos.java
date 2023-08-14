@@ -13,9 +13,17 @@ public class Pedidos {
     String Telefonodos;
     String Folio;
     String direccion;
-    String distance;
+    String comentario;
+    String status;
+    String direccionclave;
+    Double latitud;
+    Double longitud;
+    int Distancia;
+    String DistanciaText;
+    int Tiempo;
+    String TiempoValor;
 
-    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String distance) {
+    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -24,7 +32,15 @@ public class Pedidos {
         Telefonodos = telefonodos;
         Folio = folio;
         this.direccion = direccion;
-        this.distance=distance;
+        this.comentario = comentario;
+        this.status = status;
+        this.direccionclave = direccionclave;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        Distancia = distancia;
+        DistanciaText = distanciaText;
+        Tiempo = tiempo;
+        TiempoValor = tiempoValor;
     }
 
     public String getSucursal() {
@@ -90,11 +106,76 @@ public class Pedidos {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    public String getDistance() {
-        return distance;
+
+    public String getComentario() {
+        return comentario;
     }
 
-    public void setDistance(String distance) {
-        this.distance = distance;
+    public void setComentario(String comentario) {
+        this.comentario = comentario;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDireccionclave() {
+        return direccionclave;
+    }
+
+    public void setDireccionclave(String direccionclave) {
+        this.direccionclave = direccionclave;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(Double latitud) {
+        this.latitud = latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(Double longitud) {
+        this.longitud = longitud;
+    }
+
+    public int getDistancia() {
+        return Distancia;
+    }
+
+    public void setDistancia(int distancia) {
+        Distancia = distancia;
+    }
+
+    public String getDistanciaText() {
+        return DistanciaText;
+    }
+
+    public void setDistanciaText(String distanciaText) {
+        DistanciaText = distanciaText;
+    }
+
+    public int getTiempo() {
+        return Tiempo;
+    }
+
+    public void setTiempo(int tiempo) {
+        Tiempo = tiempo;
+    }
+
+    public String getTiempoValor() {
+        return TiempoValor;
+    }
+
+    public void setTiempoValor(String tiempoValor) {
+        TiempoValor = tiempoValor;
     }
 }
