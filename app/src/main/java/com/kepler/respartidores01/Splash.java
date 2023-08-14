@@ -39,104 +39,67 @@ public class Splash extends AppCompatActivity {
 
         StrServer = preference.getString("Server", "null");
 
-        switch (StrServer) {
-            case "http://jacve.dyndns.org:9085":
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.jacve)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-                break;
-            case "http://sprautomotive.servehttp.com:9085":
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.vipla)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-                break;
-            case "http://cecra.ath.cx:9085":
-
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.cecra)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-
-                break;
-            case "http://guvi.ath.cx:9085":
-
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.guvi)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-
-                break;
-            case "http://cedistabasco.ddns.net:9085":
-
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.pressa)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-
-                break;
-            case "http://autodis.ath.cx:9085":
-
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.autodis)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-
-                break;
-
-
-
-
-            default:
-                Picasso.with(getApplicationContext()).
-                        load(R.drawable.logo)
-                        .error(R.drawable.logo)
-                        .fit()
-                        .centerInside()
-                        .into(imgVi);
-
-                break;
-        }
-
-
 //        switch (StrServer) {
-//            case "http://autotop.ath.cx:9090":
+//            case "http://jacve.dyndns.org:9085":
 //                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.autotop)
+//                        load(R.drawable.jacve)
 //                        .error(R.drawable.logo)
 //                        .fit()
 //                        .centerInside()
 //                        .into(imgVi);
 //                break;
-//            case "http://autotop.ath.cx:9085":
+//            case "http://sprautomotive.servehttp.com:9085":
 //                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.totalcar)
+//                        load(R.drawable.vipla)
 //                        .error(R.drawable.logo)
 //                        .fit()
 //                        .centerInside()
 //                        .into(imgVi);
 //                break;
-//            case "http://autotop.ath.cx:9080":
+//            case "http://cecra.ath.cx:9085":
+//
 //                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.logo)
+//                        load(R.drawable.cecra)
 //                        .error(R.drawable.logo)
 //                        .fit()
 //                        .centerInside()
 //                        .into(imgVi);
+//
 //                break;
+//            case "http://guvi.ath.cx:9085":
+//
+//                Picasso.with(getApplicationContext()).
+//                        load(R.drawable.guvi)
+//                        .error(R.drawable.logo)
+//                        .fit()
+//                        .centerInside()
+//                        .into(imgVi);
+//
+//                break;
+//            case "http://cedistabasco.ddns.net:9085":
+//
+//                Picasso.with(getApplicationContext()).
+//                        load(R.drawable.pressa)
+//                        .error(R.drawable.logo)
+//                        .fit()
+//                        .centerInside()
+//                        .into(imgVi);
+//
+//                break;
+//            case "http://autodis.ath.cx:9085":
+//
+//                Picasso.with(getApplicationContext()).
+//                        load(R.drawable.autodis)
+//                        .error(R.drawable.logo)
+//                        .fit()
+//                        .centerInside()
+//                        .into(imgVi);
+//
+//                break;
+//
+//
+//
+//
 //            default:
 //                Picasso.with(getApplicationContext()).
 //                        load(R.drawable.logo)
@@ -147,6 +110,43 @@ public class Splash extends AppCompatActivity {
 //
 //                break;
 //        }
+//
+
+        switch (StrServer) {
+            case "http://autotop.ath.cx:9090":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.autotop)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            case "http://autotop.ath.cx:9085":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.totalcar)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            case "http://autotop.ath.cx:9080":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.logo)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            default:
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.logo)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+
+                break;
+        }
 
         new Handler().postDelayed(new Runnable() {
             @Override

@@ -68,40 +68,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
-       //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR","DEMO"};
-      lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
+       lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR","DEMO"};
+      //lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
         sempresas.setAdapter(adapter);
-
-//        sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//
-//                String selection = (String) adapterView.getItemAtPosition(i);
-//
-//                if(selection=="AUTOTOP"){
-//                    foto.setImageResource(R.drawable.autotop);
-//                    urlEmpresa="http://autotop.ath.cx:9090";
-//
-//                }else if (selection=="TOTALCAR"){
-//                    foto.setImageResource(R.drawable.totalcar);
-//                    urlEmpresa="http://autotop.ath.cx:9085";
-//
-//                } else if (selection=="DEMO") {
-//                    foto.setImageResource(R.drawable.logo);
-//                    urlEmpresa="http://autotop.ath.cx:9080";
-//
-//                } else {
-//                    foto.setImageResource(R.drawable.logo);
-//                    urlEmpresa="";
-//                }
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
 
         sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -109,30 +80,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 String selection = (String) adapterView.getItemAtPosition(i);
 
-                if(selection=="Autodis"){
-                    foto.setImageResource(R.drawable.autodis);
-                    urlEmpresa="http://autodis.ath.cx:9085";
+                if(selection=="AUTOTOP"){
+                    foto.setImageResource(R.drawable.autotop);
+                    urlEmpresa="http://autotop.ath.cx:9090";
 
-                }else if (selection=="Vipla"){
-                    foto.setImageResource(R.drawable.vipla);
-                    urlEmpresa="http://sprautomotive.servehttp.com:9085";
+                }else if (selection=="TOTALCAR"){
+                    foto.setImageResource(R.drawable.totalcar);
+                    urlEmpresa="http://autotop.ath.cx:9085";
 
-                } else if (selection=="Jacve") {
-                    foto.setImageResource(R.drawable.jacve);
-                    urlEmpresa="http://jacve.dyndns.org:9085";
+                } else if (selection=="DEMO") {
+                    foto.setImageResource(R.drawable.logo);
+                    urlEmpresa="http://autotop.ath.cx:9080";
 
-                } else if (selection=="Cecra") {
-                    foto.setImageResource(R.drawable.cecra);
-                    urlEmpresa="http://cecra.ath.cx:9085";
-
-                } else if (selection=="Guvi") {
-                    foto.setImageResource(R.drawable.guvi);
-                    urlEmpresa="http://guvi.ath.cx:9085";
-
-                }else if (selection=="Pressa"){
-                    foto.setImageResource(R.drawable.pressa);
-                    urlEmpresa="http://cedistabasco.ddns.net:9085";
-                }else {
+                } else {
                     foto.setImageResource(R.drawable.logo);
                     urlEmpresa="";
                 }
@@ -143,6 +103,46 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
+//        sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//
+//                String selection = (String) adapterView.getItemAtPosition(i);
+//
+//                if(selection=="Autodis"){
+//                    foto.setImageResource(R.drawable.autodis);
+//                    urlEmpresa="http://autodis.ath.cx:9085";
+//
+//                }else if (selection=="Vipla"){
+//                    foto.setImageResource(R.drawable.vipla);
+//                    urlEmpresa="http://sprautomotive.servehttp.com:9085";
+//
+//                } else if (selection=="Jacve") {
+//                    foto.setImageResource(R.drawable.jacve);
+//                    urlEmpresa="http://jacve.dyndns.org:9085";
+//
+//                } else if (selection=="Cecra") {
+//                    foto.setImageResource(R.drawable.cecra);
+//                    urlEmpresa="http://cecra.ath.cx:9085";
+//
+//                } else if (selection=="Guvi") {
+//                    foto.setImageResource(R.drawable.guvi);
+//                    urlEmpresa="http://guvi.ath.cx:9085";
+//
+//                }else if (selection=="Pressa"){
+//                    foto.setImageResource(R.drawable.pressa);
+//                    urlEmpresa="http://cedistabasco.ddns.net:9085";
+//                }else {
+//                    foto.setImageResource(R.drawable.logo);
+//                    urlEmpresa="";
+//                }
+//            }
+//            @Override
+//            public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//            }
+//        });
+//
    }
     public void sendMessage(View view){
         usua = textusu.getText().toString();
