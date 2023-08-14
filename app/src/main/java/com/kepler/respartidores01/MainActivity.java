@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
-       lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR","DEMO"};
+       lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR"};
       //lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
