@@ -1,5 +1,7 @@
 package com.kepler.respartidores01;
 
+
+
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -58,6 +61,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Principal extends AppCompatActivity {
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0 ;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
     public EditText textfolio, textonumcajas, textocajasescaner;
@@ -100,6 +104,7 @@ public class Principal extends AppCompatActivity {
                 ActivityCompat.requestPermissions(Principal.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
         }
+
 
 
         DrawerLayout drawer = binding.drawerLayout;
@@ -305,7 +310,7 @@ public class Principal extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try {
-                    String Clave,Nombre,Direccion;
+                    String Clave,Nombre,Direccion,Repartidores="";
                     String telun, teld, folio;
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -317,6 +322,7 @@ public class Principal extends AppCompatActivity {
                         telun=jsonObject.getString("k_Numero1");
                         teld=jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
+                        Repartidores=jsonObject.getString("k_Repartidores");
 
                         editor.putString("folioescrito",folio);
                         Clave = jsonObject.getString("k_Clave");
@@ -328,24 +334,40 @@ public class Principal extends AppCompatActivity {
                         editor.commit();
 
                         ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                        lpeA.add(new Pedidos("","","", Nombre, telun, teld, folio, Direccion,"","","",0.0,0.0,0,"",0,""));
+                        lpeA.add(new Pedidos("","","", Nombre, telun, teld, folio, Direccion,"","","",0.0,0.0,0,"",0,"","N"));
+
+if(Repartidores.equals("")){
+    insertarfolioesc();
+    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+    alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            dialogInterface.cancel();
+            textfolio.setText(null);
+            textonumcajas.setText(null);
+        }
+    });
+
+    android.app.AlertDialog titulo = alerta.create();
+    titulo.setTitle("Registro realizado");
+    titulo.show();
+}else{
+    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+    alerta.setMessage("Este folio ya fue asigando, no es posible asignar nuevamente").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            dialogInterface.cancel();
+            textfolio.setText(null);
+            textonumcajas.setText(null);
+        }
+    });
+
+    android.app.AlertDialog titulo = alerta.create();
+    titulo.setTitle("Problemas");
+    titulo.show();
+}
 
 
-                        insertarfolioesc();
-
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
-                        alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                                textfolio.setText(null);
-                                textonumcajas.setText(null);
-                            }
-                        });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Registro realizado");
-                        titulo.show();
 
 
                     }else{

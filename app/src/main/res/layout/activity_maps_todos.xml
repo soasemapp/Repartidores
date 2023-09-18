@@ -121,7 +121,7 @@
         android:background="@color/black"
         android:onClick="entregadoevery"
         />
-<!--
+
     <ImageButton
         android:id="@+id/btnpendientesmaps"
         android:layout_width="50dp"
@@ -135,7 +135,7 @@
         android:background="@color/black"
         android:onClick="pendientemaps"
         />
-    -->
+
 
 
 

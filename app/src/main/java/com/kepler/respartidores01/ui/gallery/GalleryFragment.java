@@ -1,13 +1,18 @@
 package com.kepler.respartidores01.ui.gallery;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +27,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -34,6 +41,7 @@ import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
 import com.kepler.respartidores01.MapsActivity;
 import com.kepler.respartidores01.MapsSolo;
+import com.kepler.respartidores01.MapsTodos;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
@@ -52,7 +60,9 @@ import java.util.Set;
 
 public class GalleryFragment extends Fragment {
     MiAdaptador miAdaptador;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
     private FragmentGalleryBinding binding;
+    String folioparaentregar;
     ListView lista;
     ListView lisdf;
     TextView txtpu,txtpt;
@@ -189,7 +199,7 @@ public class GalleryFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq,comentario,status,direccionclave;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq,comentario,status,direccionclave,Aviso;
                     Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -211,9 +221,10 @@ public class GalleryFragment extends Fragment {
                             direccionclave = jitems.getString("k_direccionCla");
                             latitud = jitems.getDouble("k_Latitud");
                             longitud = jitems.getDouble("k_Longitud");
+                            Aviso = jitems.getString("k_Aviso");
 
 
-                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,comentario,status,direccionclave,latitud,longitud,0,"",0,""));
+                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,comentario,status,direccionclave,latitud,longitud,0,"",0,"",Aviso));
                             setD.add(direccion);
 
 
@@ -311,131 +322,204 @@ public class GalleryFragment extends Fragment {
                                     startActivity(intent);*/
 
 
-
-                                    Bundle extras = new Bundle();
-                                    extras.putString("directlista",  lpeA.get(position).getDireccion());
-                                    extras.putString("nombre_direccion", lpeA.get(position).getNombre());
-                                    extras.putString("clave_cliente", lpeA.get(position).getCliente());
-                                    extras.putDouble("latitud", lpeA.get(position).getLatitud());
-                                    extras.putDouble("longitud", lpeA.get(position).getLongitud());
-                                    extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
-                                    extras.putString("folios", lpeA.get(position).getFolio());
-
-
-
-                                    Intent intent = new Intent(getContext(), MapsSolo.class);
-                                    intent.putExtras(extras);
-                                    startActivity(intent);
-                                    break;
-
-                                case R.id.btnntregar:
-                                    comentariog=null;
-                                    estatus=null;
-
-                                    builder = new AlertDialog.Builder(getContext());
-                                    LayoutInflater inflaterentrega = getLayoutInflater();
-                                    View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
-                                    builder.setView(dialogViewww);
-                                    EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
-                                    EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
-                                    Button enttegar=dialogViewww.findViewById(R.id.btentre);
-                                    enttegar.setOnClickListener(new View.OnClickListener() {
+                                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(View view) {
-                                            estatus="E";
-                                            recibio.getText().toString();
-                                            comentario.getText().toString();
-
-
-                                            if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
-
-                                                editor.putString("recibio", recibio.getText().toString());
-                                                editor.putString("entregoSucursal", lpeA.get(position).getSucursal());
-                                                editor.putString("entregoCliente", lpeA.get(position).getCliente());
-                                                editor.putString("entregoNombre", lpeA.get(position).getNombre());
-                                                editor.putString("entregonumteluno", lpeA.get(position).getTelefonouno());
-                                                editor.putString("entregonumteldos", lpeA.get(position).getTelefonodos());
-                                                editor.putString("entregoFolio", lpeA.get(position).getFolio());
-                                                editor.putString("entregoDirec", lpeA.get(position).getDireccion());
-                                                editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
-                                                editor.putString("Comentario", comentario.getText().toString());
-                                                editor.putInt("posicion", position);
-                                                editor.commit();
-                                                editor.apply();
-
-                                                actualizarfirma();
-                                                dialog.dismiss();
-                                                lpeA.remove(position);
-                                            }else{
-                                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                                                alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.cancel();
-                                                    }
-                                                });
-
-                                                android.app.AlertDialog titulo = alerta.create();
-                                                titulo.setTitle("Faltan casillas por rellenar");
-                                                titulo.show();
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            Bundle extras = new Bundle();
+                                            folioparaentregar=lpeA.get(position).getFolio();
+                                            if( lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("") ){
+                                                if(!lpeA.get(position).getTelefonodos().equals("")){
+                                                    SmsManager smsManager = SmsManager.getDefault();
+                                                    smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, "Tu pedido con el folio "+lpeA.get(position).getFolio()+" va en camino ", null, null);
+                                                Aviso();
+                                                }
                                             }
 
 
+
+                                            extras.putString("directlista",  lpeA.get(position).getDireccion());
+                                            extras.putString("nombre_direccion", lpeA.get(position).getNombre());
+                                            extras.putString("clave_cliente", lpeA.get(position).getCliente());
+                                            extras.putDouble("latitud", lpeA.get(position).getLatitud());
+                                            extras.putDouble("longitud", lpeA.get(position).getLongitud());
+                                            extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
+                                            extras.putString("folios", lpeA.get(position).getFolio());
+                                            extras.putString("Telefono", lpeA.get(position).getTelefonodos());
+
+
+
+
+                                            Intent intent = new Intent(getContext(), MapsSolo.class);
+                                            intent.putExtras(extras);
+                                            startActivity(intent);
+                                        }
+                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.cancel();
                                         }
                                     });
 
-                                    dialog = builder.create();
-                                    dialog.show();
+                                    android.app.AlertDialog titulo = alerta.create();
+                                    titulo.setTitle("Seleccionar este destino");
+                                    titulo.show();
+
+                                    break;
+
+                                case R.id.btnntregar:
+                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            comentariog=null;
+                                            estatus=null;
+
+
+                                            builder = new AlertDialog.Builder(getContext());
+                                            LayoutInflater inflaterentrega = getLayoutInflater();
+                                            View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+                                            builder.setView(dialogViewww);
+                                            EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
+                                            EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
+                                            Button enttegar=dialogViewww.findViewById(R.id.btentre);
+                                            enttegar.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    estatus="E";
+                                                    recibio.getText().toString();
+                                                    comentario.getText().toString();
+
+                                                    if(!lpeA.get(position).getTelefonodos().equals("")){
+                                                        SmsManager smsManager = SmsManager.getDefault();
+                                                        smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, "Tu pedido con el folio "+lpeA.get(position).getFolio()+" a sido entregado ", null, null);
+                                                    }
+                                                    if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+
+                                                        editor.putString("recibio", recibio.getText().toString());
+                                                        editor.putString("entregoSucursal", lpeA.get(position).getSucursal());
+                                                        editor.putString("entregoCliente", lpeA.get(position).getCliente());
+                                                        editor.putString("entregoNombre", lpeA.get(position).getNombre());
+                                                        editor.putString("entregonumteluno", lpeA.get(position).getTelefonouno());
+                                                        editor.putString("entregonumteldos", lpeA.get(position).getTelefonodos());
+                                                        editor.putString("entregoFolio", lpeA.get(position).getFolio());
+                                                        editor.putString("entregoDirec", lpeA.get(position).getDireccion());
+                                                        editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
+                                                        editor.putString("Comentario", comentario.getText().toString());
+                                                        editor.putInt("posicion", position);
+                                                        editor.commit();
+                                                        editor.apply();
+
+                                                        actualizarfirma();
+                                                        dialog.dismiss();
+                                                        lpeA.remove(position);
+                                                    }else{
+                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                dialogInterface.cancel();
+                                                            }
+                                                        });
+
+                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        titulo.setTitle("Faltan casillas por rellenar");
+                                                        titulo.show();
+                                                    }
+
+
+                                                }
+                                            });
+
+                                            dialog = builder.create();
+                                            dialog.show();
+                                        }
+                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.cancel();
+                                        }
+                                    });
+
+                                     titulo = alerta.create();
+                                    titulo.setTitle("¿Realizar la entrega?");
+                                    titulo.show();
+
+
+
+
+
 
 
                                     break;
                                 case R.id.btnpendiente:
-                                    comentariog=null;
-                                    estatus=null;
 
-                                    builder = new AlertDialog.Builder(getContext());
-                                    LayoutInflater inflatependi = getLayoutInflater();
-                                    View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
-                                    builder.setView(dialogVie);
 
-                                    EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
-                                    Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
-
-                                    pendiente.setOnClickListener(new View.OnClickListener() {
+                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta.setMessage("¿Deseas dejar pendiente este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(View view) {
-                                            estatus="P";
-                                            compendiente.getText().toString();
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            comentariog=null;
+                                            estatus=null;
 
-                                            if(!compendiente.getText().toString().equals("")) {
+                                            builder = new AlertDialog.Builder(getContext());
+                                            LayoutInflater inflatependi = getLayoutInflater();
+                                            View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
+                                            builder.setView(dialogVie);
 
-                                                editor.putString("entregoFolio", lpeA.get(position).getFolio());
-                                                editor.putString("Comentario", compendiente.getText().toString());
-                                                editor.commit();
-                                                editor.apply();
+                                            EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
+                                            Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
 
-                                                actualizarfirma();
-                                                dialog.dismiss();
+                                            pendiente.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    estatus="P";
+                                                    compendiente.getText().toString();
 
-                                            }else{
-                                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                                                alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                                        dialogInterface.cancel();
+                                                    if(!compendiente.getText().toString().equals("")) {
+
+                                                        editor.putString("entregoFolio", lpeA.get(position).getFolio());
+                                                        editor.putString("Comentario", compendiente.getText().toString());
+                                                        editor.commit();
+                                                        editor.apply();
+
+                                                        actualizarfirma();
+                                                        dialog.dismiss();
+
+                                                    }else{
+                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                dialogInterface.cancel();
+                                                            }
+                                                        });
+
+                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        titulo.setTitle("Faltan casillas por rellenar");
+                                                        titulo.show();
                                                     }
-                                                });
 
-                                                android.app.AlertDialog titulo = alerta.create();
-                                                titulo.setTitle("Faltan casillas por rellenar");
-                                                titulo.show();
-                                            }
+                                                }
+                                            });
 
+                                            dialog = builder.create();
+                                            dialog.show();
+                                        }
+                                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.cancel();
                                         }
                                     });
 
-                                    dialog = builder.create();
-                                    dialog.show();
+                                    titulo = alerta.create();
+                                    titulo.setTitle("¿No estaba el cliente?");
+                                    titulo.show();
+
+
+
+
 
 
                                     break;
@@ -473,6 +557,51 @@ public class GalleryFragment extends Fragment {
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
 }
+
+
+
+    private void Aviso(){
+
+        String url =StrServer+"/Aviso";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("folio",folioparaentregar);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
+    }
+
 
     private void detalleFactura(String Sucursal,String Folios,String Nombres){
         int pos;
@@ -561,6 +690,12 @@ public class GalleryFragment extends Fragment {
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
+
+
+
+
+
+
 
 
 

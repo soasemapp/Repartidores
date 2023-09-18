@@ -22,8 +22,9 @@ public class Pedidos {
     String DistanciaText;
     int Tiempo;
     String TiempoValor;
+    String Aviso;
 
-    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor) {
+    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor,String Aviso) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -41,6 +42,7 @@ public class Pedidos {
         DistanciaText = distanciaText;
         Tiempo = tiempo;
         TiempoValor = tiempoValor;
+        this.Aviso =Aviso;
     }
 
     public String getSucursal() {
@@ -177,5 +179,13 @@ public class Pedidos {
 
     public void setTiempoValor(String tiempoValor) {
         TiempoValor = tiempoValor;
+    }
+
+    public String getAviso() {
+        return Aviso;
+    }
+
+    public void setAviso(String aviso) {
+        Aviso = aviso;
     }
 }

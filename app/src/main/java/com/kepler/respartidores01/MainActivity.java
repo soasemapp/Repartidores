@@ -1,10 +1,12 @@
 package com.kepler.respartidores01;
 
+import android.Manifest;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,6 +42,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener{
     private Spinner sempresas;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0 ;
     private String[] lista;
     private ArrayAdapter<String> adapter;
     private ImageView foto;
@@ -61,6 +66,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         contrasena = preference.getString("pass", null);
 
         //verificacion();
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.SEND_SMS)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.SEND_SMS},
+                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+            }
+        }
         spinner();
     }
 

@@ -121,5 +121,19 @@
         android:background="@color/black"
         android:onClick="entregadoalone"
         />
+    <ImageButton
+        android:id="@+id/btnpendientesmaps"
+        android:layout_width="50dp"
+        android:layout_height="48dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="280dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/icons_cancelar"
+        android:backgroundTint="#B3FFFFFF"
+        android:elevation="2dp"
+        android:background="@color/black"
+        android:onClick="pendientemaps"
+        />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

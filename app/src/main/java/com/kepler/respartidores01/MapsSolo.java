@@ -22,6 +22,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,7 +80,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
     Geocoder coddirmap;
     String value="",text="";
     List<Address> address= new ArrayList<>();
-    String nombrequienrecibio, comentarioentre;
+    String nombrequienrecibio="", comentarioentre;
     double Latitud = 0, Longitud = 0;
     FloatingActionButton botsave;
     private SharedPreferences preference;
@@ -89,9 +90,9 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
     ArrayList<String> values=new ArrayList<>();
     private ActivityMapsSoloBinding binding;
     String strusr, strpass,  StrServer, strcodBra, strcode,  struser, strbranch,strname,strlname;
-    String direclis="",nombre_direccion="",clave_cliente,clave_direccion,folioparaentregar;
+    String direclis="",nombre_direccion="",clave_cliente,clave_direccion,folioparaentregar,Telefono="";
     double latitudclien,longitudclien;
-    String estatus;
+    String estatus,comentariog;
 
     TextView Vendedortxt, Clientetxt, Direcciontxt;
     int contador =0;
@@ -134,6 +135,8 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         longitudclien= parametros.getDouble("longitud");
         clave_direccion=parametros.getString("clave_direccion");
         folioparaentregar=parametros.getString("folios");
+        Telefono=parametros.getString("Telefono");
+
 
 
 
@@ -378,7 +381,10 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
 
-
+                        if(!Telefono.equals("")){
+                            SmsManager smsManager = SmsManager.getDefault();
+                            smsManager.sendTextMessage(Telefono, null, "Tu pedido con el folio "+folioparaentregar+" a sido entregado ", null, null);
+                        }
 
 
                         if(latitudclien==0.0 && longitudclien==0.0){
@@ -595,6 +601,109 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void actualizarfirma2(){
+
+
+
+
+        String url =StrServer+"/recibeR";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    mensajes= jsonObject.getString("Repartidores");
+
+                    Intent regresa = new Intent(MapsSolo.this, Principal.class);
+                    startActivity(regresa);
+                    finish();
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(MapsSolo.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user",struser);
+                header.put("pass",strpass);
+                return header;
+            }
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal",strbranch);
+                params.put("folio",folioparaentregar);
+                params.put("recibe",nombrequienrecibio);
+                params.put("status",estatus);
+                params.put("comentario",comentarioentre);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(MapsSolo.this).add(postRequest);
+    }
+
+
+
+
+    public void pendientemaps(View v) {
+        comentariog=null;
+        estatus=null;
+
+        builder = new AlertDialog.Builder(MapsSolo.this);
+        LayoutInflater inflatependi = getLayoutInflater();
+        View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
+        builder.setView(dialogVie);
+
+        EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
+        Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
+
+        pendiente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                estatus="P";
+                compendiente.getText().toString();
+
+                if(!compendiente.getText().toString().equals("")) {
+
+                    comentarioentre=compendiente.getText().toString();
+
+                    actualizarfirma2();
+                    dialog.dismiss();
+                }else{
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsSolo.this);
+                    alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Faltan casillas por rellenar");
+                    titulo.show();
+                }
+
+            }
+        });
+
+        dialog = builder.create();
+        dialog.show();
 
     }
 }

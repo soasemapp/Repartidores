@@ -90,6 +90,7 @@ int controlador=0;
     private LocationManager locationManager;
     private Marker mMarker;
     Geocoder coder;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0 ;
     Geocoder coddirmap;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
