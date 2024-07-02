@@ -54,9 +54,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -101,6 +104,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     String[] listaDato = null;
     AlertDialog.Builder builder6;
     AlertDialog dialog6 = null;
+    String Empresa, smsCamino;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +130,48 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         Clientetxt = findViewById(R.id.txtCliente);
         Direcciontxt = findViewById(R.id.txtDireccion);
 
+
+        switch (StrServer) {
+            case "http://jacve.dyndns.org:9085":
+                Empresa = "JACVE";
+                break;
+            case "http://sprautomotive.servehttp.com:9085":
+                Empresa = "VIPLA";
+                break;
+            case "http://cecra.ath.cx:9085":
+                Empresa = "CECRA";
+                break;
+            case "http://guvi.ath.cx:9085":
+                Empresa = "GUVI";
+                break;
+            case "http://cedistabasco.ddns.net:9085":
+                Empresa = "PRESSA";
+                break;
+            case "http://autodis.ath.cx:9085":
+                Empresa = "AUTODIS";
+                break;
+
+            case "http://sprautomotive.servehttp.com:9090":
+                Empresa = "RODATECH";
+                break;
+            case "http://sprautomotive.servehttp.com:9095":
+                Empresa = "PARTECH";
+                break;
+            case "http://sprautomotive.servehttp.com:9080":
+                Empresa = "TG";
+                break;
+            case "http://autotop.ath.cx:9090":
+                Empresa = "AUTOTOP";
+                break;
+            case "http://autotop.ath.cx:9085":
+                Empresa = "TOTALCAR";
+                break;
+            case "http://autotop.ath.cx:9080":
+                Empresa = "PRUEBA";
+                break;
+            default:
+                break;
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maptodos);
@@ -298,8 +344,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (Pedidos.get(pos1).getAviso().equals("N") || Pedidos.get(pos1).getAviso().equals("")) {
                                     if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                                        smsCamino = "En " + Empresa + " trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio " + Pedidos.get(pos1).getFolio() + " va en camino por el Repartidor " + strname + " " + strlname + ".";
+
                                         SmsManager smsManager = SmsManager.getDefault();
-                                        smsManager.sendTextMessage("4931150512", null, "Tu pedido con el folio " + Pedidos.get(pos1).getFolio() + " va en camino ", null, null);
+                                        smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
                                         Aviso();
                                     }
                                 }
@@ -327,8 +375,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if (Pedidos.get(pos1).getAviso().equals("N") || Pedidos.get(pos1).getAviso().equals("")) {
                                     if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                                        smsCamino = "En " + Empresa + " trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio " + Pedidos.get(pos1).getFolio() + " va en camino por el Repartidor " + strname + " " + strlname + ".";
+
                                         SmsManager smsManager = SmsManager.getDefault();
-                                        smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, "Tu pedido con el folio " + Pedidos.get(pos1).getFolio() + " va en camino ", null, null);
+                                        smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
                                         Aviso();
                                     }
                                 }
@@ -605,8 +655,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
                     if (Pedidos.get(pos1).getAviso().equals("N") || Pedidos.get(pos1).getAviso().equals("")) {
                         if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                            smsCamino = "En " + Empresa + " trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio " + Pedidos.get(pos1).getFolio() + " va en camino por el Repartidor " + strname + " " + strlname + ".";
+
                             SmsManager smsManager = SmsManager.getDefault();
-                            smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, "Tu pedido con el folio " + Pedidos.get(pos1).getFolio() + " va en camino ", null, null);
+                            smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
                             Aviso();
                         }
                     }
@@ -768,6 +820,11 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
     }
 
+
+
+
+
+
     public void entregadoevery(View v) {
         builder = new AlertDialog.Builder(this);
         LayoutInflater inflaterentrega = getLayoutInflater();
@@ -783,7 +840,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
                 estatus = "E";
 
-
+               // if(tiempoval>10){
                 if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                     editor.putString("recibio", recibio.getText().toString());
@@ -807,7 +864,19 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                     titulo.setTitle("Faltan casillas por rellenar");
                     titulo.show();
                 }
+           /* }else{
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                    alerta.setMessage("Estas muy lejos de la zona de entrega").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
 
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("¡Estas muy lejos!");
+                    titulo.show();
+                }*/
 
             }
         });
@@ -867,7 +936,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     private void actualizarfirma() {
         nombrequienrecibio = preference.getString("recibio", "");
         comentarioentre = preference.getString("comentario", "");
-
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
         String url = StrServer + "/recibeR";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -892,11 +961,46 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
 
                         if (Pedidos.get(pos1).getLatitud() == 0.0 && Pedidos.get(pos1).getLongitud() == 0.0) {
-                            saveLoca();
-                            if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
-                                SmsManager smsManager = SmsManager.getDefault();
-                                smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, "Tu pedido con el folio " + Pedidos.get(pos1).getFolio() + " a sido entregado ", null, null);
-                            }
+
+                            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getApplicationContext());
+                            alerta = new android.app.AlertDialog.Builder(getApplicationContext());
+                            alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                   // saveLoca();
+                                    if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                                        smsCamino = Empresa + " agradece su preferencia.\n" +
+                                                "" + Pedidos.get(pos1).getNombre() + ", Su pedido con el folio " + Pedidos.get(pos1).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + nombrequienrecibio + ". \n" +
+                                                "Le deseamos un excelente día.";
+
+                                        SmsManager smsManager = SmsManager.getDefault();
+                                        smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
+                                    }
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+
+                                    if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                                        smsCamino = Empresa + " agradece su preferencia.\n" +
+                                                "" + Pedidos.get(pos1).getNombre() + ", Su pedido con el folio " + Pedidos.get(pos1).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + nombrequienrecibio + ". \n" +
+                                                "Le deseamos un excelente día.";
+
+                                        SmsManager smsManager = SmsManager.getDefault();
+                                        smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
+                                    }
+                                }
+                            });
+                            android.app.AlertDialog titulo = alerta.create();
+                            titulo = alerta.create();
+                            titulo.setTitle("¿Realizar la entrega?");
+                            titulo.show();
+
+
+
+
                         } else {
 
 
@@ -909,8 +1013,11 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             dialog6.show();
 
                             if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
+                                smsCamino = Empresa + " agradece su preferencia.\n" +
+                                        "" + Pedidos.get(pos1).getNombre() + ", Su pedido con el folio " + Pedidos.get(pos1).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + nombrequienrecibio + ". \n" +
+                                        "Le deseamos un excelente día.";
                                 SmsManager smsManager = SmsManager.getDefault();
-                                smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, "Tu pedido con el folio " + Pedidos.get(pos1).getFolio() + " a sido entregado ", null, null);
+                                smsManager.sendTextMessage(Pedidos.get(pos1).getTelefonodos(), null, smsCamino, null, null);
                             }
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -965,6 +1072,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 params.put("recibe", nombrequienrecibio);
                 params.put("status", estatus);
                 params.put("comentario", comentarioentre);
+                params.put("hora", currentTime);
                 return params;
             }
         };
@@ -974,7 +1082,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
     private void actualizarfirma2() {
 
-
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
         String url = StrServer + "/recibeR";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -994,10 +1102,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
-                        if (Pedidos.get(pos1).getLatitud() == 0.0 && Pedidos.get(pos1).getLongitud() == 0.0) {
+                      /*  if (Pedidos.get(pos1).getLatitud() == 0.0 && Pedidos.get(pos1).getLongitud() == 0.0) {
                             saveLoca();
                         } else {
-
+*/
 
                             builder6 = new AlertDialog.Builder(MapsTodos.this);
                             LayoutInflater inflater = getLayoutInflater();
@@ -1027,7 +1135,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
                             Inicio();
-                        }
+                       /* }*/
 
                     }
                 });
@@ -1060,6 +1168,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 params.put("recibe", nombrequienrecibio);
                 params.put("status", estatus);
                 params.put("comentario", comentarioentre);
+                params.put("hora", currentTime);
                 return params;
             }
         };

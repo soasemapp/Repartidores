@@ -45,16 +45,21 @@ import com.kepler.respartidores01.MapsTodos;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
 import com.kepler.respartidores01.Pedidos;
+import com.kepler.respartidores01.Principal;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,7 +78,7 @@ public class GalleryFragment extends Fragment {
 
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String  struser, strcode, strbranch, strpass;
+    String  struser, strcode, strbranch, strpass,strname, strlname,stremail;
     String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc =null;
 
     AlertDialog.Builder builder;
@@ -92,10 +97,13 @@ public class GalleryFragment extends Fragment {
     String folioconfirma, sucursalonfrima, recibiofir, comentariog;
     private SwipeRefreshLayout refreshLayout;
     String estatus;
+    String smsCamino,Empresa,CONFIGURACION="";
+
 
     String Sucursal,Folios,Nombres;
     android.app.AlertDialog.Builder builder6;
     android.app.AlertDialog dialog6 = null;
+    int posicion=0;
 
 
 
@@ -121,6 +129,9 @@ public class GalleryFragment extends Fragment {
         strpass = preference.getString("pass", "");
         strbranch = preference.getString("branch", "");
         strcode = preference.getString("code", "");
+        strname = preference.getString("name", "null");
+        strlname = preference.getString("lname", "null");
+        stremail=preference.getString("email","null");
 
 
         escnombre = preference.getString("Nombreescrito", "null");
@@ -137,8 +148,55 @@ public class GalleryFragment extends Fragment {
         builder6 = new android.app.AlertDialog.Builder(getActivity());
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.pantallacarga, null);
+        leerWSCONFIGURACION();
 
-        LeerWs();
+
+//Mensaje de Aviso de del folio va en camino
+
+
+        //Mensaje de que el folio a sido entregado
+        switch (StrServer) {
+            case "http://jacve.dyndns.org:9085":
+                Empresa="JACVE";
+                break;
+            case "http://sprautomotive.servehttp.com:9085":
+                Empresa="VIPLA";
+                break;
+            case "http://cecra.ath.cx:9085":
+                Empresa="CECRA";
+                break;
+            case "http://guvi.ath.cx:9085":
+                Empresa="GUVI";
+                break;
+            case "http://cedistabasco.ddns.net:9085":
+                Empresa="PRESSA";
+                break;
+            case "http://autodis.ath.cx:9085":
+                Empresa="AUTODIS";
+                break;
+
+            case "http://sprautomotive.servehttp.com:9090":
+                Empresa="RODATECH";
+                break;
+            case "http://sprautomotive.servehttp.com:9095":
+                Empresa="PARTECH";
+                break;
+            case "http://sprautomotive.servehttp.com:9080":
+                Empresa="TG";
+                break;
+            case "http://autotop.ath.cx:9090":
+                Empresa="AUTOTOP";
+                break;
+            case "http://autotop.ath.cx:9085":
+                Empresa="TOTALCAR";
+                break;
+            case "http://autotop.ath.cx:9080":
+                Empresa="PRUEBA";
+                break;
+            default:
+                break;
+        }
+
 
         // Obtener el refreshLayout
         refreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefresh);
@@ -189,6 +247,56 @@ public class GalleryFragment extends Fragment {
         super.onDestroyView();
     }
 
+private void leerWSCONFIGURACION(){
+
+    String url =StrServer+"/configuracion";
+
+    StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            try {
+
+                JSONObject jItem;
+                JSONObject jitems;
+                String Repartidores="";
+                JSONObject jsonObject = new JSONObject(response);
+
+                jItem = jsonObject.getJSONObject("Item");
+                for (int i = 0; i <jItem.length(); i++) {
+                    jitems = jItem.getJSONObject(""+i);
+                    CONFIGURACION = jitems.getString("Repartidores");
+                }
+
+                LeerWs();
+
+
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            })
+    {
+        @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            HashMap header = new HashMap();
+            header.put("user",struser);
+            header.put("pass",strpass);
+            return header;
+        }
+
+    };
+    Volley.newRequestQueue(getActivity()).add(postRequest);
+
+}
+
+
     private void LeerWs(){
         lpeA.clear();
         setD.clear();
@@ -204,7 +312,7 @@ public class GalleryFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(response);
 
 
-                    if (response.length() != 6) {
+                    if (jsonObject.length() != 0) {
                         jfacturas = jsonObject.getJSONObject("Repartidores");
                         for (int i = 0; i <jfacturas.length(); i++) {
                             jitems = jfacturas.getJSONObject("items" + i);
@@ -236,8 +344,12 @@ public class GalleryFragment extends Fragment {
                         alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
 
+                                dialogInterface.cancel();
+                                lpeA.clear();
+                                lista = (ListView) getView().findViewById(R.id.listaporentregar);
+                                miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                                lista.setAdapter(miAdaptador);
 
                             }
                         });
@@ -253,7 +365,7 @@ public class GalleryFragment extends Fragment {
                 //crea la lista
                 if (lpeA.size() != 0) {
                     lista = (ListView) getView().findViewById(R.id.listaporentregar);
-                     miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA);
+                     miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
                     lista.setAdapter(miAdaptador);
 
                     //para el detlle de factura
@@ -322,6 +434,9 @@ public class GalleryFragment extends Fragment {
                                     startActivity(intent);*/
 
 
+
+
+
                                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
@@ -330,8 +445,10 @@ public class GalleryFragment extends Fragment {
                                             folioparaentregar=lpeA.get(position).getFolio();
                                             if( lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("") ){
                                                 if(!lpeA.get(position).getTelefonodos().equals("")){
+                                                    smsCamino="En "+Empresa+" trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio "+folioparaentregar+" va en camino por el Repartidor "+strname+" "+strlname+".";
+
                                                     SmsManager smsManager = SmsManager.getDefault();
-                                                    smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, "Tu pedido con el folio "+lpeA.get(position).getFolio()+" va en camino ", null, null);
+                                                    smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
                                                 Aviso();
                                                 }
                                             }
@@ -391,8 +508,13 @@ public class GalleryFragment extends Fragment {
                                                     comentario.getText().toString();
 
                                                     if(!lpeA.get(position).getTelefonodos().equals("")){
+
+                                                         smsCamino=Empresa+" agradece su preferencia.\n" +
+                                                                ""+lpeA.get(position).getNombre()+", Su pedido con el folio "+lpeA.get(position).getFolio()+" ha sido entregado por el Repartidor "+strname+" "+strlname+" a "+recibio+". \n" +
+                                                                "Le deseamos un excelente día.";
+
                                                         SmsManager smsManager = SmsManager.getDefault();
-                                                        smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, "Tu pedido con el folio "+lpeA.get(position).getFolio()+" a sido entregado ", null, null);
+                                                        smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
                                                     }
                                                     if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
@@ -407,12 +529,14 @@ public class GalleryFragment extends Fragment {
                                                         editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
                                                         editor.putString("Comentario", comentario.getText().toString());
                                                         editor.putInt("posicion", position);
+                                                        posicion =position;
+
                                                         editor.commit();
                                                         editor.apply();
 
                                                         actualizarfirma();
                                                         dialog.dismiss();
-                                                        lpeA.remove(position);
+
                                                     }else{
                                                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
@@ -668,6 +792,11 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+
+
+
+
+
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 })
@@ -706,7 +835,7 @@ public class GalleryFragment extends Fragment {
         comentariog=preference.getString("Comentario","");
         int posi= preference.getInt("posicion",0);
 
-
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
         String url =StrServer+"/recibeR";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -716,6 +845,18 @@ public class GalleryFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(response);
 
                     mensajes= jsonObject.getString("Repartidores");
+                    if(!estatus.equals("P")){
+                        lpeA.remove(posicion);
+                        miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                        lista.setAdapter(miAdaptador);
+                    }else{
+                        Intent intent = new Intent(getContext(), Principal.class);
+
+                        getActivity().overridePendingTransition(0, 0);
+                        startActivity(intent);
+                        getActivity().overridePendingTransition(0, 0);
+                        getActivity().finish();
+                    }
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -740,7 +881,19 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                        alerta.setMessage("Hubo un problema con el registro deberias volver a intentar hacerlo").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+
+
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Ups!!");
+                        titulo.show();
                     }
                 })
         {
@@ -759,6 +912,7 @@ public class GalleryFragment extends Fragment {
                 params.put("recibe",recibiofir);
                 params.put("status",estatus);
                 params.put("comentario",comentariog);
+                params.put("hora", currentTime);
                 return params;
             }
         };

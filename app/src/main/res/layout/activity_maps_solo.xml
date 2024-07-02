@@ -115,7 +115,7 @@
         android:layout_gravity="start"
         android:layout_marginTop="210dp"
         android:layout_marginLeft="10dp"
-        android:src="@drawable/ic_btn_entregado"
+        android:src="@drawable/icons_comprobado"
         android:backgroundTint="#B3FFFFFF"
         android:elevation="2dp"
         android:background="@color/black"

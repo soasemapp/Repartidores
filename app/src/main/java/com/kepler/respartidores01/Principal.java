@@ -1,7 +1,6 @@
 package com.kepler.respartidores01;
 
 
-
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -58,22 +57,24 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Principal extends AppCompatActivity {
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0 ;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityPrincipalBinding binding;
     public EditText textfolio, textonumcajas, textocajasescaner;
 
     public String usaFolio;
-        String numcajas="1" ;
-   public ArrayList<Pedidos> lpeA=new ArrayList<>();
+    String numcajas = "1";
+    public ArrayList<Pedidos> lpeA = new ArrayList<>();
     TextView namerepa, correorepa;
     private SharedPreferences preference;
     ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo, struser, strbranch;
+    int Contador=0;
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -106,13 +107,12 @@ public class Principal extends AppCompatActivity {
         }
 
 
-
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity,R.id.mapsActivityTodos, R.id.cerrarsecion)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity, R.id.mapsActivityTodos, R.id.cerrarsecion)
                 .setOpenableLayout(drawer)
                 .build();
 
@@ -123,7 +123,7 @@ public class Principal extends AppCompatActivity {
 
         MenuItem menuItem = navigationView.getMenu().getItem(5);
 
-        menuItem.setOnMenuItemClickListener(item ->{
+        menuItem.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.cerrarsecion) {
 
                 editor.clear().commit();
@@ -136,7 +136,6 @@ public class Principal extends AppCompatActivity {
             }
             return super.onOptionsItemSelected(item);
         });
-
 
 
         //ACCESO A ESCRIBIR O ESCANEAR EL FOLIO DESDE UN DIALOGO
@@ -153,6 +152,37 @@ public class Principal extends AppCompatActivity {
                             }
                         }).create().show();
                 return true;
+            }    if (item.getItemId()  == R.id.RodatechMenu) {
+                StrServer = "http://sprautomotive.servehttp.com:9090";
+                editor.putString("Server", StrServer);
+                editor.commit();
+                Intent Cambiar = new Intent(this, Splash.class);
+                overridePendingTransition(0, 0);
+                startActivity(Cambiar);
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (item.getItemId()  == R.id.PartechMenu) {
+                StrServer = "http://sprautomotive.servehttp.com:9095";
+                editor.putString("Server", StrServer);
+                editor.commit();
+                Intent Cambiar = new Intent(this, Splash.class);
+                overridePendingTransition(0, 0);
+
+                startActivity(Cambiar);
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (item.getItemId()  == R.id.SharkMenu) {
+                StrServer = "http://sprautomotive.servehttp.com:9080";
+                editor.putString("Server", StrServer);
+                editor.commit();
+                Intent Cambiar = new Intent(this, Splash.class);
+                overridePendingTransition(0, 0);
+                startActivity(Cambiar);
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
             }
             return super.onOptionsItemSelected(item);
         });
@@ -162,8 +192,8 @@ public class Principal extends AppCompatActivity {
         strcodBra = preference.getString("branch", null);
         strcode = preference.getString("code", null);
         StrServer = preference.getString("Server", "null");
-        strname=preference.getString("name","");
-        strcorreo=preference.getString("email","");
+        strname = preference.getString("name", "");
+        strcorreo = preference.getString("email", "");
         strbranch = preference.getString("branch", "");
 
         struser = preference.getString("user", "");
@@ -173,11 +203,11 @@ public class Principal extends AppCompatActivity {
     //ESCANEAR LOS FOLIOS
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        IntentResult result= IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
-        if(result !=null){
+        if (result != null) {
 
-            if(result.getContents()==null){
+            if (result.getContents() == null) {
                 android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                 alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
@@ -190,26 +220,49 @@ public class Principal extends AppCompatActivity {
                 titulo.setTitle("Lectura Cancelada");
                 titulo.show();
 
-            }else{
-                usaFolio =result.getContents();
-                    LeerWs();
+            } else {
+                usaFolio = result.getContents();
+                if (!usaFolio.equals("")) {
+                    if (usaFolio.length() < 7) {
+                        int fo = usaFolio.length();
+                        switch (fo) {
+                            case 1:
+                                usaFolio = "000000" + usaFolio;
+                                break;
+                            case 2:
+                                usaFolio = "00000" + usaFolio;
+                                break;
+                            case 3:
+                                usaFolio = "0000" + usaFolio;
+                                break;
+                            case 4:
+                                usaFolio = "000" + usaFolio;
+                                break;
+                            case 5:
+                                usaFolio = "00" + usaFolio;
+                                break;
+                            case 6:
+                                usaFolio = "0" + usaFolio;
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+
+                }
+                LeerWs();
             }
-        }else{
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.principal, menu);
-        return true;
-    }
-    @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_principal);
-        namerepa= findViewById(R.id.txtmenuname);
-        correorepa=findViewById(R.id.textViewcorreo);
+        namerepa = findViewById(R.id.txtmenuname);
+        correorepa = findViewById(R.id.textViewcorreo);
         namerepa.setText(strname);
         namerepa.setTextSize(18);
         correorepa.setText(strcorreo);
@@ -234,17 +287,17 @@ public class Principal extends AppCompatActivity {
         dialog.show();
 
         textfolio = (EditText) dialogView.findViewById(R.id.cajatextfolio);
-        textonumcajas=(EditText) dialogView.findViewById(R.id.cajatextonumc);
+        textonumcajas = (EditText) dialogView.findViewById(R.id.cajatextonumc);
 
 
         textfolio.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                usaFolio =textfolio.getText().toString();
-                numcajas=textonumcajas.getText().toString();
+                usaFolio = textfolio.getText().toString();
+                numcajas = textonumcajas.getText().toString();
 
-                if(!usaFolio.equals("")) {
+                if (!usaFolio.equals("")) {
                     if (usaFolio.length() < 7) {
                         int fo = usaFolio.length();
                         switch (fo) {
@@ -255,13 +308,13 @@ public class Principal extends AppCompatActivity {
                                 usaFolio = "00000" + usaFolio;
                                 break;
                             case 3:
-                                usaFolio ="0000" + usaFolio;
+                                usaFolio = "0000" + usaFolio;
                                 break;
                             case 4:
-                                usaFolio ="000" + usaFolio;
+                                usaFolio = "000" + usaFolio;
                                 break;
                             case 5:
-                                usaFolio ="00" + usaFolio;
+                                usaFolio = "00" + usaFolio;
                                 break;
                             case 6:
                                 usaFolio = "0" + usaFolio;
@@ -272,7 +325,7 @@ public class Principal extends AppCompatActivity {
                         }
                     }
                     textfolio.setText(usaFolio);
-                }else{
+                } else {
                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                     alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -293,8 +346,8 @@ public class Principal extends AppCompatActivity {
     }
 
 
-    public void respuestascanner(View view){
-        IntentIntegrator integrador= new IntentIntegrator(Principal.this);
+    public void respuestascanner(View view) {
+        IntentIntegrator integrador = new IntentIntegrator(Principal.this);
         integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
         integrador.setPrompt("Lector");
         integrador.setCameraId(0);
@@ -305,72 +358,80 @@ public class Principal extends AppCompatActivity {
 
 
     private void LeerWs() {
+
+
         String url = StrServer + "/consulfac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
-                    String Clave,Nombre,Direccion,Repartidores="";
+                    String Clave, Nombre, Direccion, Repartidores = "",Stauts="";
                     String telun, teld, folio;
                     JSONObject jsonObject = new JSONObject(response);
 
-                    if(jsonObject.length()>0) {
+                    if (jsonObject.length() > 0) {
                         jsonObject = jsonObject.getJSONObject("Repartidores");
                         Clave = jsonObject.getString("k_Clave");
-                        folio=jsonObject.getString("k_Folio");
+                        folio = jsonObject.getString("k_Folio");
                         Nombre = jsonObject.getString("k_Nombre");
-                        telun=jsonObject.getString("k_Numero1");
-                        teld=jsonObject.getString("k_Numero2");
+                        telun = jsonObject.getString("k_Numero1");
+                        teld = jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
-                        Repartidores=jsonObject.getString("k_Repartidores");
+                        Repartidores = jsonObject.getString("k_Repartidores");
+                        Stauts= jsonObject.getString("k_Status");
 
-                        editor.putString("folioescrito",folio);
+                        editor.putString("folioescrito", folio);
                         Clave = jsonObject.getString("k_Clave");
-                        editor.putString("Nombreescrito",  Nombre);
+                        editor.putString("Nombreescrito", Nombre);
                         editor.putString("Num1_escrito", telun);
-                        editor.putString("Num2escrito",teld);
-                        editor.putString("direccionescrito", Direccion );
-                        editor.putString("numc",numcajas);
+                        editor.putString("Num2escrito", teld);
+                        editor.putString("direccionescrito", Direccion);
+                        editor.putString("numc", numcajas);
                         editor.commit();
 
-                        ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                        lpeA.add(new Pedidos("","","", Nombre, telun, teld, folio, Direccion,"","","",0.0,0.0,0,"",0,"","N"));
 
-if(Repartidores.equals("")){
-    insertarfolioesc();
-    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
-    alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dialogInterface.cancel();
-            textfolio.setText(null);
-            textonumcajas.setText(null);
-        }
-    });
 
-    android.app.AlertDialog titulo = alerta.create();
-    titulo.setTitle("Registro realizado");
-    titulo.show();
-}else{
-    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
-    alerta.setMessage("Este folio ya fue asigando, no es posible asignar nuevamente").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-            dialogInterface.cancel();
-            textfolio.setText(null);
-            textonumcajas.setText(null);
-        }
-    });
+                        if (Stauts.equals("A") && Repartidores.equals("")) {
 
-    android.app.AlertDialog titulo = alerta.create();
-    titulo.setTitle("Problemas");
-    titulo.show();
-}
+                            ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
+                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N"));
+
+                            insertarfolioesc();
 
 
 
+                            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                            alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+                                    overridePendingTransition(0, 0);
+                                    startActivity(getIntent());
+                                    overridePendingTransition(0, 0);
+                                    finish();
+                                }
+                            });
 
-                    }else{
+                            android.app.AlertDialog titulo = alerta.create();
+                            titulo.setTitle("Registro realizado");
+                            titulo.show();
+                        } else {
+                            android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+                            alerta.setMessage("Este folio ya fue asigando, no es posible asignar nuevamente").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.cancel();
+                                    usaFolio = "";
+                                }
+                            });
+
+                            android.app.AlertDialog titulo = alerta.create();
+                            titulo.setTitle("Problemas");
+                            titulo.show();
+                        }
+
+
+                    } else {
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                         alerta.setMessage("No se encontro folio").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
@@ -383,7 +444,7 @@ if(Repartidores.equals("")){
                         titulo.setTitle("No existe");
                         titulo.show();
 
-                        usaFolio="";
+                        usaFolio = "";
 
                     }
 
@@ -420,45 +481,45 @@ if(Repartidores.equals("")){
     }
 
     //boton del alert para guardar el folio escrito
-  public void guardarfolio(View v){
+    public void guardarfolio(View v) {
 
-      usaFolio =textfolio.getText().toString();
-      numcajas=textonumcajas.getText().toString();
+        usaFolio = textfolio.getText().toString();
+        numcajas = textonumcajas.getText().toString();
 
-      if(!usaFolio.equals("")) {
-          if (usaFolio.length() < 7) {
-              int fo = usaFolio.length();
-              switch (fo) {
-                  case 1:
-                      usaFolio = "000000" + usaFolio;
-                      break;
-                  case 2:
-                      usaFolio = "00000" + usaFolio;
-                      break;
-                  case 3:
-                      usaFolio = "0000" + usaFolio;
-                      break;
-                  case 4:
-                      usaFolio = "000" + usaFolio;
-                      break;
-                  case 5:
-                      usaFolio = "00" + usaFolio;
-                      break;
-                  case 6:
-                      usaFolio = "0" + usaFolio;
-                      break;
+        if (!usaFolio.equals("")) {
+            if (usaFolio.length() < 7) {
+                int fo = usaFolio.length();
+                switch (fo) {
+                    case 1:
+                        usaFolio = "000000" + usaFolio;
+                        break;
+                    case 2:
+                        usaFolio = "00000" + usaFolio;
+                        break;
+                    case 3:
+                        usaFolio = "0000" + usaFolio;
+                        break;
+                    case 4:
+                        usaFolio = "000" + usaFolio;
+                        break;
+                    case 5:
+                        usaFolio = "00" + usaFolio;
+                        break;
+                    case 6:
+                        usaFolio = "0" + usaFolio;
+                        break;
 
-                  default:
-                      break;
-              }
-          }
-          textfolio.setText(usaFolio);
-      }
+                    default:
+                        break;
+                }
+            }
+            textfolio.setText(usaFolio);
+        }
 
-        if(!usaFolio.equals("") && !numcajas.equals("")){
-           LeerWs();
+        if (!usaFolio.equals("") && !numcajas.equals("")) {
+            LeerWs();
 
-        }else{
+        } else {
             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
             alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
@@ -473,9 +534,10 @@ if(Repartidores.equals("")){
         }
     }
 
-    private void insertarfolioesc(){
+    private void insertarfolioesc() {
 
-        String url =StrServer+"/registroR";
+        String url = StrServer + "/registroR";
+         String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -485,7 +547,8 @@ if(Repartidores.equals("")){
                     JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
 
-                     jsonObject.getString("Repartidores");
+
+
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -497,22 +560,23 @@ if(Repartidores.equals("")){
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(Principal.this, error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("folio",usaFolio);
-                params.put("repartidor",strcode);
-                params.put("numC",numcajas);
+                params.put("sucursal", strbranch);
+                params.put("folio", usaFolio);
+                params.put("repartidor", strcode);
+                params.put("numC", numcajas);
+                params.put("hora", currentTime);
                 return params;
             }
         };
@@ -540,6 +604,99 @@ if(Repartidores.equals("")){
         mensaje.show();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.principal, menu);
+
+        switch (StrServer) {
+            case "http://sprautomotive.servehttp.com:9090": {
+                MenuItem item = menu.findItem(R.id.MenuSPR);
+                MenuItem itemRod = menu.findItem(R.id.RodatechMenu);
+                MenuItem itemPartech = menu.findItem(R.id.PartechMenu);
+                MenuItem itemSharck = menu.findItem(R.id.SharkMenu);
+                itemRod.setVisible(false);
+                itemPartech.setVisible(true);
+                itemSharck.setVisible(true);
+                item.setVisible(true);
+                break;
+            }
+            case "http://sprautomotive.servehttp.com:9095": {
+                MenuItem item = menu.findItem(R.id.MenuSPR);
+
+                MenuItem itemRod = menu.findItem(R.id.RodatechMenu);
+                MenuItem itemPartech = menu.findItem(R.id.PartechMenu);
+                MenuItem itemSharck = menu.findItem(R.id.SharkMenu);
+                itemRod.setVisible(true);
+                itemPartech.setVisible(false);
+                itemSharck.setVisible(true);
+
+                item.setVisible(true);
+                break;
+            }
+            case "http://sprautomotive.servehttp.com:9080": {
+                MenuItem item = menu.findItem(R.id.MenuSPR);
+
+
+                MenuItem itemRod = menu.findItem(R.id.RodatechMenu);
+                MenuItem itemPartech = menu.findItem(R.id.PartechMenu);
+                MenuItem itemSharck = menu.findItem(R.id.SharkMenu);
+                itemRod.setVisible(true);
+                itemPartech.setVisible(true);
+                itemSharck.setVisible(false);
+
+
+                item.setVisible(true);
+                break;
+            }
+            default: {
+                MenuItem item = menu.findItem(R.id.MenuSPR);
+                item.setVisible(false);
+                break;
+            }
+        }
+
+        return true;
+    }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+
+        if (id == R.id.RodatechMenu) {
+            StrServer = "http://sprautomotive.servehttp.com:9090";
+            editor.putString("Server", StrServer);
+            editor.commit();
+            Intent Cambiar = new Intent(this, Splash.class);
+            overridePendingTransition(0, 0);
+            startActivity(Cambiar);
+            overridePendingTransition(0, 0);
+            finish();
+        } else if (id == R.id.PartechMenu) {
+            StrServer = "http://sprautomotive.servehttp.com:9095";
+            editor.putString("Server", StrServer);
+            editor.commit();
+            Intent Cambiar = new Intent(this, Splash.class);
+            overridePendingTransition(0, 0);
+            startActivity(Cambiar);
+            overridePendingTransition(0, 0);
+            finish();
+        } else if (id == R.id.SharkMenu) {
+            StrServer = "http://sprautomotive.servehttp.com:9080";
+            editor.putString("Server", StrServer);
+            editor.commit();
+            Intent Cambiar = new Intent(this, Splash.class);
+            overridePendingTransition(0, 0);
+            startActivity(Cambiar);
+            overridePendingTransition(0, 0);
+            finish();
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
 }

@@ -24,6 +24,7 @@ public class Splash extends AppCompatActivity {
     LinearLayout Conten;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +98,60 @@ public class Splash extends AppCompatActivity {
 
                 break;
 
+            case "http://sprautomotive.servehttp.com:9090":
 
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.rodatech)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+
+                break;
+            case "http://sprautomotive.servehttp.com:9095":
+
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.partech)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+
+                break;
+            case "http://sprautomotive.servehttp.com:9080":
+
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.shark)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+
+                break;
+            case "http://autotop.ath.cx:9090":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.autotop)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            case "http://autotop.ath.cx:9085":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.totalcar)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            case "http://autotop.ath.cx:9080":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.logo)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
 
 
             default:
@@ -111,42 +165,6 @@ public class Splash extends AppCompatActivity {
                 break;
         }
 
-
-//        switch (StrServer) {
-//            case "http://autotop.ath.cx:9090":
-//                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.autotop)
-//                        .error(R.drawable.logo)
-//                        .fit()
-//                        .centerInside()
-//                        .into(imgVi);
-//                break;
-//            case "http://autotop.ath.cx:9085":
-//                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.totalcar)
-//                        .error(R.drawable.logo)
-//                        .fit()
-//                        .centerInside()
-//                        .into(imgVi);
-//                break;
-//            case "http://autotop.ath.cx:9080":
-//                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.logo)
-//                        .error(R.drawable.logo)
-//                        .fit()
-//                        .centerInside()
-//                        .into(imgVi);
-//                break;
-//            default:
-//                Picasso.with(getApplicationContext()).
-//                        load(R.drawable.logo)
-//                        .error(R.drawable.logo)
-//                        .fit()
-//                        .centerInside()
-//                        .into(imgVi);
-//
-//                break;
-//        }
 
         new Handler().postDelayed(new Runnable() {
             @Override

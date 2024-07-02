@@ -14,5 +14,37 @@
         app:showAsAction="ifRoom"
         />
 
+    <item  android:title="Menu"
+        android:icon="@drawable/baseline_menu_24"
+        android:id="@+id/MenuSPR"
+        android:iconTint="@color/white"
+        app:showAsAction="always">
+        <menu>
+
+            <item
+                android:title="Rodatech"
+                android:id="@+id/RodatechMenu"
+                app:showAsAction="never"
+
+                />
+            <item
+                android:title="Partech"
+                android:id="@+id/PartechMenu"
+                app:showAsAction="never"
+
+                />
+            <item
+                android:title="Shark"
+                android:id="@+id/SharkMenu"
+                app:showAsAction="never"
+
+                />
+
+
+        </menu>
+    </item>
+
+
+
 
 </menu>

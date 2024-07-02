@@ -15,17 +15,33 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MiAdaptador extends BaseAdapter {
     private Context c;
     private int diseno;
     private ArrayList<Pedidos> ap;
+    private String Configuracion,strpass,StrServer;
 
-    public MiAdaptador(Context c, int diseno, ArrayList<Pedidos> ap) {
+    public MiAdaptador(Context c, int diseno, ArrayList<Pedidos> ap,String Configuracion) {
         this.c = c;
         this.diseno = diseno;
         this.ap = ap;
+        this.Configuracion=Configuracion;
+
+
     }
 
     @Override
@@ -81,10 +97,23 @@ public class MiAdaptador extends BaseAdapter {
                 img.setVisibility(View.GONE);
             }
 
+
+
+
+
+
             irmap.setTag(position);
             detafac.setTag(position);
             entreado.setTag(position);
             pendiente.setTag(position);
+
+        if(Configuracion.equals("1")){
+            entreado.setVisibility(View.GONE);
+            pendiente.setVisibility(View.GONE);
+        }else {
+            entreado.setVisibility(View.VISIBLE);
+            pendiente.setVisibility(View.VISIBLE);
+        }
 
         irmap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +142,8 @@ public class MiAdaptador extends BaseAdapter {
                 ((ListView) parent).performItemClick(view, position, 0);
             }
         });
+
+
 
 
 

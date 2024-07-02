@@ -84,48 +84,46 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void spinner() {
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
-       //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR","DEMO"};
-      lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa"};
+        lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR",/*"DEMO"*/};
+        //lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa","MIGRACION" +""};
+         // lista = new String[]{"Seleccionar...","Rodatech","Partech","Shark"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
         sempresas.setAdapter(adapter);
 
-//        sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 //
-//                String selection = (String) adapterView.getItemAtPosition(i);
-//
-//                if(selection=="AUTOTOP"){
-//                    foto.setImageResource(R.drawable.autotop);
-//                    urlEmpresa="http://autotop.ath.cx:9090";
-//
-//                }else if (selection=="TOTALCAR"){
-//                    foto.setImageResource(R.drawable.totalcar);
-//                    urlEmpresa="http://autotop.ath.cx:9085";
-//
-//                } else if (selection=="DEMO") {
-//                    foto.setImageResource(R.drawable.logo);
-//                    urlEmpresa="http://autotop.ath.cx:9080";
-//
-//                } else {
-//                    foto.setImageResource(R.drawable.logo);
-//                    urlEmpresa="";
-//                }
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
 
         sempresas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                 String selection = (String) adapterView.getItemAtPosition(i);
+                if(selection=="AUTOTOP"){
+                    foto.setImageResource(R.drawable.autotop);
+                    urlEmpresa="http://autotop.ath.cx:9090";
 
-                if(selection=="Autodis"){
+                }else if (selection=="TOTALCAR"){
+                    foto.setImageResource(R.drawable.totalcar);
+                    urlEmpresa="http://autotop.ath.cx:9085";
+
+                } else if (selection=="DEMO") {
+                    foto.setImageResource(R.drawable.logo);
+                    urlEmpresa="http://autotop.ath.cx:9080";
+
+                } else if(selection=="Rodatech"){
+                    foto.setImageResource(R.drawable.rodatech);
+                    urlEmpresa="http://sprautomotive.servehttp.com:9090";
+
+                }else if (selection=="Partech"){
+                    foto.setImageResource(R.drawable.partech);
+                    urlEmpresa="http://sprautomotive.servehttp.com:9095";
+
+                } else if (selection=="Shark") {
+                    foto.setImageResource(R.drawable.shark);
+                    urlEmpresa="http://sprautomotive.servehttp.com:9080";
+
+                }
+                else if(selection=="Autodis"){
                     foto.setImageResource(R.drawable.autodis);
                     urlEmpresa="http://autodis.ath.cx:9085";
 
@@ -148,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }else if (selection=="Pressa"){
                     foto.setImageResource(R.drawable.pressa);
                     urlEmpresa="http://cedistabasco.ddns.net:9085";
+                }else if (selection=="MIGRACION"){
+                    foto.setImageResource(R.drawable.pressa);
+                    urlEmpresa="http://cedistabasco.ddns.net:9080";
                 }else {
                     foto.setImageResource(R.drawable.logo);
                     urlEmpresa="";
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 public void onResponse(String response) {
                     try {
                         JSONObject jsonObject = new JSONObject(response);
-var tamaño =response.length();
+                        var tamaño =response.length();
                        if(tamaño>71) {
                            jsonObject = jsonObject.getJSONObject("UserInfo");
                            editor.putString("user", usua);
