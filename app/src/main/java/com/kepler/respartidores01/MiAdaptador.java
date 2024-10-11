@@ -3,6 +3,7 @@ package com.kepler.respartidores01;
 import static androidx.test.InstrumentationRegistry.getContext;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class MiAdaptador extends BaseAdapter {
     private Context c;
@@ -82,12 +84,39 @@ public class MiAdaptador extends BaseAdapter {
         LinearLayout viewcomentario = vistaDiseno.findViewById(R.id.viewcomentario);
         ImageView img = vistaDiseno.findViewById(R.id.imgpendiente);
         TextView id_comentario = vistaDiseno.findViewById(R.id.id_comentario);
+        TextView id_timer = vistaDiseno.findViewById(R.id.txtTiempo);
 
             tvNombres.setText(auxi.Nombre);
             tvtelefonouno.setText(auxi.Telefonouno);
             tvtelefodos.setText(auxi.Telefonodos);
             tvtfolio.setText(auxi.Folio);
             id_comentario.setText(auxi.comentario);
+            int minutos=Integer.parseInt(auxi.Minutos);
+            int horas=Integer.parseInt(auxi.Horas);
+
+            minutos =120-minutos;
+        String Horas=formatearMinutosAHoraMinuto(minutos);
+
+
+if (minutos<=0){
+    id_timer.setText(Horas);
+    id_timer.setTextColor(Color.RED);
+    id_timer.setBackgroundColor(Color.BLACK);
+}
+if(minutos<60 && minutos>0) {
+    id_timer.setText(Horas);
+    id_timer.setTextColor(Color.YELLOW);
+    id_timer.setBackgroundColor(Color.BLACK);
+
+}
+if (minutos>60 && minutos<120){
+    id_timer.setText(Horas);
+    id_timer.setTextColor(Color.GREEN);
+    id_timer.setBackgroundColor(Color.BLACK);
+}
+
+
+
 
             if (auxi.status.equals("P")){
                 viewcomentario.setVisibility(View.VISIBLE);
@@ -148,5 +177,22 @@ public class MiAdaptador extends BaseAdapter {
 
 
         return vistaDiseno;
+    }
+
+    public String formatearMinutosAHoraMinuto(int minutos) {
+
+        String formato="";
+        if(minutos<=0){
+            formato="El tiempo expiro";
+        }
+        if(minutos<60 && minutos>0) {
+            formato="Faltan %02d:%02d Minutos para entregar el pedido";
+        }
+        if (minutos>60 && minutos<120){
+            formato="Una hora %02d con %02d minutos";
+        }
+        long horasReales = TimeUnit.MINUTES.toHours(minutos);
+        long minutosReales = TimeUnit.MINUTES.toMinutes(minutos) - TimeUnit.HOURS.toMinutes(TimeUnit.MINUTES.toHours(minutos));
+        return String.format(formato, horasReales, minutosReales);
     }
 }

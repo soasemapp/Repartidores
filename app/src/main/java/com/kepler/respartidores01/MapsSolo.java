@@ -19,6 +19,7 @@ import android.location.LocationManager;
 import android.media.AudioFocusRequest;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,6 +98,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
     String direclis = "", nombre_direccion = "", clave_cliente, clave_direccion, folioparaentregar, Telefono = "";
     double latitudclien, longitudclien;
     String estatus, comentariog;
+    ImageButton bntwaze;
 
     TextView Vendedortxt, Clientetxt, Direcciontxt;
     int contador = 0;
@@ -121,6 +124,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         strlname = preference.getString("lname", "null");
         strbranch = preference.getString("branch", "");
         strcode = preference.getString("code", "");
+        bntwaze = findViewById(R.id.bntwaze);
 
         switch (StrServer) {
             case "http://jacve.dyndns.org:9085":
@@ -726,6 +730,8 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         };
         Volley.newRequestQueue(MapsSolo.this).add(postRequest);
     }
+
+
 
 
     public void pendientemaps(View v) {

@@ -17,6 +17,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.SmsManager;
@@ -25,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -99,6 +101,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     String nombrequienrecibio = "", comentarioentre;
     LatLng miUbicacion;
     AlertDialog mDialog;
+    ImageButton bntwaze;
 
     ArrayList<String> values = new ArrayList<>();
     String[] listaDato = null;
@@ -129,7 +132,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         Vendedortxt = findViewById(R.id.txtVendedor);
         Clientetxt = findViewById(R.id.txtCliente);
         Direcciontxt = findViewById(R.id.txtDireccion);
-
+        bntwaze = findViewById(R.id.bntwaze);
 
         switch (StrServer) {
             case "http://jacve.dyndns.org:9085":
@@ -739,7 +742,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso,Hora,Minutos,PedidosHora;
                     Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
                     int json = response.length();
@@ -761,7 +764,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             latitud = jitems.getDouble("k_Latitud");
                             longitud = jitems.getDouble("k_Longitud");
                             Aviso = jitems.getString("k_Aviso");
-                            Pedidos.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso));
+                            Hora = jitems.getString("k_Horas");
+                            Minutos = jitems.getString("k_Minutos");
+                            PedidosHora = jitems.getString("k_Pedido" );
+                            Pedidos.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso,Hora,Minutos,PedidosHora));
 
                         }
                         direcciones();
@@ -1078,7 +1084,13 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         };
         Volley.newRequestQueue(MapsTodos.this).add(postRequest);
     }
+    public void btnSite (View View) {
 
+        String url = "https://ul.waze.com/ul?ll="+latcrta+"%2C"+longcort+"&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
 
     private void actualizarfirma2() {
 

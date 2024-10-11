@@ -135,5 +135,19 @@
         android:onClick="pendientemaps"
         />
 
+    <ImageButton
+        android:id="@+id/bntwaze"
+        android:layout_width="50dp"
+        android:layout_height="48dp"
+        android:layout_gravity="start"
+        android:layout_marginTop="350dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/wade"
+        android:backgroundTint="#B3FFFFFF"
+        android:elevation="2dp"
+
+        android:onClick="btnSite"
+        />
+
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

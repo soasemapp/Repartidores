@@ -31,13 +31,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </Toolbar>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="25dp">
 
+        <Button
+            android:id="@+id/ButtonTodos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:text="Todos"
+            ></Button>
+        <Button
+            android:id="@+id/ButtonClientes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:text="Cliente"
+            ></Button>
+    </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/TodoOcultar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="visible"
             android:layout_marginBottom="25dp">
+
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:layout_width="match_parent"
@@ -51,6 +78,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ClienteOcultar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:orientation="vertical"
+            android:layout_marginBottom="25dp">
+
+            <Button
+                android:id="@+id/listaclientes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Selecciona un cliente"
+                ></Button>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:showAsAction="never"
+                android:id="@+id/swipeRefresh2"
+                >
+
+                <ListView
+                    android:id="@+id/listaporentregar2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

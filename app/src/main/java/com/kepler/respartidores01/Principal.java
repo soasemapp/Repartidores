@@ -394,7 +394,7 @@ public class Principal extends AppCompatActivity {
                         if (Stauts.equals("A") && Repartidores.equals("")) {
 
                             ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N"));
+                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N","","",""));
 
                             insertarfolioesc();
 

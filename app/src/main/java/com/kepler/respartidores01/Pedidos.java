@@ -23,8 +23,11 @@ public class Pedidos {
     int Tiempo;
     String TiempoValor;
     String Aviso;
+    String Horas ;
+    String  Minutos ;
+    String PedidoHora ;
 
-    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor,String Aviso) {
+    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor, String aviso, String horas, String minutos, String pedidoHora) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -42,7 +45,10 @@ public class Pedidos {
         DistanciaText = distanciaText;
         Tiempo = tiempo;
         TiempoValor = tiempoValor;
-        this.Aviso =Aviso;
+        Aviso = aviso;
+        Horas = horas;
+        Minutos = minutos;
+        PedidoHora = pedidoHora;
     }
 
     public String getSucursal() {
@@ -187,5 +193,29 @@ public class Pedidos {
 
     public void setAviso(String aviso) {
         Aviso = aviso;
+    }
+
+    public String getHoras() {
+        return Horas;
+    }
+
+    public void setHoras(String horas) {
+        Horas = horas;
+    }
+
+    public String getMinutos() {
+        return Minutos;
+    }
+
+    public void setMinutos(String minutos) {
+        Minutos = minutos;
+    }
+
+    public String getPedidoHora() {
+        return PedidoHora;
+    }
+
+    public void setPedidoHora(String pedidoHora) {
+        PedidoHora = pedidoHora;
     }
 }
