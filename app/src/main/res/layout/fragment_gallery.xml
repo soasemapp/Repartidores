@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_marginBottom="25dp">
 
 
@@ -87,7 +87,7 @@
             android:id="@+id/ClienteOcultar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
+            android:visibility="visible"
             android:orientation="vertical"
             android:layout_marginBottom="25dp">
 
@@ -108,7 +108,7 @@
                 ></Button>
 
                 <Button
-                    android:id="@+id/btnall"
+                    android:id="@+id/btn_entregar_todo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

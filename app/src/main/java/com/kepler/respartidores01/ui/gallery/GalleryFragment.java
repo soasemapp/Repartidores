@@ -69,32 +69,32 @@ import java.util.Set;
 public class GalleryFragment extends Fragment {
     MiAdaptador miAdaptador;
     MiAdaptador miAdaptador2;
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
     private FragmentGalleryBinding binding;
     String folioparaentregar;
     ListView lista;
     ListView lista2;
     ListView lisdf;
-    TextView txtpu,txtpt;
+    TextView txtpu, txtpt;
     int j;
-    public ArrayList<Pedidos> lpeA=new ArrayList<>();
-    public ArrayList<Mdestallefac> ldf=new ArrayList<>();
-    public ArrayList<SetAndGetListClientes> ClientesListas=new ArrayList<>();
+    public ArrayList<Pedidos> lpeA = new ArrayList<>();
+    public ArrayList<Mdestallefac> ldf = new ArrayList<>();
+    public ArrayList<SetAndGetListClientes> ClientesListas = new ArrayList<>();
     String mensajes;
-
+    Button btn_entregar_todo;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String  struser, strcode, strbranch, strpass,strname, strlname,stremail;
-    String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc =null;
-    String strscliente;
+    String struser, strcode, strbranch, strpass, strname, strlname, stremail;
+    String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc = null;
+    String strscliente="";
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
     private TextView sucur;
-    TextView fol,cli,nom,npac,tun,tdos,di;
+    TextView fol, cli, nom, npac, tun, tdos, di;
     LinearLayout ClientesOcular;
     LinearLayout TodosOcultar;
-    Button ButtonCliente,ButtonTodos,ButtonListaClientes;
+    Button ButtonCliente, ButtonTodos, ButtonListaClientes;
     Set<String> setD = new HashSet<>();
     Set<String> setN = new HashSet<>();
     Set<String> setC = new HashSet<>();
@@ -102,19 +102,18 @@ public class GalleryFragment extends Fragment {
 
     String DFfolio, DFsucursal, DFcliente, DFnombre;
 
-    String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec,preciounitario="",preciototal="";
+    String producto, descripcion, cantidad, entregorc, entregofolio, entregodirec, preciounitario = "", preciototal = "";
     String folioconfirma, sucursalonfrima, recibiofir, comentariog;
     private SwipeRefreshLayout refreshLayout;
     private SwipeRefreshLayout refreshLayout2;
     String estatus;
-    String smsCamino,Empresa,CONFIGURACION="";
+    String smsCamino, Empresa, CONFIGURACION = "";
 
 
-    String Sucursal,Folios,Nombres;
+    String Sucursal, Folios, Nombres;
     android.app.AlertDialog.Builder builder6;
     android.app.AlertDialog dialog6 = null;
-    int posicion=0;
-
+    int posicion = 0;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -141,7 +140,7 @@ public class GalleryFragment extends Fragment {
         strcode = preference.getString("code", "");
         strname = preference.getString("name", "null");
         strlname = preference.getString("lname", "null");
-        stremail=preference.getString("email","null");
+        stremail = preference.getString("email", "null");
 
 
         escnombre = preference.getString("Nombreescrito", "null");
@@ -149,22 +148,125 @@ public class GalleryFragment extends Fragment {
         escnumun = preference.getString("Num1_escrito", "null");
         escnumdos = preference.getString("Num2escrito", "null");
         escdireccion = preference.getString("direccionescrito", "null");
-        escnumc=preference.getString("numc","");
+        escnumc = preference.getString("numc", "");
 
-        ButtonTodos=getView().findViewById(R.id.ButtonTodos);
-        ButtonCliente=getActivity().findViewById(R.id.ButtonClientes);
+        ButtonTodos = getView().findViewById(R.id.ButtonTodos);
+        ButtonCliente = getActivity().findViewById(R.id.ButtonClientes);
         ButtonCliente.setBackgroundColor(Color.RED);
         ButtonTodos.setBackgroundColor(Color.BLACK);
-        ClientesOcular=getView().findViewById(R.id.ClienteOcultar);
-        TodosOcultar=getView().findViewById(R.id.TodoOcultar);
-        ButtonListaClientes=getActivity().findViewById(R.id.listaclientes);
-        entregorc= preference.getString("recibio","");
-        entregodirec=preference.getString("entregoDirec","");
+        ClientesOcular = getView().findViewById(R.id.ClienteOcultar);
+        TodosOcultar = getView().findViewById(R.id.TodoOcultar);
+        ButtonListaClientes = getActivity().findViewById(R.id.listaclientes);
+        btn_entregar_todo=getActivity().findViewById(R.id.btn_entregar_todo);
+        entregorc = preference.getString("recibio", "");
+        entregodirec = preference.getString("entregoDirec", "");
         setD.clear();
         lpeA.clear();
         builder6 = new android.app.AlertDialog.Builder(getActivity());
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.pantallacarga, null);
+
+
+        btn_entregar_todo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               if (!strscliente.isEmpty()){
+                   comentariog = null;
+                   estatus = null;
+
+
+                   builder = new AlertDialog.Builder(getContext());
+                   LayoutInflater inflaterentrega = getLayoutInflater();
+                   View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+                   builder.setView(dialogViewww);
+                   EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+                   EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+                   Button enttegar = dialogViewww.findViewById(R.id.btentre);
+                   enttegar.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View view) {
+                           estatus = "E";
+                           recibio.getText().toString();
+                           comentario.getText().toString();
+                           String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+                           if (!lpeA.get(0).getTelefonodos().equals("")) {
+
+                               smsCamino = Empresa + " agradece su preferencia.\n" +
+                                       "" + lpeA.get(0).getNombre() + ", Su pedido con el folio " + lpeA.get(0).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
+                                       "Le deseamos un excelente día.";
+
+                               SmsManager smsManager = SmsManager.getDefault();
+                               smsManager.sendTextMessage(lpeA.get(0).getTelefonodos(), null, smsCamino, null, null);
+                           }
+
+                           if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                              for (int i = 0; i < lpeA.size(); i++) {
+                                    String folio="";
+                                    String recibiostr=recibio.getText().toString();
+                                    String comentariostr=comentario.getText().toString();
+                                    folio = lpeA.get(i).getFolio();
+
+
+
+                                  actualizarfirmanuevo(estatus,folio,recibiostr,comentariostr,currentTime);
+                               }
+                               dialog.dismiss();
+                               android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                               alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialogInterface, int i) {
+                                       dialogInterface.cancel();
+
+                                   }
+                               });
+
+                               android.app.AlertDialog titulo = alerta.create();
+                               titulo.setTitle("");
+                               titulo.show();
+                               lpeA.clear();
+                               ClientesListas.clear();
+                               leerWSListaClientes();
+                               leerWSCONFIGURACION();
+
+                               strscliente="";
+                               ButtonListaClientes.setText("Selecciona un cliente");
+
+                           }else{
+                               android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                               alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                   @Override
+                                   public void onClick(DialogInterface dialogInterface, int i) {
+                                       dialogInterface.cancel();
+                                   }
+                               });
+
+                               android.app.AlertDialog titulo = alerta.create();
+                               titulo.setTitle("Faltan casillas por rellenar");
+                               titulo.show();
+                           }
+
+                       }
+                   });
+
+                   dialog = builder.create();
+                   dialog.show();
+
+               }else {
+                   android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                   alerta.setMessage("Selecciona un cliente porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                       }
+                   });
+
+                   android.app.AlertDialog titulo = alerta.create();
+                   titulo.setTitle("Verifica");
+                   titulo.show();
+               }
+            }
+        });
 
 
         ButtonListaClientes.setOnClickListener(new View.OnClickListener() {
@@ -203,49 +305,47 @@ public class GalleryFragment extends Fragment {
         leerWSCONFIGURACION();
 
 
-
-
 //Mensaje de Aviso de del folio va en camino
 
 
         //Mensaje de que el folio a sido entregado
         switch (StrServer) {
             case "http://jacve.dyndns.org:9085":
-                Empresa="JACVE";
+                Empresa = "JACVE";
                 break;
             case "http://sprautomotive.servehttp.com:9085":
-                Empresa="VIPLA";
+                Empresa = "VIPLA";
                 break;
             case "http://cecra.ath.cx:9085":
-                Empresa="CECRA";
+                Empresa = "CECRA";
                 break;
             case "http://guvi.ath.cx:9085":
-                Empresa="GUVI";
+                Empresa = "GUVI";
                 break;
             case "http://cedistabasco.ddns.net:9085":
-                Empresa="PRESSA";
+                Empresa = "PRESSA";
                 break;
             case "http://autodis.ath.cx:9085":
-                Empresa="AUTODIS";
+                Empresa = "AUTODIS";
                 break;
 
             case "http://sprautomotive.servehttp.com:9090":
-                Empresa="RODATECH";
+                Empresa = "RODATECH";
                 break;
             case "http://sprautomotive.servehttp.com:9095":
-                Empresa="PARTECH";
+                Empresa = "PARTECH";
                 break;
             case "http://sprautomotive.servehttp.com:9080":
-                Empresa="TG";
+                Empresa = "TG";
                 break;
             case "http://autotop.ath.cx:9090":
-                Empresa="AUTOTOP";
+                Empresa = "AUTOTOP";
                 break;
             case "http://autotop.ath.cx:9085":
-                Empresa="TOTALCAR";
+                Empresa = "TOTALCAR";
                 break;
             case "http://autotop.ath.cx:9080":
-                Empresa="PRUEBA";
+                Empresa = "PRUEBA";
                 break;
             default:
                 break;
@@ -280,26 +380,26 @@ public class GalleryFragment extends Fragment {
                 }
         );
         refreshLayout.setColorSchemeResources(R.color.ColorRojoTenue);
-ButtonCliente.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        ClientesOcular.setVisibility(View.VISIBLE);
-        TodosOcultar.setVisibility(View.GONE);
-        ButtonCliente.setBackgroundColor(Color.BLACK);
-        ButtonTodos.setBackgroundColor(Color.RED);
-    }
-});
-ButtonTodos.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-        ClientesOcular.setVisibility(View.GONE);
-        TodosOcultar.setVisibility(View.VISIBLE);
-        ButtonCliente.setBackgroundColor(Color.RED);
-        ButtonTodos.setBackgroundColor(Color.BLACK);
-    }
-});
+        ButtonCliente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClientesOcular.setVisibility(View.VISIBLE);
+                TodosOcultar.setVisibility(View.GONE);
+                ButtonCliente.setBackgroundColor(Color.BLACK);
+                ButtonTodos.setBackgroundColor(Color.RED);
+            }
+        });
+        ButtonTodos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClientesOcular.setVisibility(View.GONE);
+                TodosOcultar.setVisibility(View.VISIBLE);
+                ButtonCliente.setBackgroundColor(Color.RED);
+                ButtonTodos.setBackgroundColor(Color.BLACK);
+            }
+        });
 
- }
+    }
 
     public class HackingBackgroundTaskk extends AsyncTask<Void, Void, Void> {
 
@@ -314,7 +414,7 @@ ButtonTodos.setOnClickListener(new View.OnClickListener() {
                 e.printStackTrace();
             }
 
-           return null;
+            return null;
         }
 
         @Override
@@ -323,7 +423,7 @@ ButtonTodos.setOnClickListener(new View.OnClickListener() {
             lpeA.clear();
             LeerWs();
             leerWSListaClientes();
-            ClientesListas=new ArrayList<>();
+            ClientesListas = new ArrayList<>();
             refreshLayout.setRefreshing(false);
         }
 
@@ -350,7 +450,7 @@ ButtonTodos.setOnClickListener(new View.OnClickListener() {
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             lpeA.clear();
-            ClientesListas=new ArrayList<>();
+            ClientesListas = new ArrayList<>();
             LeerWs2();
             leerWSListaClientes();
             refreshLayout2.setRefreshing(false);
@@ -364,59 +464,58 @@ ButtonTodos.setOnClickListener(new View.OnClickListener() {
         super.onDestroyView();
     }
 
-private void leerWSCONFIGURACION(){
+    private void leerWSCONFIGURACION() {
 
-    String url =StrServer+"/configuracion";
+        String url = StrServer + "/configuracion";
 
-    StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-        @Override
-        public void onResponse(String response) {
-            try {
+        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
 
-                JSONObject jItem;
-                JSONObject jitems;
-                String Repartidores="";
-                JSONObject jsonObject = new JSONObject(response);
+                    JSONObject jItem;
+                    JSONObject jitems;
+                    String Repartidores = "";
+                    JSONObject jsonObject = new JSONObject(response);
 
-                jItem = jsonObject.getJSONObject("Item");
-                for (int i = 0; i <jItem.length(); i++) {
-                    jitems = jItem.getJSONObject(""+i);
-                    CONFIGURACION = jitems.getString("Repartidores");
+                    jItem = jsonObject.getJSONObject("Item");
+                    for (int i = 0; i < jItem.length(); i++) {
+                        jitems = jItem.getJSONObject("" + i);
+                        CONFIGURACION = jitems.getString("Repartidores");
+                    }
+
+                    LeerWs();
+
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
                 }
 
-                LeerWs();
-
-
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user", struser);
+                header.put("pass", strpass);
+                return header;
             }
 
-        }
-    },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            })
-    {
-        @Override
-        public Map<String, String> getHeaders() throws AuthFailureError {
-            HashMap header = new HashMap();
-            header.put("user",struser);
-            header.put("pass",strpass);
-            return header;
-        }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
 
-    };
-    Volley.newRequestQueue(getActivity()).add(postRequest);
-
-}
+    }
 
 
-    private void leerWSListaClientes(){
+    private void leerWSListaClientes() {
 
-        String url =StrServer+"/listclientesrepar";
+        String url = StrServer + "/listclientesrepar";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -425,8 +524,8 @@ private void leerWSCONFIGURACION(){
 
                     JSONObject jItem;
                     JSONObject jitems;
-                    String Repartidores="";
-                    String clave,nom;
+                    String Repartidores = "";
+                    String clave, nom;
 
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -438,7 +537,7 @@ private void leerWSCONFIGURACION(){
                             nom = jitems.getString("k_cliente");
 
 
-                            ClientesListas.add(new SetAndGetListClientes(clave,nom));
+                            ClientesListas.add(new SetAndGetListClientes(clave, nom));
 
 
                         }
@@ -456,20 +555,20 @@ private void leerWSCONFIGURACION(){
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("id_repartidor",strcode);
+                params.put("sucursal", strbranch);
+                params.put("id_repartidor", strcode);
                 return params;
             }
         };
@@ -478,24 +577,24 @@ private void leerWSCONFIGURACION(){
     }
 
 
-    private void LeerWs(){
+    public void LeerWs() {
         lpeA.clear();
         setD.clear();
-        String url =StrServer+"/consulxEn";
+        String url = StrServer + "/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq,comentario,status,direccionclave,Aviso,Hora,Minutos,Pedidos;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso, Hora, Minutos, Pedidos;
                     Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
 
 
                     if (jsonObject.length() != 0) {
                         jfacturas = jsonObject.getJSONObject("Repartidores");
-                        for (int i = 0; i <jfacturas.length(); i++) {
+                        for (int i = 0; i < jfacturas.length(); i++) {
                             jitems = jfacturas.getJSONObject("items" + i);
                             sucu = jitems.getString("k_Sucursal");
                             folio = jitems.getString("k_Folio");
@@ -514,11 +613,10 @@ private void leerWSCONFIGURACION(){
 
                             Hora = jitems.getString("k_Horas");
                             Minutos = jitems.getString("k_Minutos");
-                            Pedidos = jitems.getString("k_Pedido" );
+                            Pedidos = jitems.getString("k_Pedido");
 
 
-
-                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,comentario,status,direccionclave,latitud,longitud,0,"",0,"",Aviso,Hora,Minutos,Pedidos));
+                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso, Hora, Minutos, Pedidos));
                             setD.add(direccion);
 
 
@@ -534,7 +632,7 @@ private void leerWSCONFIGURACION(){
                                 dialogInterface.cancel();
                                 lpeA.clear();
                                 lista = (ListView) getView().findViewById(R.id.listaporentregar);
-                                miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                                miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA, CONFIGURACION);
                                 lista.setAdapter(miAdaptador);
 
                             }
@@ -551,7 +649,7 @@ private void leerWSCONFIGURACION(){
                 //crea la lista
                 if (lpeA.size() != 0) {
                     lista = (ListView) getView().findViewById(R.id.listaporentregar);
-                     miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                    miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA, CONFIGURACION);
                     lista.setAdapter(miAdaptador);
 
                     //para el detlle de factura
@@ -598,12 +696,12 @@ private void leerWSCONFIGURACION(){
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                    Sucursal =lpeA.get(position).getSucursal();
-                                                    Folios =lpeA.get(position).getFolio();
-                                                    Nombres=lpeA.get(position).getCliente();
+                                                    Sucursal = lpeA.get(position).getSucursal();
+                                                    Folios = lpeA.get(position).getFolio();
+                                                    Nombres = lpeA.get(position).getCliente();
 
 
-                                                    detalleFactura(Sucursal,Folios,Nombres);
+                                                    detalleFactura(Sucursal, Folios, Nombres);
                                                 }
                                             });
                                     dialog = builder.create();
@@ -620,28 +718,24 @@ private void leerWSCONFIGURACION(){
                                     startActivity(intent);*/
 
 
-
-
-
                                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             Bundle extras = new Bundle();
-                                            folioparaentregar=lpeA.get(position).getFolio();
-                                            if( lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("") ){
-                                                if(!lpeA.get(position).getTelefonodos().equals("")){
-                                                    smsCamino="En "+Empresa+" trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio "+folioparaentregar+" va en camino por el Repartidor "+strname+" "+strlname+".";
+                                            folioparaentregar = lpeA.get(position).getFolio();
+                                            if (lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("")) {
+                                                if (!lpeA.get(position).getTelefonodos().equals("")) {
+                                                    smsCamino = "En " + Empresa + " trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio " + folioparaentregar + " va en camino por el Repartidor " + strname + " " + strlname + ".";
 
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
-                                                Aviso();
+                                                    Aviso();
                                                 }
                                             }
 
 
-
-                                            extras.putString("directlista",  lpeA.get(position).getDireccion());
+                                            extras.putString("directlista", lpeA.get(position).getDireccion());
                                             extras.putString("nombre_direccion", lpeA.get(position).getNombre());
                                             extras.putString("clave_cliente", lpeA.get(position).getCliente());
                                             extras.putDouble("latitud", lpeA.get(position).getLatitud());
@@ -649,8 +743,6 @@ private void leerWSCONFIGURACION(){
                                             extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
                                             extras.putString("folios", lpeA.get(position).getFolio());
                                             extras.putString("Telefono", lpeA.get(position).getTelefonodos());
-
-
 
 
                                             Intent intent = new Intent(getContext(), MapsSolo.class);
@@ -675,34 +767,34 @@ private void leerWSCONFIGURACION(){
                                     alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                            comentariog=null;
-                                            estatus=null;
+                                            comentariog = null;
+                                            estatus = null;
 
 
                                             builder = new AlertDialog.Builder(getContext());
                                             LayoutInflater inflaterentrega = getLayoutInflater();
                                             View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
                                             builder.setView(dialogViewww);
-                                            EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
-                                            EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
-                                            Button enttegar=dialogViewww.findViewById(R.id.btentre);
+                                            EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+                                            EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+                                            Button enttegar = dialogViewww.findViewById(R.id.btentre);
                                             enttegar.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
-                                                    estatus="E";
+                                                    estatus = "E";
                                                     recibio.getText().toString();
                                                     comentario.getText().toString();
 
-                                                    if(!lpeA.get(position).getTelefonodos().equals("")){
+                                                    if (!lpeA.get(position).getTelefonodos().equals("")) {
 
-                                                         smsCamino=Empresa+" agradece su preferencia.\n" +
-                                                                ""+lpeA.get(position).getNombre()+", Su pedido con el folio "+lpeA.get(position).getFolio()+" ha sido entregado por el Repartidor "+strname+" "+strlname+" a "+recibio+". \n" +
+                                                        smsCamino = Empresa + " agradece su preferencia.\n" +
+                                                                "" + lpeA.get(position).getNombre() + ", Su pedido con el folio " + lpeA.get(position).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
                                                                 "Le deseamos un excelente día.";
 
                                                         SmsManager smsManager = SmsManager.getDefault();
                                                         smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
                                                     }
-                                                    if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                                                    if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                                                         editor.putString("recibio", recibio.getText().toString());
                                                         editor.putString("entregoSucursal", lpeA.get(position).getSucursal());
@@ -715,7 +807,7 @@ private void leerWSCONFIGURACION(){
                                                         editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
                                                         editor.putString("Comentario", comentario.getText().toString());
                                                         editor.putInt("posicion", position);
-                                                        posicion =position;
+                                                        posicion = position;
 
                                                         editor.commit();
                                                         editor.apply();
@@ -723,7 +815,7 @@ private void leerWSCONFIGURACION(){
                                                         actualizarfirma();
                                                         dialog.dismiss();
 
-                                                    }else{
+                                                    } else {
                                                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -751,14 +843,9 @@ private void leerWSCONFIGURACION(){
                                         }
                                     });
 
-                                     titulo = alerta.create();
+                                    titulo = alerta.create();
                                     titulo.setTitle("¿Realizar la entrega?");
                                     titulo.show();
-
-
-
-
-
 
 
                                     break;
@@ -769,24 +856,24 @@ private void leerWSCONFIGURACION(){
                                     alerta.setMessage("¿Deseas dejar pendiente este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                            comentariog=null;
-                                            estatus=null;
+                                            comentariog = null;
+                                            estatus = null;
 
                                             builder = new AlertDialog.Builder(getContext());
                                             LayoutInflater inflatependi = getLayoutInflater();
                                             View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
                                             builder.setView(dialogVie);
 
-                                            EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
-                                            Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
+                                            EditText compendiente = dialogVie.findViewById(R.id.motivo_pendiente);
+                                            Button pendiente = dialogVie.findViewById(R.id.btn_pendientemot);
 
                                             pendiente.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
-                                                    estatus="P";
+                                                    estatus = "P";
                                                     compendiente.getText().toString();
 
-                                                    if(!compendiente.getText().toString().equals("")) {
+                                                    if (!compendiente.getText().toString().equals("")) {
 
                                                         editor.putString("entregoFolio", lpeA.get(position).getFolio());
                                                         editor.putString("Comentario", compendiente.getText().toString());
@@ -796,7 +883,7 @@ private void leerWSCONFIGURACION(){
                                                         actualizarfirma();
                                                         dialog.dismiss();
 
-                                                    }else{
+                                                    } else {
                                                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -828,10 +915,6 @@ private void leerWSCONFIGURACION(){
                                     titulo.show();
 
 
-
-
-
-
                                     break;
 
                                 default:
@@ -848,46 +931,45 @@ private void leerWSCONFIGURACION(){
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("id_repartidor",strcode);
+                params.put("sucursal", strbranch);
+                params.put("id_repartidor", strcode);
                 return params;
             }
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
-}
+    }
 
 
-
-    private void LeerWs2(){
+    private void LeerWs2() {
         lpeA.clear();
         setD.clear();
-        String url =StrServer+"/consulxEnclientes";
+        String url = StrServer + "/consulxEnclientes";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq,comentario,status,direccionclave,Aviso,Hora,Minutos,Pedidos;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso, Hora, Minutos, Pedidos;
                     Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
 
 
                     if (jsonObject.length() != 0) {
                         jfacturas = jsonObject.getJSONObject("Repartidores");
-                        for (int i = 0; i <jfacturas.length(); i++) {
+                        for (int i = 0; i < jfacturas.length(); i++) {
                             jitems = jfacturas.getJSONObject("items" + i);
                             sucu = jitems.getString("k_Sucursal");
                             folio = jitems.getString("k_Folio");
@@ -906,11 +988,10 @@ private void leerWSCONFIGURACION(){
 
                             Hora = jitems.getString("k_Horas");
                             Minutos = jitems.getString("k_Minutos");
-                            Pedidos = jitems.getString("k_Pedido" );
+                            Pedidos = jitems.getString("k_Pedido");
 
 
-
-                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion,comentario,status,direccionclave,latitud,longitud,0,"",0,"",Aviso,Hora,Minutos,Pedidos));
+                            lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso, Hora, Minutos, Pedidos));
                             setD.add(direccion);
 
 
@@ -926,7 +1007,7 @@ private void leerWSCONFIGURACION(){
                                 dialogInterface.cancel();
                                 lpeA.clear();
                                 lista2 = (ListView) getView().findViewById(R.id.listaporentregar2);
-                                miAdaptador2 = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                                miAdaptador2 = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA, CONFIGURACION);
                                 lista2.setAdapter(miAdaptador2);
 
                             }
@@ -943,7 +1024,7 @@ private void leerWSCONFIGURACION(){
                 //crea la lista
                 if (lpeA.size() != 0) {
                     lista2 = (ListView) getView().findViewById(R.id.listaporentregar2);
-                    miAdaptador2 = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                    miAdaptador2 = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA, CONFIGURACION);
                     lista2.setAdapter(miAdaptador2);
 
                     //para el detlle de factura
@@ -990,12 +1071,12 @@ private void leerWSCONFIGURACION(){
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                    Sucursal =lpeA.get(position).getSucursal();
-                                                    Folios =lpeA.get(position).getFolio();
-                                                    Nombres=lpeA.get(position).getCliente();
+                                                    Sucursal = lpeA.get(position).getSucursal();
+                                                    Folios = lpeA.get(position).getFolio();
+                                                    Nombres = lpeA.get(position).getCliente();
 
 
-                                                    detalleFactura(Sucursal,Folios,Nombres);
+                                                    detalleFactura(Sucursal, Folios, Nombres);
                                                 }
                                             });
                                     dialog = builder.create();
@@ -1012,18 +1093,15 @@ private void leerWSCONFIGURACION(){
                                     startActivity(intent);*/
 
 
-
-
-
                                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
                                             Bundle extras = new Bundle();
-                                            folioparaentregar=lpeA.get(position).getFolio();
-                                            if( lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("") ){
-                                                if(!lpeA.get(position).getTelefonodos().equals("")){
-                                                    smsCamino="En "+Empresa+" trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio "+folioparaentregar+" va en camino por el Repartidor "+strname+" "+strlname+".";
+                                            folioparaentregar = lpeA.get(position).getFolio();
+                                            if (lpeA.get(position).getAviso().equals("N") || lpeA.get(position).getAviso().equals("")) {
+                                                if (!lpeA.get(position).getTelefonodos().equals("")) {
+                                                    smsCamino = "En " + Empresa + " trabajamos para brindarle un mejor servicio y agradecemos su compra con el Folio " + folioparaentregar + " va en camino por el Repartidor " + strname + " " + strlname + ".";
 
                                                     SmsManager smsManager = SmsManager.getDefault();
                                                     smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
@@ -1032,8 +1110,7 @@ private void leerWSCONFIGURACION(){
                                             }
 
 
-
-                                            extras.putString("directlista",  lpeA.get(position).getDireccion());
+                                            extras.putString("directlista", lpeA.get(position).getDireccion());
                                             extras.putString("nombre_direccion", lpeA.get(position).getNombre());
                                             extras.putString("clave_cliente", lpeA.get(position).getCliente());
                                             extras.putDouble("latitud", lpeA.get(position).getLatitud());
@@ -1041,8 +1118,6 @@ private void leerWSCONFIGURACION(){
                                             extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
                                             extras.putString("folios", lpeA.get(position).getFolio());
                                             extras.putString("Telefono", lpeA.get(position).getTelefonodos());
-
-
 
 
                                             Intent intent = new Intent(getContext(), MapsSolo.class);
@@ -1067,34 +1142,34 @@ private void leerWSCONFIGURACION(){
                                     alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                            comentariog=null;
-                                            estatus=null;
+                                            comentariog = null;
+                                            estatus = null;
 
 
                                             builder = new AlertDialog.Builder(getContext());
                                             LayoutInflater inflaterentrega = getLayoutInflater();
                                             View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
                                             builder.setView(dialogViewww);
-                                            EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
-                                            EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
-                                            Button enttegar=dialogViewww.findViewById(R.id.btentre);
+                                            EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+                                            EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+                                            Button enttegar = dialogViewww.findViewById(R.id.btentre);
                                             enttegar.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
-                                                    estatus="E";
+                                                    estatus = "E";
                                                     recibio.getText().toString();
                                                     comentario.getText().toString();
 
-                                                    if(!lpeA.get(position).getTelefonodos().equals("")){
+                                                    if (!lpeA.get(position).getTelefonodos().equals("")) {
 
-                                                        smsCamino=Empresa+" agradece su preferencia.\n" +
-                                                                ""+lpeA.get(position).getNombre()+", Su pedido con el folio "+lpeA.get(position).getFolio()+" ha sido entregado por el Repartidor "+strname+" "+strlname+" a "+recibio+". \n" +
+                                                        smsCamino = Empresa + " agradece su preferencia.\n" +
+                                                                "" + lpeA.get(position).getNombre() + ", Su pedido con el folio " + lpeA.get(position).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
                                                                 "Le deseamos un excelente día.";
 
                                                         SmsManager smsManager = SmsManager.getDefault();
                                                         smsManager.sendTextMessage(lpeA.get(position).getTelefonodos(), null, smsCamino, null, null);
                                                     }
-                                                    if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                                                    if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                                                         editor.putString("recibio", recibio.getText().toString());
                                                         editor.putString("entregoSucursal", lpeA.get(position).getSucursal());
@@ -1107,7 +1182,7 @@ private void leerWSCONFIGURACION(){
                                                         editor.putString("entregoNumpaq", lpeA.get(position).getNumpaq());
                                                         editor.putString("Comentario", comentario.getText().toString());
                                                         editor.putInt("posicion", position);
-                                                        posicion =position;
+                                                        posicion = position;
 
                                                         editor.commit();
                                                         editor.apply();
@@ -1115,7 +1190,7 @@ private void leerWSCONFIGURACION(){
                                                         actualizarfirma();
                                                         dialog.dismiss();
 
-                                                    }else{
+                                                    } else {
                                                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -1148,11 +1223,6 @@ private void leerWSCONFIGURACION(){
                                     titulo.show();
 
 
-
-
-
-
-
                                     break;
                                 case R.id.btnpendiente:
 
@@ -1161,24 +1231,24 @@ private void leerWSCONFIGURACION(){
                                     alerta.setMessage("¿Deseas dejar pendiente este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
-                                            comentariog=null;
-                                            estatus=null;
+                                            comentariog = null;
+                                            estatus = null;
 
                                             builder = new AlertDialog.Builder(getContext());
                                             LayoutInflater inflatependi = getLayoutInflater();
                                             View dialogVie = inflatependi.inflate(R.layout.diseno_pendiente, null);
                                             builder.setView(dialogVie);
 
-                                            EditText compendiente=dialogVie.findViewById(R.id.motivo_pendiente);
-                                            Button pendiente=dialogVie.findViewById(R.id.btn_pendientemot);
+                                            EditText compendiente = dialogVie.findViewById(R.id.motivo_pendiente);
+                                            Button pendiente = dialogVie.findViewById(R.id.btn_pendientemot);
 
                                             pendiente.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
-                                                    estatus="P";
+                                                    estatus = "P";
                                                     compendiente.getText().toString();
 
-                                                    if(!compendiente.getText().toString().equals("")) {
+                                                    if (!compendiente.getText().toString().equals("")) {
 
                                                         editor.putString("entregoFolio", lpeA.get(position).getFolio());
                                                         editor.putString("Comentario", compendiente.getText().toString());
@@ -1188,7 +1258,7 @@ private void leerWSCONFIGURACION(){
                                                         actualizarfirma();
                                                         dialog.dismiss();
 
-                                                    }else{
+                                                    } else {
                                                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
@@ -1220,10 +1290,6 @@ private void leerWSCONFIGURACION(){
                                     titulo.show();
 
 
-
-
-
-
                                     break;
 
                                 default:
@@ -1240,21 +1306,21 @@ private void leerWSCONFIGURACION(){
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("id_repartidor",strcode);
-                params.put("clientes",strscliente);
+                params.put("sucursal", strbranch);
+                params.put("id_repartidor", strcode);
+                params.put("clientes", strscliente);
                 return params;
             }
         };
@@ -1262,9 +1328,9 @@ private void leerWSCONFIGURACION(){
     }
 
 
-    private void Aviso(){
+    private void Aviso() {
 
-        String url =StrServer+"/Aviso";
+        String url = StrServer + "/Aviso";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -1284,20 +1350,20 @@ private void leerWSCONFIGURACION(){
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("folio",folioparaentregar);
+                params.put("sucursal", strbranch);
+                params.put("folio", folioparaentregar);
                 return params;
             }
         };
@@ -1305,13 +1371,12 @@ private void leerWSCONFIGURACION(){
     }
 
 
-    private void detalleFactura(String Sucursal,String Folios,String Nombres){
+    private void detalleFactura(String Sucursal, String Folios, String Nombres) {
         int pos;
         ldf.clear();
 
 
-
-        String url =StrServer+"/detallefac";
+        String url = StrServer + "/detallefac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @SuppressLint("MissingInflatedId")
             @Override
@@ -1322,17 +1387,17 @@ private void leerWSCONFIGURACION(){
                     JSONObject jsonObject = new JSONObject(response);
 
                     jfacturas = jsonObject.getJSONObject("Repartidores");
-                    for (int i = 0; i <jfacturas.length(); i++) {
-                        jitems = jfacturas.getJSONObject("items"+i);
+                    for (int i = 0; i < jfacturas.length(); i++) {
+                        jitems = jfacturas.getJSONObject("items" + i);
                         producto = jitems.getString("k_Producto");
                         descripcion = jitems.getString("k_Descripcion");
                         cantidad = jitems.getString("k_Cantidad");
-                       if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
-                           preciounitario = jitems.getString("k_preciou");
-                           preciototal = jitems.getString("k_preciototal");
-                       }
+                        if (StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080")) {
+                            preciounitario = jitems.getString("k_preciou");
+                            preciototal = jitems.getString("k_preciototal");
+                        }
 
-                        ldf.add(new Mdestallefac(producto,descripcion,cantidad,preciounitario,preciototal));
+                        ldf.add(new Mdestallefac(producto, descripcion, cantidad, preciounitario, preciototal));
                     }
 
                 } catch (JSONException e) {
@@ -1345,13 +1410,13 @@ private void leerWSCONFIGURACION(){
 
                 lisdf = (ListView) dialogVieww.findViewById(R.id.lis_detfac);
 
-                txtpu=(TextView)dialogVieww.findViewById(R.id.txvpru);
-                txtpt=(TextView)dialogVieww.findViewById(R.id.txvprt);
-                if(StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080") ) {
+                txtpu = (TextView) dialogVieww.findViewById(R.id.txvpru);
+                txtpt = (TextView) dialogVieww.findViewById(R.id.txvprt);
+                if (StrServer.equals("http://autotop.ath.cx:9090") || StrServer.equals("http://autotop.ath.cx:9085") || StrServer.equals("http://autotop.ath.cx:9080")) {
                     txtpu.setVisibility(View.VISIBLE);
                     txtpt.setVisibility(View.VISIBLE);
                 }
-                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf,StrServer);
+                AdapeterDetallefac miAdaptador = new AdapeterDetallefac(getActivity(), R.layout.disenodetfac, ldf, StrServer);
                 lisdf.setAdapter(miAdaptador);
 
                 builder.setView(dialogVieww)
@@ -1372,26 +1437,23 @@ private void leerWSCONFIGURACION(){
                     public void onErrorResponse(VolleyError error) {
 
 
-
-
-
                         Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("cliente",Nombres);
-                params.put("folio",Folios);
+                params.put("sucursal", strbranch);
+                params.put("cliente", Nombres);
+                params.put("folio", Folios);
                 return params;
             }
         };
@@ -1399,22 +1461,15 @@ private void leerWSCONFIGURACION(){
     }
 
 
+    private void actualizarfirma() {
 
-
-
-
-
-
-
-    private void actualizarfirma(){
-
-        folioconfirma=preference.getString("entregoFolio","");
-        recibiofir=preference.getString("recibio","");
-        comentariog=preference.getString("Comentario","");
-        int posi= preference.getInt("posicion",0);
+        folioconfirma = preference.getString("entregoFolio", "");
+        recibiofir = preference.getString("recibio", "");
+        comentariog = preference.getString("Comentario", "");
+        int posi = preference.getInt("posicion", 0);
 
         String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-        String url =StrServer+"/recibeR";
+        String url = StrServer + "/recibeR";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -1422,12 +1477,12 @@ private void leerWSCONFIGURACION(){
                 try {
                     JSONObject jsonObject = new JSONObject(response);
 
-                    mensajes= jsonObject.getString("Repartidores");
-                    if(!estatus.equals("P")){
+                    mensajes = jsonObject.getString("Repartidores");
+                    if (!estatus.equals("P")) {
                         lpeA.remove(posicion);
-                        miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA,CONFIGURACION);
+                        miAdaptador = new MiAdaptador(getActivity(), R.layout.diseno_item, lpeA, CONFIGURACION);
                         lista.setAdapter(miAdaptador);
-                    }else{
+                    } else {
                         Intent intent = new Intent(getContext(), Principal.class);
 
                         getActivity().overridePendingTransition(0, 0);
@@ -1473,23 +1528,23 @@ private void leerWSCONFIGURACION(){
                         titulo.setTitle("Ups!!");
                         titulo.show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("folio",folioconfirma);
-                params.put("recibe",recibiofir);
-                params.put("status",estatus);
-                params.put("comentario",comentariog);
+                params.put("sucursal", strbranch);
+                params.put("folio", folioconfirma);
+                params.put("recibe", recibiofir);
+                params.put("status", estatus);
+                params.put("comentario", comentariog);
                 params.put("hora", currentTime);
                 return params;
             }
@@ -1498,7 +1553,66 @@ private void leerWSCONFIGURACION(){
     }
 
 
+    private void actualizarfirmanuevo(String estatus,String folio,String recibiostr,String comentariostr, String currentTime) {
 
+
+        String url = StrServer + "/recibeR";
+
+        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+
+                    mensajes = jsonObject.getString("Repartidores");
+
+
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                        alerta.setMessage("Hubo un problema con el registro deberias volver a intentar hacerlo").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+
+
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Ups!!");
+                        titulo.show();
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap header = new HashMap();
+                header.put("user", struser);
+                header.put("pass", strpass);
+                return header;
+            }
+
+            @Override
+            public Map<String, String> getParams() throws AuthFailureError {
+                HashMap params = new HashMap();
+                params.put("sucursal", strbranch);
+                params.put("folio", folio);
+                params.put("recibe", recibiostr);
+                params.put("status", estatus);
+                params.put("comentario", comentariostr);
+                params.put("hora", currentTime);
+                return params;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(postRequest);
+    }
 
 
 }
