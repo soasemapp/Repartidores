@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             android:layout_marginBottom="25dp">
 
 
@@ -87,7 +87,7 @@
             android:id="@+id/ClienteOcultar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="visible"
+            android:visibility="gone"
             android:orientation="vertical"
             android:layout_marginBottom="25dp">
 
