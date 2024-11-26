@@ -1,24 +1,18 @@
 package com.kepler.respartidores01;
 
 import android.Manifest;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.Toast;
-
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +25,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -268,7 +261,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MainActivity.this);
+                    alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Error");
+                    titulo.show();
                 }
             }){
                 @Override

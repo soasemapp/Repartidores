@@ -1,6 +1,5 @@
 package com.kepler.respartidores01;
 
-import static androidx.test.InstrumentationRegistry.getContext;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -23,9 +22,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -78,13 +75,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String[] listaDato = null;
     String[] listtiempo = null;
     String[] linombres=null;
-    String[] lifolio=null;
+
     String estatus;
 
 int controlador=0;
     ArrayList<String> listD=null;
 
-    private boolean actualposition = true;
+
     double longitudorigen;
     double latitudorigen;
     private LocationManager locationManager;
@@ -94,7 +91,7 @@ int controlador=0;
     Geocoder coddirmap;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String strusr, strpass,  StrServer, strcodBra, strcode,  struser,
+    String  strpass,  StrServer, strcodBra, strcode,  struser,
     strbranch,strname, strlname;;
     List<Address> address= new ArrayList<>();
     ArrayList<LatLng> puntosdireccion = new ArrayList<>();
@@ -538,7 +535,17 @@ int controlador=0;
             @Override
             public void onErrorResponse(VolleyError volleyError)
             {
-                Toast.makeText(MapsActivity.this, volleyError.toString(), Toast.LENGTH_SHORT).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                alerta.setMessage(volleyError.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
             }
         });
         Volley.newRequestQueue(this).add(stringRequesttt);
@@ -657,7 +664,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Error");
+                        titulo.show();
                     }
                 })
         {
@@ -740,7 +757,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Error");
+                        titulo.show();
                     }
                 })
         {
@@ -801,7 +828,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
+                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Error");
+                        titulo.show();
                     }
                 })
         {
