@@ -1,9 +1,5 @@
 package com.kepler.respartidores01;
 
-import android.widget.Button;
-
-import java.util.ArrayList;
-
 public class Pedidos {
     String sucursal;
     String cliente;

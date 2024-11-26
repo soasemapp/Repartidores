@@ -46,7 +46,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.kepler.respartidores01.databinding.ActivityMapsTodosBinding;
@@ -55,7 +54,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,26 +61,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     double Latitud = 0, Longitud = 0;
     private GoogleMap mMap;
     private Marker mMarker;
     public ArrayList<Pedidos> Pedidos = new ArrayList<>();
-    //public ArrayList<Direcciones> Direcciones = new ArrayList<>();
     private Marker mMarkerepartidor;
     private ActivityMapsTodosBinding binding;
     Geocoder coder;
     int contador = 0;
     String mensajes;
-    String direclis = "", nombre_direccion = "", clave_cliente, latitudclien, longitudclien, clave_direccion, folioparaentregar;
+    String direclis = "", nombre_direccion = "", clave_cliente, clave_direccion, folioparaentregar;
     int pos1 = 0;
     AlertDialog.Builder builder;
     private SharedPreferences preference;
     List<Address> address = new ArrayList<>();
     private SharedPreferences.Editor editor;
-    String strusr, strpass, StrServer, strcodBra, strcode, struser, strbranch, strname, strlname;
+    String  strpass, StrServer, strcodBra, strcode, struser, strbranch, strname, strlname;
     JSONObject routes;
     AlertDialog dialog = null;
     String tiempo = "";
@@ -103,7 +99,6 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     AlertDialog mDialog;
     ImageButton bntwaze;
 
-    ArrayList<String> values = new ArrayList<>();
     String[] listaDato = null;
     AlertDialog.Builder builder6;
     AlertDialog dialog6 = null;
@@ -566,7 +561,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(MapsTodos.this, volleyError.toString(), Toast.LENGTH_SHORT).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                alerta.setMessage(volleyError.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
             }
         });
         Volley.newRequestQueue(this).add(stringRequesttt);
@@ -605,7 +610,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                Toast.makeText(MapsTodos.this, volleyError.toString(), Toast.LENGTH_SHORT).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                alerta.setMessage(volleyError.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
             }
         });
         Volley.newRequestQueue(this).add(stringRequesttt);
@@ -798,8 +813,18 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MapsTodos.this, error.getMessage(), Toast.LENGTH_LONG).show();
-            }
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
+             }
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -1059,7 +1084,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MapsTodos.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
             }
         }) {
             @Override
@@ -1161,7 +1196,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsTodos.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Error");
+                        titulo.show();
                     }
                 }) {
             @Override
@@ -1207,7 +1252,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MapsTodos.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+
+                        android.app.AlertDialog titulo = alerta.create();
+                        titulo.setTitle("Error");
+                        titulo.show();
                     }
                 }) {
             @Override
@@ -1268,7 +1323,17 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MapsTodos.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsTodos.this);
+                alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+
+                android.app.AlertDialog titulo = alerta.create();
+                titulo.setTitle("Error");
+                titulo.show();
             }
         }) {
             @Override
