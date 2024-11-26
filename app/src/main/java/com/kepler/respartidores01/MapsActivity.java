@@ -432,7 +432,17 @@ int controlador=0;
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
+                AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
+                alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
 
+                    }
+                });
+                AlertDialog titulo1 = alerta1.create();
+                titulo1.setTitle("Error");
+                titulo1.show();
             }
         });
         queue.add(stringRequest);
@@ -535,17 +545,17 @@ int controlador=0;
             @Override
             public void onErrorResponse(VolleyError volleyError)
             {
-                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
-                alerta.setMessage(volleyError.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
+                alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
+
                     }
                 });
-
-                android.app.AlertDialog titulo = alerta.create();
-                titulo.setTitle("Error");
-                titulo.show();
+                AlertDialog titulo1 = alerta1.create();
+                titulo1.setTitle("Error");
+                titulo1.show();
             }
         });
         Volley.newRequestQueue(this).add(stringRequesttt);
@@ -664,17 +674,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 })
         {
@@ -757,17 +767,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 })
         {
@@ -828,17 +838,17 @@ int controlador=0;
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 })
         {

@@ -1,7 +1,6 @@
 package com.kepler.respartidores01.ui.gallery;
 
 
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,8 +13,8 @@ import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.app.AlertDialog;
 
-import androidx.appcompat.app.AlertDialog;
 
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -23,6 +22,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -35,7 +35,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.kepler.respartidores01.AdapeterDetallefac;
-import com.kepler.respartidores01.MainActivity;
 import com.kepler.respartidores01.MapsSolo;
 import com.kepler.respartidores01.Mdestallefac;
 import com.kepler.respartidores01.MiAdaptador;
@@ -77,7 +76,7 @@ public class GalleryFragment extends Fragment {
     private SharedPreferences.Editor editor;
     String struser, strcode, strbranch, strpass, strname, strlname, stremail;
     String strcodBra, StrServer, escfolio, escnombre, escdireccion, escnumun, escnumdos, escnumc = null;
-    String strscliente="";
+    String strscliente = "";
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -148,7 +147,7 @@ public class GalleryFragment extends Fragment {
         ClientesOcular = getView().findViewById(R.id.ClienteOcultar);
         TodosOcultar = getView().findViewById(R.id.TodoOcultar);
         ButtonListaClientes = getActivity().findViewById(R.id.listaclientes);
-        btn_entregar_todo=getActivity().findViewById(R.id.btn_entregar_todo);
+        btn_entregar_todo = getActivity().findViewById(R.id.btn_entregar_todo);
         entregorc = preference.getString("recibio", "");
         entregodirec = preference.getString("entregoDirec", "");
         setD.clear();
@@ -161,101 +160,100 @@ public class GalleryFragment extends Fragment {
         btn_entregar_todo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               if (!strscliente.isEmpty()){
-                   comentariog = null;
-                   estatus = null;
+                if (!strscliente.isEmpty()) {
+                    comentariog = null;
+                    estatus = null;
 
 
-                   builder = new AlertDialog.Builder(getContext());
-                   LayoutInflater inflaterentrega = getLayoutInflater();
-                   View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
-                   builder.setView(dialogViewww);
-                   EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
-                   EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
-                   Button enttegar = dialogViewww.findViewById(R.id.btentre);
-                   enttegar.setOnClickListener(new View.OnClickListener() {
-                       @Override
-                       public void onClick(View view) {
-                           estatus = "E";
-                           recibio.getText().toString();
-                           comentario.getText().toString();
-                           String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                           if (!lpeA.get(0).getTelefonodos().equals("")) {
+                    builder = new AlertDialog.Builder(getContext());
+                    LayoutInflater inflaterentrega = getLayoutInflater();
+                    View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+                    builder.setView(dialogViewww);
+                    EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+                    EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+                    Button enttegar = dialogViewww.findViewById(R.id.btentre);
+                    enttegar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            estatus = "E";
+                            recibio.getText().toString();
+                            comentario.getText().toString();
+                            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+                            if (!lpeA.get(0).getTelefonodos().equals("")) {
 
-                               smsCamino = Empresa + " agradece su preferencia.\n" +
-                                       "" + lpeA.get(0).getNombre() + ", Su pedido con el folio " + lpeA.get(0).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
-                                       "Le deseamos un excelente día.";
+                                smsCamino = Empresa + " agradece su preferencia.\n" +
+                                        "" + lpeA.get(0).getNombre() + ", Su pedido con el folio " + lpeA.get(0).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
+                                        "Le deseamos un excelente día.";
 
-                               SmsManager smsManager = SmsManager.getDefault();
-                               smsManager.sendTextMessage(lpeA.get(0).getTelefonodos(), null, smsCamino, null, null);
-                           }
+                                SmsManager smsManager = SmsManager.getDefault();
+                                smsManager.sendTextMessage(lpeA.get(0).getTelefonodos(), null, smsCamino, null, null);
+                            }
 
-                           if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
-                              for (int i = 0; i < lpeA.size(); i++) {
-                                    String folio="";
-                                    String recibiostr=recibio.getText().toString();
-                                    String comentariostr=comentario.getText().toString();
+                            if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                                for (int i = 0; i < lpeA.size(); i++) {
+                                    String folio = "";
+                                    String recibiostr = recibio.getText().toString();
+                                    String comentariostr = comentario.getText().toString();
                                     folio = lpeA.get(i).getFolio();
 
 
+                                    actualizarfirmanuevo(estatus, folio, recibiostr, comentariostr, currentTime);
+                                }
+                                dialog.dismiss();
+                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
 
-                                  actualizarfirmanuevo(estatus,folio,recibiostr,comentariostr,currentTime);
-                               }
-                               dialog.dismiss();
-                               android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                               alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                   @Override
-                                   public void onClick(DialogInterface dialogInterface, int i) {
-                                       dialogInterface.cancel();
+                                    }
+                                });
 
-                                   }
-                               });
+                                android.app.AlertDialog titulo = alerta.create();
+                                titulo.setTitle("");
+                                titulo.show();
+                                lpeA.clear();
+                                ClientesListas.clear();
+                                leerWSListaClientes();
+                                leerWSCONFIGURACION();
 
-                               android.app.AlertDialog titulo = alerta.create();
-                               titulo.setTitle("");
-                               titulo.show();
-                               lpeA.clear();
-                               ClientesListas.clear();
-                               leerWSListaClientes();
-                               leerWSCONFIGURACION();
+                                strscliente = "";
+                                ButtonListaClientes.setText("Selecciona un cliente");
 
-                               strscliente="";
-                               ButtonListaClientes.setText("Selecciona un cliente");
+                            } else {
+                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
 
-                           }else{
-                               android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                               alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                   @Override
-                                   public void onClick(DialogInterface dialogInterface, int i) {
-                                       dialogInterface.cancel();
-                                   }
-                               });
+                                android.app.AlertDialog titulo = alerta.create();
+                                titulo.setTitle("Faltan casillas por rellenar");
+                                titulo.show();
+                            }
 
-                               android.app.AlertDialog titulo = alerta.create();
-                               titulo.setTitle("Faltan casillas por rellenar");
-                               titulo.show();
-                           }
+                        }
+                    });
 
-                       }
-                   });
+                    dialog = builder.create();
+                    dialog.show();
 
-                   dialog = builder.create();
-                   dialog.show();
-
-               }else {
-                   android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                   alerta.setMessage("Selecciona un cliente porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                       @Override
-                       public void onClick(DialogInterface dialogInterface, int i) {
+                } else {
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                    alerta.setMessage("Selecciona un cliente porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
 
-                       }
-                   });
+                        }
+                    });
 
-                   android.app.AlertDialog titulo = alerta.create();
-                   titulo.setTitle("Verifica");
-                   titulo.show();
-               }
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Verifica");
+                    titulo.show();
+                }
             }
         });
 
@@ -487,18 +485,19 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
-                       }
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
+                     }
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -554,17 +553,18 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();                    }
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
+                    }
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -939,17 +939,17 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override
@@ -1324,17 +1324,17 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override
@@ -1378,17 +1378,17 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override
@@ -1476,17 +1476,17 @@ public class GalleryFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
 
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
-                        alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
+
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Error");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override
@@ -1563,19 +1563,17 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                        alerta.setMessage("Hubo un problema con el registro deberias volver a intentar hacerlo").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
 
-
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Ups!!");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override
@@ -1602,7 +1600,7 @@ public class GalleryFragment extends Fragment {
     }
 
 
-    private void actualizarfirmanuevo(String estatus,String folio,String recibiostr,String comentariostr, String currentTime) {
+    private void actualizarfirmanuevo(String estatus, String folio, String recibiostr, String comentariostr, String currentTime) {
 
 
         String url = StrServer + "/recibeR";
@@ -1625,19 +1623,17 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                        alerta.setMessage("Hubo un problema con el registro deberias volver a intentar hacerlo").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
 
-
                             }
                         });
-
-                        android.app.AlertDialog titulo = alerta.create();
-                        titulo.setTitle("Ups!!");
-                        titulo.show();
+                        AlertDialog titulo1 = alerta1.create();
+                        titulo1.setTitle("Error");
+                        titulo1.show();
                     }
                 }) {
             @Override

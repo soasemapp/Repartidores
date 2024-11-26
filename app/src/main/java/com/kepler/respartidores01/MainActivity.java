@@ -1,6 +1,7 @@
 package com.kepler.respartidores01;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -261,17 +262,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MainActivity.this);
-                    alerta.setMessage(error.getMessage().toString()).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    AlertDialog.Builder alerta1 = new AlertDialog.Builder(MainActivity.this);
+                    alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             dialogInterface.cancel();
+
                         }
                     });
-
-                    android.app.AlertDialog titulo = alerta.create();
-                    titulo.setTitle("Error");
-                    titulo.show();
+                    AlertDialog titulo1 = alerta1.create();
+                    titulo1.setTitle("Error");
+                    titulo1.show();
                 }
             }){
                 @Override
