@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.SetAndGet;
 
 public class PedidosEntregados {
     String sucursal;

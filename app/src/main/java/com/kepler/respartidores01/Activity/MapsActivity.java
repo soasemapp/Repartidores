@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 
 import android.Manifest;
@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.android.volley.AuthFailureError;
@@ -46,6 +47,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.Service.ConexionService;
 import com.kepler.respartidores01.databinding.ActivityMapsBinding;
 
 import org.json.JSONArray;
@@ -71,15 +74,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String mensajes;
 
     AlertDialog.Builder builder;
-   AlertDialog dialog = null;
+    AlertDialog dialog = null;
     String[] listaDato = null;
     String[] listtiempo = null;
-    String[] linombres=null;
+    String[] linombres = null;
 
     String estatus;
 
-int controlador=0;
-    ArrayList<String> listD=null;
+    int controlador = 0;
+    ArrayList<String> listD = null;
 
 
     double longitudorigen;
@@ -87,23 +90,24 @@ int controlador=0;
     private LocationManager locationManager;
     private Marker mMarker;
     Geocoder coder;
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0 ;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
     Geocoder coddirmap;
     private SharedPreferences preference;
     private SharedPreferences.Editor editor;
-    String  strpass,  StrServer, strcodBra, strcode,  struser,
-    strbranch,strname, strlname;;
-    List<Address> address= new ArrayList<>();
+    String strpass, StrServer, strcodBra, strcode, struser,
+            strbranch, strname, strlname;
+    ;
+    List<Address> address = new ArrayList<>();
     ArrayList<LatLng> puntosdireccion = new ArrayList<>();
-    int clave=0;
-    ArrayList<String> values=new ArrayList<>();
-    String direclis, nombrelist =null;
-    String value=null;
-    String tiempo=null;
-    String dircort=null;
+    int clave = 0;
+    ArrayList<String> values = new ArrayList<>();
+    String direclis, nombrelist = null;
+    String value = null;
+    String tiempo = null;
+    String dircort = null;
     Double latcrta = 0.0;
-    String tiempocorto=null;
-    Double longcort=0.0;
+    String tiempocorto = null;
+    Double longcort = 0.0;
     JSONObject routes;
     JSONObject legs;
     JSONObject distance;
@@ -120,15 +124,15 @@ int controlador=0;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
-        preference= this.getSharedPreferences("Login", Context.MODE_PRIVATE);
+        preference = this.getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
-        struser= preference.getString("user","");
-        strpass=preference.getString("pass","");
-        strbranch=preference.getString("branch","");
-        strcode=preference.getString("code","");
+        struser = preference.getString("user", "");
+        strpass = preference.getString("pass", "");
+        strbranch = preference.getString("branch", "");
+        strcode = preference.getString("code", "");
 
 
         strcodBra = preference.getString("codBra", "null");
@@ -140,20 +144,20 @@ int controlador=0;
         strbranch = preference.getString("branch", "");
         strcode = preference.getString("code", "");
 
-         setD = preference.getStringSet("Direcciones",null);
+        setD = preference.getStringSet("Direcciones", null);
 
 
-        if(setD!=null){
-        listD = new ArrayList<String>(setD);}
+        if (setD != null) {
+            listD = new ArrayList<String>(setD);
+        }
 
-        direclis =null;
-        nombrelist =null;
+        direclis = null;
+        nombrelist = null;
 
         Bundle parametros = this.getIntent().getExtras();
 
-        direclis= parametros.getString("directlista");
-        nombrelist=parametros.getString("nombre_direccion");
-
+        direclis = parametros.getString("directlista");
+        nombrelist = parametros.getString("nombre_direccion");
 
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -176,7 +180,7 @@ int controlador=0;
                             public void onLocationChanged(Location location) {
                                 coddirmap = new Geocoder(MapsActivity.this);
                                 if (getApplicationContext() != null) {
-                                    if(direclis==null) {
+                                    if (direclis == null) {
                                         LatLng miUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
 
                                         latitudorigen = location.getLatitude();
@@ -194,18 +198,17 @@ int controlador=0;
                                                 .build();
                                         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-                                        if (listD!=null){
+                                        if (listD != null) {
                                             obtdistanc();
                                         }
 
-                                    }
-                                    else {
+                                    } else {
                                         Double dircelisLAT;
                                         Double dircelisLONG;
                                         try {
                                             address = coddirmap.getFromLocationName(direclis, 2);
                                             Address direx;
-                                            direx=address.get(0);
+                                            direx = address.get(0);
                                             dircelisLAT = direx.getLatitude();
                                             dircelisLONG = direx.getLongitude();
 
@@ -232,7 +235,7 @@ int controlador=0;
 
                                         obtdistanc();
                                     }
-                                    direclis=null;
+                                    direclis = null;
                                 }
                             }
 
@@ -272,8 +275,8 @@ int controlador=0;
 
         mMap = googleMap;
 
-        if (listD!=null){
-        nombre();
+        if (listD != null) {
+            nombre();
         }
 
 
@@ -317,8 +320,9 @@ int controlador=0;
                                     .build();
                             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPositio));
 
-                            if (listD!=null){
-                            obtdistanc();}
+                            if (listD != null) {
+                                obtdistanc();
+                            }
 
                         } else {
                             Double dircelisLAT;
@@ -370,20 +374,15 @@ int controlador=0;
     }
 
 
-
-
-
-
-
     public void funcion() {
-        TextView tiempoc= findViewById(R.id.tiempo_id);
+        TextView tiempoc = findViewById(R.id.tiempo_id);
 
         int Valor = Integer.parseInt(listaDato[0]);
 
-        dircort=listD.get(0);
-        latcrta=puntosdireccion.get(0).latitude;
-        longcort=puntosdireccion.get(0).longitude;
-        tiempocorto=listtiempo[0];
+        dircort = listD.get(0);
+        latcrta = puntosdireccion.get(0).latitude;
+        longcort = puntosdireccion.get(0).longitude;
+        tiempocorto = listtiempo[0];
 
         editor.putString("dircort", listD.get(0));
         editor.commit();
@@ -396,10 +395,10 @@ int controlador=0;
             } else {
                 Valor = Integer.parseInt(listaDato[i]);
 
-                dircort=listD.get(i);
-                latcrta=puntosdireccion.get(i).latitude;
-                longcort=puntosdireccion.get(i).longitude;
-                tiempocorto=listtiempo[i];
+                dircort = listD.get(i);
+                latcrta = puntosdireccion.get(i).latitude;
+                longcort = puntosdireccion.get(i).longitude;
+                tiempocorto = listtiempo[i];
 
                 editor.remove("dircort");
                 editor.commit();
@@ -411,7 +410,7 @@ int controlador=0;
             }
         }
 
-        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + latcrta +"," + longcort + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + latcrta + "," + longcort + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
 
         RequestQueue queue = Volley.newRequestQueue(MapsActivity.this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -426,7 +425,7 @@ int controlador=0;
                 }
 
                 tiempoc.setVisibility(View.VISIBLE);
-                tiempoc.setText("Tiempo: "+tiempocorto);
+                tiempoc.setText("Tiempo: " + tiempocorto);
 
             }
         }, new Response.ErrorListener() {
@@ -449,15 +448,14 @@ int controlador=0;
 
     }
 
-    public void obtdistanc()
-    {
+    public void obtdistanc() {
         listaDato = new String[puntosdireccion.size()];
         listtiempo = new String[puntosdireccion.size()];
 
         for (int i = 0; i < puntosdireccion.size(); i++) {
             LatLng nuevo = puntosdireccion.get(i);
             String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + latitudorigen + "," + longitudorigen + "&destination=" + nuevo.latitude + "," + nuevo.longitude + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
-            ingresarDatos(i,url);
+            ingresarDatos(i, url);
         }
     }
 
@@ -512,13 +510,12 @@ int controlador=0;
                 }).create().show();
     }
 
-    public void ingresarDatos(int pos, String url)
-    {
+    public void ingresarDatos(int pos, String url) {
         StringRequest stringRequesttt = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
-                  JSONObject jso = new JSONObject(response);
+                    JSONObject jso = new JSONObject(response);
                     routes = jso.getJSONArray("routes").getJSONObject(0);
                     legs = routes.getJSONArray("legs").getJSONObject(0);
                     distance = legs.getJSONObject("distance");
@@ -526,10 +523,10 @@ int controlador=0;
                     values.add(value);
                     listaDato[pos] = value;
 
-                    duration=legs.getJSONObject("duration");
-                    tiempo=duration.getString("text");
+                    duration = legs.getJSONObject("duration");
+                    tiempo = duration.getString("text");
 
-                    listtiempo[pos]=tiempo;
+                    listtiempo[pos] = tiempo;
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -543,8 +540,7 @@ int controlador=0;
 
         }, new Response.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError volleyError)
-            {
+            public void onErrorResponse(VolleyError volleyError) {
                 AlertDialog.Builder alerta1 = new AlertDialog.Builder(MapsActivity.this);
                 alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
@@ -562,24 +558,23 @@ int controlador=0;
         controlador++;
     }
 
-    public void entregado(View v)
-    {
+    public void entregado(View v) {
         builder = new AlertDialog.Builder(this);
         LayoutInflater inflaterentrega = getLayoutInflater();
         View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
         builder.setView(dialogViewww);
-        EditText recibio=dialogViewww.findViewById(R.id.quien_recibio);
-        EditText comentario=dialogViewww.findViewById(R.id.id_comentario);
-        Button enttegar=dialogViewww.findViewById(R.id.btentre);
+        EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+        EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+        Button enttegar = dialogViewww.findViewById(R.id.btentre);
         enttegar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                estatus="E";
+                estatus = "E";
                 recibio.getText().toString();
                 comentario.getText().toString();
 
 
-                if(!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                     editor.putString("recibio", recibio.getText().toString());
                     editor.putString("comentario", comentario.getText().toString());
@@ -589,7 +584,7 @@ int controlador=0;
                     rec();
 
 
-                }else{
+                } else {
                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
                     alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -612,10 +607,10 @@ int controlador=0;
 
     }
 
-    private void nombre(){
+    private void nombre() {
         linombres = new String[listD.size()];
 
-        String url =StrServer+"/consulxEn";
+        String url = StrServer + "/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -625,17 +620,17 @@ int controlador=0;
                     String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq;
                     JSONObject jsonObject = new JSONObject(response);
 
-                    int json=response.length();
+                    int json = response.length();
 
                     if (json != 6) {
                         jfacturas = jsonObject.getJSONObject("Repartidores");
-                        for (int i = 0; i <jfacturas.length(); i++) {
+                        for (int i = 0; i < jfacturas.length(); i++) {
                             jitems = jfacturas.getJSONObject("items" + i);
                             Nombre = jitems.getString("k_Nombre");
                             direccion = jitems.getString("k_Direccion");
 
-                            for (int j=0; j<listD.size(); j++) {
-                                String ok=listD.get(j);
+                            for (int j = 0; j < listD.size(); j++) {
+                                String ok = listD.get(j);
                                 if (Objects.equals(ok, direccion)) {
                                     linombres[j] = Nombre;
                                 }
@@ -644,13 +639,13 @@ int controlador=0;
                         }
                         agregarnombres();
 
-                    }else{
+                    } else {
                         android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsActivity.this);
                         alerta.setMessage("No hay entregas pendientes por realizar").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.cancel();
-                                Intent regresa = new Intent(MapsActivity.this,Principal.class);
+                                Intent regresa = new Intent(MapsActivity.this, Principal.class);
                                 startActivity(regresa);
                                 finish();
 
@@ -666,7 +661,6 @@ int controlador=0;
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
-
 
 
             }
@@ -686,26 +680,27 @@ int controlador=0;
                         titulo1.setTitle("Error");
                         titulo1.show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("id_repartidor",strcode);
+                params.put("sucursal", strbranch);
+                params.put("id_repartidor", strcode);
                 return params;
             }
         };
         Volley.newRequestQueue(MapsActivity.this).add(postRequest);
     }
-    public void agregarnombres(){
+
+    public void agregarnombres() {
 
         //OBTENER LAS LATITUDES Y LONGITUDES DE LA DIRECCION
         coder = new Geocoder(MapsActivity.this);
@@ -727,10 +722,10 @@ int controlador=0;
         }
     }
 
-    public void rec(){
-        direccortaparaentregar=preference.getString("dircort","");
+    public void rec() {
+        direccortaparaentregar = preference.getString("dircort", "");
 
-        String url =StrServer+"/consulxEn";
+        String url = StrServer + "/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -741,7 +736,7 @@ int controlador=0;
                     JSONObject jsonObject = new JSONObject(response);
 
                     jfacturas = jsonObject.getJSONObject("Repartidores");
-                    for (int i = 0; i <jfacturas.length(); i++) {
+                    for (int i = 0; i < jfacturas.length(); i++) {
                         jitems = jfacturas.getJSONObject("items" + i);
                         sucu = jitems.getString("k_Sucursal");
                         folio = jitems.getString("k_Folio");
@@ -752,9 +747,9 @@ int controlador=0;
                         telun = jitems.getString("k_Telefono1");
                         teld = jitems.getString("k_Telefono2");
 
-                            if (Objects.equals(direccortaparaentregar, direccion)) {
-                               folioparaentregar=folio;
-                            }
+                        if (Objects.equals(direccortaparaentregar, direccion)) {
+                            folioparaentregar = folio;
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -779,30 +774,31 @@ int controlador=0;
                         titulo1.setTitle("Error");
                         titulo1.show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("id_repartidor",strcode);
+                params.put("sucursal", strbranch);
+                params.put("id_repartidor", strcode);
                 return params;
             }
         };
         Volley.newRequestQueue(MapsActivity.this).add(postRequest);
     }
-    private void actualizarfirma(){
-        nombrequienrecibio=preference.getString("recibio","");
-        comentarioentre=preference.getString("comentario","");
 
-        String url =StrServer+"/recibeR";
+    private void actualizarfirma() {
+        nombrequienrecibio = preference.getString("recibio", "");
+        comentarioentre = preference.getString("comentario", "");
+
+        String url = StrServer + "/recibeR";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -812,18 +808,18 @@ int controlador=0;
                     JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
 
-                    mensajes= jsonObject.getString("Repartidores");
+                    mensajes = jsonObject.getString("Repartidores");
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
 
                 android.app.AlertDialog.Builder alerta = new AlertDialog.Builder(MapsActivity.this);
-                alerta.setMessage(mensajes + " con folio: "+ folioparaentregar).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                alerta.setMessage(mensajes + " con folio: " + folioparaentregar).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.cancel();
-                        Intent regresar = new Intent(MapsActivity.this,Principal.class);
+                        Intent regresar = new Intent(MapsActivity.this, Principal.class);
                         startActivity(regresar);
                         finish();
                     }
@@ -850,29 +846,28 @@ int controlador=0;
                         titulo1.setTitle("Error");
                         titulo1.show();
                     }
-                })
-        {
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap header = new HashMap();
-                header.put("user",struser);
-                header.put("pass",strpass);
+                header.put("user", struser);
+                header.put("pass", strpass);
                 return header;
             }
+
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
-                params.put("folio",folioparaentregar);
-                params.put("recibe",nombrequienrecibio);
+                params.put("sucursal", strbranch);
+                params.put("folio", folioparaentregar);
+                params.put("recibe", nombrequienrecibio);
                 params.put("status", estatus);
-                params.put("comentario",comentarioentre);
+                params.put("comentario", comentarioentre);
                 return params;
             }
         };
         Volley.newRequestQueue(MapsActivity.this).add(postRequest);
     }
-
 
 
 }

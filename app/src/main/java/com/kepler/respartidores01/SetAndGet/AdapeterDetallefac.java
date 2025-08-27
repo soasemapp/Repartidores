@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.SetAndGet;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.kepler.respartidores01.R;
 
 import java.util.ArrayList;
 

@@ -34,14 +34,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.kepler.respartidores01.AdapeterDetallefac;
-import com.kepler.respartidores01.MapsSolo;
-import com.kepler.respartidores01.Mdestallefac;
-import com.kepler.respartidores01.MiAdaptador;
-import com.kepler.respartidores01.Pedidos;
-import com.kepler.respartidores01.Principal;
+import com.kepler.respartidores01.SetAndGet.AdapeterDetallefac;
+import com.kepler.respartidores01.Activity.MapsSolo;
+import com.kepler.respartidores01.SetAndGet.Mdestallefac;
+import com.kepler.respartidores01.Adapter.MiAdaptador;
+import com.kepler.respartidores01.SetAndGet.Pedidos;
+import com.kepler.respartidores01.Activity.Principal;
 import com.kepler.respartidores01.R;
-import com.kepler.respartidores01.SetAndGetListClientes;
+import com.kepler.respartidores01.SetAndGet.SetAndGetListClientes;
 import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
 
 import org.json.JSONException;
@@ -121,6 +121,7 @@ public class GalleryFragment extends Fragment {
 
         preference = getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
+
 
         strcodBra = preference.getString("codBra", "null");
         StrServer = preference.getString("Server", "null");
@@ -336,6 +337,11 @@ public class GalleryFragment extends Fragment {
             case "http://autotop.ath.cx:9080":
                 Empresa = "PRUEBA";
                 break;
+            case "http://bpr.ath.cx:9095":
+                Empresa = "BPR";
+                break;
+            case "http://vazquin.ath.cx:9085":
+                Empresa = "BPR";
             default:
                 break;
         }

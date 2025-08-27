@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 
 import android.Manifest;
@@ -16,9 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -35,6 +37,10 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.kepler.respartidores01.Service.ConexionService;
+import com.kepler.respartidores01.SetAndGet.Pedidos;
+import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.SetAndGet.ClienteSandG;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
 
 import org.json.JSONException;
@@ -61,7 +67,7 @@ public class Principal extends AppCompatActivity {
     ArrayList<ClienteSandG> ClientesDis = new ArrayList<>();
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo, struser, strbranch;
-    int Contador=0;
+    int Contador = 0;
 
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
@@ -69,6 +75,7 @@ public class Principal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         binding = ActivityPrincipalBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -139,7 +146,8 @@ public class Principal extends AppCompatActivity {
                             }
                         }).create().show();
                 return true;
-            }    if (item.getItemId()  == R.id.RodatechMenu) {
+            }
+            if (item.getItemId() == R.id.RodatechMenu) {
                 StrServer = "http://sprautomotive.servehttp.com:9090";
                 editor.putString("Server", StrServer);
                 editor.commit();
@@ -149,7 +157,7 @@ public class Principal extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if (item.getItemId()  == R.id.PartechMenu) {
+            } else if (item.getItemId() == R.id.PartechMenu) {
                 StrServer = "http://sprautomotive.servehttp.com:9095";
                 editor.putString("Server", StrServer);
                 editor.commit();
@@ -160,7 +168,7 @@ public class Principal extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if (item.getItemId()  == R.id.SharkMenu) {
+            } else if (item.getItemId() == R.id.SharkMenu) {
                 StrServer = "http://sprautomotive.servehttp.com:9080";
                 editor.putString("Server", StrServer);
                 editor.commit();
@@ -352,7 +360,7 @@ public class Principal extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 try {
-                    String Clave, Nombre, Direccion, Repartidores = "",Stauts="";
+                    String Clave, Nombre, Direccion, Repartidores = "", Stauts = "";
                     String telun, teld, folio;
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -365,7 +373,7 @@ public class Principal extends AppCompatActivity {
                         teld = jsonObject.getString("k_Numero2");
                         Direccion = jsonObject.getString("k_Direccion");
                         Repartidores = jsonObject.getString("k_Repartidores");
-                        Stauts= jsonObject.getString("k_Status");
+                        Stauts = jsonObject.getString("k_Status");
 
                         editor.putString("folioescrito", folio);
                         Clave = jsonObject.getString("k_Clave");
@@ -377,14 +385,12 @@ public class Principal extends AppCompatActivity {
                         editor.commit();
 
 
-
                         if (Stauts.equals("A") && Repartidores.equals("")) {
 
                             ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N","","",""));
+                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N", "", "", ""));
 
                             insertarfolioesc();
-
 
 
                             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
@@ -534,7 +540,7 @@ public class Principal extends AppCompatActivity {
     private void insertarfolioesc() {
 
         String url = StrServer + "/registroR";
-         String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+        String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -543,8 +549,6 @@ public class Principal extends AppCompatActivity {
                     JSONObject jfacturas;
                     JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
-
-
 
 
                 } catch (JSONException e) {
@@ -566,7 +570,7 @@ public class Principal extends AppCompatActivity {
                         android.app.AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
-                         }
+                    }
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -684,6 +688,7 @@ public class Principal extends AppCompatActivity {
         } else if (id == R.id.PartechMenu) {
             StrServer = "http://sprautomotive.servehttp.com:9095";
             editor.putString("Server", StrServer);
+            editor.commit();
             editor.commit();
             Intent Cambiar = new Intent(this, Splash.class);
             overridePendingTransition(0, 0);

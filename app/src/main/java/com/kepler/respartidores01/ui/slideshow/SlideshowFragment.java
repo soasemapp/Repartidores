@@ -26,10 +26,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.kepler.respartidores01.AdapeterDetallefac;
-import com.kepler.respartidores01.Adapterentregados;
-import com.kepler.respartidores01.Mdestallefac;
-import com.kepler.respartidores01.PedidosEntregados;
+import com.kepler.respartidores01.SetAndGet.AdapeterDetallefac;
+import com.kepler.respartidores01.SetAndGet.Adapterentregados;
+import com.kepler.respartidores01.SetAndGet.Mdestallefac;
+import com.kepler.respartidores01.SetAndGet.PedidosEntregados;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.databinding.FragmentSlideshowBinding;
 

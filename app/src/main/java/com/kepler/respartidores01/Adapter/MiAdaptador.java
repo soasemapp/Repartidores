@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Adapter;
 
 
 
@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.kepler.respartidores01.SetAndGet.Pedidos;
+import com.kepler.respartidores01.R;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
@@ -73,13 +76,13 @@ public class MiAdaptador extends BaseAdapter {
         TextView id_comentario = vistaDiseno.findViewById(R.id.id_comentario);
         TextView id_timer = vistaDiseno.findViewById(R.id.txtTiempo);
 
-            tvNombres.setText(auxi.Nombre);
-            tvtelefonouno.setText(auxi.Telefonouno);
-            tvtelefodos.setText(auxi.Telefonodos);
-            tvtfolio.setText(auxi.Folio);
-            id_comentario.setText(auxi.comentario);
-            int minutos=Integer.parseInt(auxi.Minutos);
-            int horas=Integer.parseInt(auxi.Horas);
+            tvNombres.setText(auxi.getNombre());
+            tvtelefonouno.setText(auxi.getTelefonouno());
+            tvtelefodos.setText(auxi.getTelefonodos());
+            tvtfolio.setText(auxi.getFolio());
+            id_comentario.setText(auxi.getComentario());
+            int minutos=Integer.parseInt(auxi.getMinutos());
+            int horas=Integer.parseInt(auxi.getHoras());
 
             minutos =120-minutos;
         String Horas=formatearMinutosAHoraMinuto(minutos);
@@ -105,7 +108,7 @@ if (minutos>60 && minutos<120){
 
 
 
-            if (auxi.status.equals("P")){
+            if (auxi.getStatus().equals("P")){
                 viewcomentario.setVisibility(View.VISIBLE);
                 img.setVisibility(View.VISIBLE);
             }else{

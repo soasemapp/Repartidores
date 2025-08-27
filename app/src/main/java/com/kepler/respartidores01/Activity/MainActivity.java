@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -26,6 +26,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.Service.ConexionService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         usuraio = preference.getString("user", null);
         contrasena = preference.getString("pass", null);
 
+
         //verificacion();
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.SEND_SMS)
@@ -79,8 +82,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
         //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR",/*"DEMO"*/};
-        lista = new String[]{"Seleccionar...","Autodis","Vipla","Jacve", "Cecra", "Guvi", "Pressa","MIGRACION" +""};
-         // lista = new String[]{"Seleccionar...","Rodatech","Partech","Shark"};
+        /*lista = new String[]{"Seleccionar...","Jacve"};*/
+           lista = new String[]{"Seleccionar...","Autodis","Vipla", "Cecra", "Guvi", "Pressa","BPR","VAZQUIN" };
+         //lista = new String[]{"Seleccionar...","Rodatech","Partech","Shark"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
         sempresas.setAdapter(adapter);
@@ -140,9 +144,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }else if (selection=="Pressa"){
                     foto.setImageResource(R.drawable.pressa);
                     urlEmpresa="http://cedistabasco.ddns.net:9085";
-                }else if (selection=="MIGRACION"){
-                    foto.setImageResource(R.drawable.pressa);
-                    urlEmpresa="http://cedistabasco.ddns.net:9080";
+                }else if (selection=="BPR"){
+                    foto.setImageResource(R.drawable.logobpr);
+                    urlEmpresa="http://bpr.ath.cx:9095";
+                }else if (selection=="VAZQUIN"){
+                    foto.setImageResource(R.drawable.vazquinlogo);
+                    urlEmpresa="http://vazquin.ath.cx:9085";
+                }else if (selection=="Pruebas"){
+                    foto.setImageResource(R.drawable.logo);
+                    urlEmpresa="http://bpr.ath.cx:9090";
                 }else {
                     foto.setImageResource(R.drawable.logo);
                     urlEmpresa="";

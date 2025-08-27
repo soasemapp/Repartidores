@@ -1,4 +1,4 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.kepler.respartidores01.R;
 import com.squareup.picasso.Picasso;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -146,6 +147,23 @@ public class Splash extends AppCompatActivity {
             case "http://autotop.ath.cx:9080":
                 Picasso.with(getApplicationContext()).
                         load(R.drawable.logo)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+
+            case "http://bpr.ath.cx:9095":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.logobpr)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
+            case "http://vazquin.ath.cx:9085":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.vazquinlogo)
                         .error(R.drawable.logo)
                         .fit()
                         .centerInside()

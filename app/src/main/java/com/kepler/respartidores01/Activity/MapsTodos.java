@@ -1,7 +1,8 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -48,6 +49,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.Service.ConexionService;
+import com.kepler.respartidores01.SetAndGet.Pedidos;
 import com.kepler.respartidores01.databinding.ActivityMapsTodosBinding;
 
 import org.json.JSONArray;
@@ -66,7 +70,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     double Latitud = 0, Longitud = 0;
     private GoogleMap mMap;
     private Marker mMarker;
-    public ArrayList<Pedidos> Pedidos = new ArrayList<>();
+    public ArrayList<com.kepler.respartidores01.SetAndGet.Pedidos> Pedidos = new ArrayList<>();
     private Marker mMarkerepartidor;
     private ActivityMapsTodosBinding binding;
     Geocoder coder;
@@ -78,7 +82,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     private SharedPreferences preference;
     List<Address> address = new ArrayList<>();
     private SharedPreferences.Editor editor;
-    String  strpass, StrServer, strcodBra, strcode, struser, strbranch, strname, strlname;
+    String strpass, StrServer, strcodBra, strcode, struser, strbranch, strname, strlname;
     JSONObject routes;
     AlertDialog dialog = null;
     String tiempo = "";
@@ -167,9 +171,16 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
             case "http://autotop.ath.cx:9080":
                 Empresa = "PRUEBA";
                 break;
+            case "http://bpr.ath.cx:9095":
+                Empresa = "BPR";
+                break;
+            case "http://vazquin.ath.cx:9085":
+                Empresa = "VAZQUIN";
+                break;
             default:
                 break;
         }
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.maptodos);
@@ -777,7 +788,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso,Hora,Minutos,PedidosHora;
+                    String Nombre, telun, teld, folio, direccion, sucu, cliente, numpaq, comentario, status, direccionclave, Aviso, Hora, Minutos, PedidosHora;
                     Double latitud, longitud;
                     JSONObject jsonObject = new JSONObject(response);
                     int json = response.length();
@@ -801,8 +812,8 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             Aviso = jitems.getString("k_Aviso");
                             Hora = jitems.getString("k_Horas");
                             Minutos = jitems.getString("k_Minutos");
-                            PedidosHora = jitems.getString("k_Pedido" );
-                            Pedidos.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso,Hora,Minutos,PedidosHora));
+                            PedidosHora = jitems.getString("k_Pedido");
+                            Pedidos.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso, Hora, Minutos, PedidosHora));
 
                         }
                         direcciones();
@@ -844,7 +855,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                 AlertDialog titulo1 = alerta1.create();
                 titulo1.setTitle("Error");
                 titulo1.show();
-             }
+            }
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -872,10 +883,6 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
     }
 
 
-
-
-
-
     public void entregadoevery(View v) {
         builder = new AlertDialog.Builder(this);
         LayoutInflater inflaterentrega = getLayoutInflater();
@@ -891,7 +898,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
 
                 estatus = "E";
 
-               // if(tiempoval>10){
+                // if(tiempoval>10){
                 if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                     editor.putString("recibio", recibio.getText().toString());
@@ -1019,7 +1026,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                   // saveLoca();
+                                    // saveLoca();
                                     if (!Pedidos.get(pos1).getTelefonodos().equals("")) {
                                         smsCamino = Empresa + " agradece su preferencia.\n" +
                                                 "" + Pedidos.get(pos1).getNombre() + ", Su pedido con el folio " + Pedidos.get(pos1).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + nombrequienrecibio + ". \n" +
@@ -1048,8 +1055,6 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                             titulo = alerta.create();
                             titulo.setTitle("¿Realizar la entrega?");
                             titulo.show();
-
-
 
 
                         } else {
@@ -1139,9 +1144,10 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
         };
         Volley.newRequestQueue(MapsTodos.this).add(postRequest);
     }
-    public void btnSite (View View) {
 
-        String url = "https://ul.waze.com/ul?ll="+latcrta+"%2C"+longcort+"&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location";
+    public void btnSite(View View) {
+
+        String url = "https://ul.waze.com/ul?ll=" + latcrta + "%2C" + longcort + "&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location";
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
@@ -1174,35 +1180,35 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
                         } else {
 */
 
-                            builder6 = new AlertDialog.Builder(MapsTodos.this);
-                            LayoutInflater inflater = getLayoutInflater();
-                            View dialogView = inflater.inflate(R.layout.pantallacargacarrito, null);
-                            builder6.setView(dialogView);
-                            dialog6 = builder6.create();
-                            builder6.setCancelable(false);
-                            dialog6.show();
+                        builder6 = new AlertDialog.Builder(MapsTodos.this);
+                        LayoutInflater inflater = getLayoutInflater();
+                        View dialogView = inflater.inflate(R.layout.pantallacargacarrito, null);
+                        builder6.setView(dialogView);
+                        dialog6 = builder6.create();
+                        builder6.setCancelable(false);
+                        dialog6.show();
 
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog6.dismiss();
-                                }
-                            }, 5000);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog6.dismiss();
+                            }
+                        }, 5000);
 
 
-                            Pedidos.clear();
-                            listaDato = null;
-                            mMap.clear();
+                        Pedidos.clear();
+                        listaDato = null;
+                        mMap.clear();
 
-                            dialog.dismiss();
-                            mMarkerepartidor = mMap.addMarker(new MarkerOptions().position(miUbicacion).title(strname + strlname).icon(BitmapDescriptorFactory.fromResource(R.drawable.repartidor2)));
+                        dialog.dismiss();
+                        mMarkerepartidor = mMap.addMarker(new MarkerOptions().position(miUbicacion).title(strname + strlname).icon(BitmapDescriptorFactory.fromResource(R.drawable.repartidor2)));
 
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
-                            CameraPosition cameraPosition = new CameraPosition.Builder().target(miUbicacion).zoom(17).build();
-                            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(miUbicacion));
+                        CameraPosition cameraPosition = new CameraPosition.Builder().target(miUbicacion).zoom(17).build();
+                        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                            Inicio();
-                       /* }*/
+                        Inicio();
+                        /* }*/
 
                     }
                 });

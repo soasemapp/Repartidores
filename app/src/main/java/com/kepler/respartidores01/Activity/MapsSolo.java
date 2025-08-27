@@ -1,6 +1,7 @@
-package com.kepler.respartidores01;
+package com.kepler.respartidores01.Activity;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -45,6 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.Service.ConexionService;
 import com.kepler.respartidores01.databinding.ActivityMapsSoloBinding;
 
 import org.json.JSONArray;
@@ -102,6 +105,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
 
 
+
         preference = this.getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
 
@@ -152,6 +156,12 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                 break;
             case "http://autotop.ath.cx:9080":
                 Empresa = "PRUEBA";
+                break;
+            case "http://bpr.ath.cx:9095":
+                Empresa = "BPR";
+                break;
+            case "http://vazquin.ath.cx:9085":
+                Empresa = "VAZQUIN";
                 break;
             default:
                 break;
