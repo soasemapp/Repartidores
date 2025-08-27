@@ -22,15 +22,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -105,12 +110,18 @@ public class GalleryFragment extends Fragment {
     android.app.AlertDialog dialog6 = null;
     int posicion = 0;
 
+    private LinearLayout loadingLayout;
+    private boolean isLoading = false;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        // Inicializar loading layout
+        loadingLayout = root.findViewById(R.id.loadingLayout);
 
         return root;
     }
@@ -156,6 +167,9 @@ public class GalleryFragment extends Fragment {
         builder6 = new android.app.AlertDialog.Builder(getActivity());
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.pantallacarga, null);
+
+        // Cargar datos iniciales
+        loadInitialData();
 
 
         btn_entregar_todo.setOnClickListener(new View.OnClickListener() {
@@ -396,6 +410,42 @@ public class GalleryFragment extends Fragment {
 
     }
 
+    private void loadInitialData() {
+        if (isLoading) return;
+
+        showLoading(true);
+        leerWSCONFIGURACION();
+    }
+
+    private void showLoading(boolean show) {
+        isLoading = show;
+
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                if (show) {
+                    loadingLayout.setVisibility(View.VISIBLE);
+                    // Bloquear interacción con botones
+                    setButtonsEnabled(false);
+                } else {
+                    loadingLayout.setVisibility(View.GONE);
+                    // Habilitar interacción
+                    setButtonsEnabled(true);
+                }
+            });
+        }
+    }
+
+    private void setButtonsEnabled(boolean enabled) {
+        if (getView() != null) {
+            ButtonTodos.setEnabled(enabled);
+            ButtonCliente.setEnabled(enabled);
+            ButtonListaClientes.setEnabled(enabled);
+            btn_entregar_todo.setEnabled(enabled);
+        }
+    }
+
+
+
     public class HackingBackgroundTaskk extends AsyncTask<Void, Void, Void> {
 
         static final int DURACION = 5 * 1000; // 3 segundos de carga
@@ -415,6 +465,7 @@ public class GalleryFragment extends Fragment {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+            showLoading(true); // Mostrar loading durante actualización
             lpeA.clear();
             LeerWs();
             leerWSListaClientes();
@@ -457,9 +508,11 @@ public class GalleryFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        isLoading = false;
     }
 
     private void leerWSCONFIGURACION() {
+        showLoading(true);
 
         String url = StrServer + "/configuracion";
 
@@ -479,11 +532,13 @@ public class GalleryFragment extends Fragment {
                         CONFIGURACION = jitems.getString("Repartidores");
                     }
 
-                    LeerWs();
-
+                    //LeerWs();
+                    // Ahora cargar la lista de clientes
+                    leerWSListaClientes();
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    showLoading(false);
+                    Toast.makeText(getActivity(), "Error al procesar configuración", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -503,6 +558,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                      }
                 }) {
             @Override
@@ -514,6 +571,13 @@ public class GalleryFragment extends Fragment {
             }
 
         };
+        // Configurar timeout
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000, // 15 segundos
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
         Volley.newRequestQueue(getActivity()).add(postRequest);
 
     }
@@ -549,9 +613,13 @@ public class GalleryFragment extends Fragment {
                         }
                     }
 
+                    // Finalmente cargar las entregas
+                    LeerWs();
+
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    showLoading(false);
+                    Toast.makeText(getActivity(), "Error al procesar clientes", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -570,6 +638,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                     }
                 }) {
             @Override
@@ -588,18 +658,28 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
         Volley.newRequestQueue(getActivity()).add(postRequest);
 
     }
 
 
     public void LeerWs() {
+        showLoading(true);
+
         lpeA.clear();
         setD.clear();
         String url = StrServer + "/consulxEn";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // OCULTAR LOADING AL FINAL
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
@@ -956,6 +1036,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                     }
                 }) {
             @Override
@@ -974,17 +1056,27 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
 
     private void LeerWs2() {
+        showLoading(true);
+
         lpeA.clear();
         setD.clear();
         String url = StrServer + "/consulxEnclientes";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // OCULTAR LOADING AL FINAL
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
@@ -1341,6 +1433,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                     }
                 }) {
             @Override
@@ -1360,17 +1454,27 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
 
     private void Aviso() {
 
+        showLoading(true);
+
         String url = StrServer + "/Aviso";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // OCULTAR LOADING AL FINAL
                 try {
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -1395,6 +1499,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                     }
                 }) {
             @Override
@@ -1413,11 +1519,17 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
 
     private void detalleFactura(String Sucursal, String Folios, String Nombres) {
+        showLoading(true);
+
         int pos;
         ldf.clear();
 
@@ -1427,6 +1539,7 @@ public class GalleryFragment extends Fragment {
             @SuppressLint("MissingInflatedId")
             @Override
             public void onResponse(String response) {
+                showLoading(false); // OCULTAR LOADING AL FINAL
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
@@ -1493,6 +1606,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+                        showLoading(false);
+                        handleNetworkError(error);
                     }
                 }) {
             @Override
@@ -1512,11 +1627,21 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
+
+        postRequest.setRetryPolicy(new DefaultRetryPolicy(
+                15000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+
+
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
 
     private void actualizarfirma() {
+
+
 
         folioconfirma = preference.getString("entregoFolio", "");
         recibiofir = preference.getString("recibio", "");
@@ -1663,6 +1788,33 @@ public class GalleryFragment extends Fragment {
             }
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
+    }
+    private void handleNetworkError(VolleyError error) {
+        if (error instanceof TimeoutError) {
+            Toast.makeText(getActivity(), "Señal devil", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Revise su conexión a internet", Toast.LENGTH_LONG).show();
+        } else if (error instanceof NoConnectionError) {
+            Toast.makeText(getActivity(), "Sin conexión a internet", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getActivity(), "Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isLoading", isLoading);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            isLoading = savedInstanceState.getBoolean("isLoading", false);
+            if (isLoading) {
+                showLoading(true);
+            }
+        }
     }
 
 
