@@ -169,6 +169,14 @@ public class Splash extends AppCompatActivity {
                         .centerInside()
                         .into(imgVi);
                 break;
+            case "http://pesbac.ath.cx:9095":
+                Picasso.with(getApplicationContext()).
+                        load(R.drawable.pesbacdark)
+                        .error(R.drawable.logo)
+                        .fit()
+                        .centerInside()
+                        .into(imgVi);
+                break;
 
 
             default:

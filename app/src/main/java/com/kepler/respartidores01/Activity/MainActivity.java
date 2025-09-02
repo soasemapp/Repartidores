@@ -82,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
         //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR",/*"DEMO"*/};
-        /*lista = new String[]{"Seleccionar...","Jacve"};*/
-           lista = new String[]{"Seleccionar...","Autodis","Vipla", "Cecra", "Guvi", "Pressa","BPR","VAZQUIN" };
+        lista = new String[]{"Seleccionar...","Hazak"};
+          // lista = new String[]{"Seleccionar...","Autodis","Vipla", "Cecra", "Guvi", "Pressa","BPR","VAZQUIN","PESBAC" };
          //lista = new String[]{"Seleccionar...","Rodatech","Partech","Shark"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
@@ -150,6 +150,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }else if (selection=="VAZQUIN"){
                     foto.setImageResource(R.drawable.vazquinlogo);
                     urlEmpresa="http://vazquin.ath.cx:9085";
+                }else if (selection=="PESBAC"){
+                    foto.setImageResource(R.drawable.pesbaclight);
+                    urlEmpresa="http://pesbac.ath.cx:9095";
                 }else if (selection=="Pruebas"){
                     foto.setImageResource(R.drawable.logo);
                     urlEmpresa="http://bpr.ath.cx:9090";
@@ -157,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     foto.setImageResource(R.drawable.logo);
                     urlEmpresa="";
                 }
+
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {

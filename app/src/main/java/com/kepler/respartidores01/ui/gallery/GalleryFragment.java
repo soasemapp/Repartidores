@@ -229,7 +229,6 @@ public class GalleryFragment extends Fragment {
                                 titulo.show();
                                 lpeA.clear();
                                 ClientesListas.clear();
-                                leerWSListaClientes();
                                 leerWSCONFIGURACION();
 
                                 strscliente = "";
@@ -304,9 +303,6 @@ public class GalleryFragment extends Fragment {
             }
         });
 
-        leerWSListaClientes();
-
-        leerWSCONFIGURACION();
 
 
 //Mensaje de Aviso de del folio va en camino
@@ -355,7 +351,12 @@ public class GalleryFragment extends Fragment {
                 Empresa = "BPR";
                 break;
             case "http://vazquin.ath.cx:9085":
-                Empresa = "BPR";
+                Empresa = "VAZQUIN";
+                break;
+            case "http://pesbac.ath.cx:9095":
+                Empresa = "PESBAC";
+                break;
+
             default:
                 break;
         }
@@ -532,8 +533,8 @@ public class GalleryFragment extends Fragment {
                         CONFIGURACION = jitems.getString("Repartidores");
                     }
 
-                    //LeerWs();
-                    // Ahora cargar la lista de clientes
+                    LeerWs();
+
                     leerWSListaClientes();
 
                 } catch (JSONException e) {
@@ -613,8 +614,6 @@ public class GalleryFragment extends Fragment {
                         }
                     }
 
-                    // Finalmente cargar las entregas
-                    LeerWs();
 
 
                 } catch (JSONException e) {

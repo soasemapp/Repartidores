@@ -163,6 +163,9 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
             case "http://vazquin.ath.cx:9085":
                 Empresa = "VAZQUIN";
                 break;
+            case "http://pesbac.ath.cx:9095":
+                Empresa = "PESBAC";
+                break;
             default:
                 break;
         }
