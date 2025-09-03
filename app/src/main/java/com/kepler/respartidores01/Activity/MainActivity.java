@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     foto.setImageResource(R.drawable.vipla);
                     urlEmpresa="http://sprautomotive.servehttp.com:9085";
 
-                } else if (selection=="Jacve") {
+                } else if (selection=="Hazak") {
                     foto.setImageResource(R.drawable.jacve);
                     urlEmpresa="http://jacve.dyndns.org:9085";
 

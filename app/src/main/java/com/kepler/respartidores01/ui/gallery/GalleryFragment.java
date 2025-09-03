@@ -2,13 +2,18 @@ package com.kepler.respartidores01.ui.gallery;
 
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +40,8 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -60,7 +67,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
 public class GalleryFragment extends Fragment {
     MiAdaptador miAdaptador;
     MiAdaptador miAdaptador2;
@@ -413,9 +419,14 @@ public class GalleryFragment extends Fragment {
 
     private void loadInitialData() {
         if (isLoading) return;
+        showLoading(true);
+        startLoadingTimeout(); // Añadir timeout
+        leerWSCONFIGURACION();
+
+       /* if (isLoading) return;
 
         showLoading(true);
-        leerWSCONFIGURACION();
+        leerWSCONFIGURACION();*/
     }
 
     private void showLoading(boolean show) {
@@ -520,6 +531,7 @@ public class GalleryFragment extends Fragment {
         StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false);
                 try {
 
                     JSONObject jItem;
@@ -561,7 +573,7 @@ public class GalleryFragment extends Fragment {
                         titulo1.show();
                         showLoading(false);
                         handleNetworkError(error);
-                     }
+                    }
                 }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
@@ -585,12 +597,14 @@ public class GalleryFragment extends Fragment {
 
 
     private void leerWSListaClientes() {
+        showLoading(true);
 
         String url = StrServer + "/listclientesrepar";
 
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false);
                 try {
 
                     JSONObject jItem;
@@ -930,6 +944,8 @@ public class GalleryFragment extends Fragment {
 
                                             dialog = builder.create();
                                             dialog.show();
+
+
                                         }
                                     }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                                         @Override
@@ -1639,7 +1655,7 @@ public class GalleryFragment extends Fragment {
 
 
     private void actualizarfirma() {
-
+        showLoading(true); // MOSTRAR LOADING DURANTE LA OPERACIÓN
 
 
         folioconfirma = preference.getString("entregoFolio", "");
@@ -1653,6 +1669,7 @@ public class GalleryFragment extends Fragment {
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false);
                 try {
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -1671,7 +1688,9 @@ public class GalleryFragment extends Fragment {
                     }
 
                 } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    showLoading(false);
+                    Toast.makeText(getActivity(), "Error al procesar respuesta", Toast.LENGTH_SHORT).show();
+                    //throw new RuntimeException(e);
                 }
 
                 android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
@@ -1726,7 +1745,15 @@ public class GalleryFragment extends Fragment {
                 return params;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(postRequest);
+        // Configurar para no cachear
+        postRequest.setShouldCache(false);
+
+        // Agregar a la cola
+        if (getActivity() != null) {
+            Volley.newRequestQueue(getActivity()).add(postRequest);
+        }
+
+        //Volley.newRequestQueue(getActivity()).add(postRequest);
     }
 
 
@@ -1738,6 +1765,7 @@ public class GalleryFragment extends Fragment {
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // OCULTAR LOADING
                 try {
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -1753,7 +1781,26 @@ public class GalleryFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
+                        showLoading(false); // OCULTAR LOADING EN ERROR
+
+                        // Manejar error con reintento
+                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+
+                        alerta.setMessage("Error de conexión. ¿Reintentar?")
+                                .setCancelable(false)
+                                .setPositiveButton("Sí", (dialogInterface, i) -> {
+                                    // Reintentar después de 2 segundos
+                                    new Handler().postDelayed(() -> {
+                                        if (getActivity() != null && !getActivity().isFinishing()) {
+                                            actualizarfirma();
+                                        }
+                                    }, 2000);
+                                })
+                                .setNegativeButton("No", (dialogInterface, i) -> dialogInterface.cancel());
+                        alerta.show();
+
+
+                     /*   AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
                         alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1764,6 +1811,8 @@ public class GalleryFragment extends Fragment {
                         AlertDialog titulo1 = alerta1.create();
                         titulo1.setTitle("Error");
                         titulo1.show();
+
+                      */
                     }
                 }) {
             @Override
@@ -1785,6 +1834,14 @@ public class GalleryFragment extends Fragment {
                 params.put("hora", currentTime);
                 return params;
             }
+            @Override
+            public RetryPolicy getRetryPolicy() {
+                return new DefaultRetryPolicy(
+                        15000, // 15 segundos timeout
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            }
+
         };
         Volley.newRequestQueue(getActivity()).add(postRequest);
     }
@@ -1814,6 +1871,15 @@ public class GalleryFragment extends Fragment {
                 showLoading(true);
             }
         }
+    }
+
+    private void startLoadingTimeout() {
+        new Handler().postDelayed(() -> {
+            if (isLoading) {
+                showLoading(false);
+                Toast.makeText(getActivity(), "Timeout - Verifique su conexión", Toast.LENGTH_SHORT).show();
+            }
+        }, 30000); // 30 segundos timeout
     }
 
 

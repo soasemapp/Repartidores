@@ -2,6 +2,7 @@ package com.kepler.respartidores01.Activity;
 
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,8 +29,13 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -353,12 +359,13 @@ public class Principal extends AppCompatActivity {
 
 
     private void LeerWs() {
-
+        showLoading(true); // Mostrar loading
 
         String url = StrServer + "/consulfac";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // Ocultar loading
                 try {
                     String Clave, Nombre, Direccion, Repartidores = "", Stauts = "";
                     String telun, teld, folio;
@@ -394,7 +401,7 @@ public class Principal extends AppCompatActivity {
 
 
                             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
-                            alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        /*    alerta.setMessage("Folio registrado con exito").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     dialogInterface.cancel();
@@ -407,7 +414,7 @@ public class Principal extends AppCompatActivity {
 
                             android.app.AlertDialog titulo = alerta.create();
                             titulo.setTitle("Registro realizado");
-                            titulo.show();
+                            titulo.show();*/
                         } else {
                             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
                             alerta.setMessage("Este folio ya fue asigando, no es posible asignar nuevamente").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
@@ -451,6 +458,8 @@ public class Principal extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        showLoading(false);
+                        manejarErrorVolley(error, "leer folio");
                         android.app.AlertDialog.Builder alerta1 = new android.app.AlertDialog.Builder(Principal.this);
                         alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
@@ -479,12 +488,23 @@ public class Principal extends AppCompatActivity {
                 params.put("folio", usaFolio);
                 return params;
             }
+            @Override
+            public RetryPolicy getRetryPolicy() {
+                return new DefaultRetryPolicy(
+                        15000, // 15 segundos timeout
+                        0,     // 0 reintentos
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            }
         };
+        // Configurar para no cachear
+        postRequest.setShouldCache(false);
         Volley.newRequestQueue(this).add(postRequest);
     }
 
     //boton del alert para guardar el folio escrito
     public void guardarfolio(View v) {
+
+        showLoading(true);
 
         usaFolio = textfolio.getText().toString();
         numcajas = textonumcajas.getText().toString();
@@ -523,7 +543,16 @@ public class Principal extends AppCompatActivity {
             LeerWs();
 
         } else {
+            showLoading(false); // Ocultar loading si hay error
+
             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+            alerta.setMessage("Ingrese el folio y el número de cajas por favor")
+                    .setCancelable(false)
+                    .setNegativeButton("Ok", (dialogInterface, i) -> dialogInterface.cancel());
+            alerta.show();
+        }
+
+       /*     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
             alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -534,10 +563,11 @@ public class Principal extends AppCompatActivity {
             android.app.AlertDialog titulo = alerta.create();
             titulo.setTitle("Ingrese el folio y el numero de cajas porfavor");
             titulo.show();
-        }
+        }*/
     }
 
     private void insertarfolioesc() {
+        showLoading(true); // Mostrar loading
 
         String url = StrServer + "/registroR";
         String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
@@ -545,20 +575,27 @@ public class Principal extends AppCompatActivity {
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                showLoading(false); // Ocultar loading
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
                     JSONObject jsonObject = new JSONObject(response);
+                    // Procesar respuesta exitosa
+                    mostrarExito("Folio registrado correctamente");
 
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
+                    // Procesar respuesta exitosa
+                    //   mostrarExito("Folio registrado correctamente");
                 }
             }
         },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        showLoading(false);
+                        manejarErrorVolley(error, "registrar folio");
                         android.app.AlertDialog.Builder alerta1 = new android.app.AlertDialog.Builder(Principal.this);
                         alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
@@ -590,7 +627,15 @@ public class Principal extends AppCompatActivity {
                 params.put("hora", currentTime);
                 return params;
             }
+            @Override
+            public RetryPolicy getRetryPolicy() {
+                return new DefaultRetryPolicy(
+                        15000, // 15 segundos timeout
+                        2,     // 2 reintentos
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+            }
         };
+        postRequest.setShouldCache(false);
         Volley.newRequestQueue(this).add(postRequest);
     }
 
@@ -709,6 +754,88 @@ public class Principal extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void manejarErrorVolley(VolleyError error, String operacion) {
+        if (error instanceof TimeoutError) {
+            mostrarDialogoReintento("Tiempo de espera agotado al " + operacion +
+                    ". ¿Desea intentarlo de nuevo?", operacion);
+        } else if (error instanceof NoConnectionError) {
+            mostrarError("Sin conexión a internet. Verifique su conexión");
+        } else if (error instanceof ServerError) {
+            mostrarError("Error del servidor. Intente más tarde");
+        } else {
+            mostrarError("Error al " + operacion + ": " + error.getMessage());
+        }
+    }
+
+    private void mostrarDialogoReintento(String mensaje, final String operacion) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(Principal.this);
+        builder.setMessage(mensaje)
+                .setCancelable(false)
+                .setPositiveButton("Reintentar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        switch (operacion) {
+                            case "leer folio":
+                                LeerWs();
+                                break;
+                            case "registrar folio":
+                                insertarfolioesc();
+                                break;
+                        }
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        android.app.AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void mostrarError(String mensaje) {
+        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+        alerta.setMessage(mensaje)
+                .setCancelable(false)
+                .setNegativeButton("Ok", (dialogInterface, i) -> dialogInterface.cancel());
+        alerta.show();
+    }
+
+    private void mostrarExito(String mensaje) {
+        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
+        alerta.setMessage(mensaje)
+                .setCancelable(false)
+                .setNegativeButton("Ok", (dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                    startActivity(getIntent());
+                    // Recargar la actividad o limpiar campos
+                    textfolio.setText("");
+                    textonumcajas.setText("");
+                    finish();
+                });
+        alerta.show();
+
+    }
+    private void showLoading(boolean show) {
+        if (show) {
+            // Mostrar progreso (puedes usar un ProgressDialog o un View en tu layout)
+            if (progressDialog == null) {
+                progressDialog = new ProgressDialog(Principal.this);
+                progressDialog.setMessage("Procesando...");
+                progressDialog.setCancelable(false);
+            }
+            progressDialog.show();
+        } else {
+            // Ocultar progreso
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    // Declara la variable progressDialog
+    private ProgressDialog progressDialog;
+
 
 
 }
