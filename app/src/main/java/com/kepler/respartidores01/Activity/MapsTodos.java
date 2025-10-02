@@ -137,7 +137,7 @@ public class MapsTodos extends FragmentActivity implements OnMapReadyCallback {
             case "http://jacve.dyndns.org:9085":
                 Empresa = "JACVE";
                 break;
-            case "http://sprautomotive.servehttp.com:9085":
+            case "http://vipla.ath.cx:9085":
                 Empresa = "VIPLA";
                 break;
             case "http://cecra.ath.cx:9085":

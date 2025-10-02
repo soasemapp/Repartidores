@@ -49,7 +49,7 @@ public class Splash extends AppCompatActivity {
                         .centerInside()
                         .into(imgVi);
                 break;
-            case "http://sprautomotive.servehttp.com:9085":
+            case "http://vipla.ath.cx:9085":
                 Picasso.with(getApplicationContext()).
                         load(R.drawable.vipla)
                         .error(R.drawable.logo)

@@ -82,8 +82,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sempresas = findViewById(R.id.spinerempresas);
         foto=findViewById(R.id.imageView1);
         //lista = new String[]{"Seleccionar...","AUTOTOP","TOTALCAR",/*"DEMO"*/};
-        lista = new String[]{"Seleccionar...","Hazak"};
-          // lista = new String[]{"Seleccionar...","Autodis","Vipla", "Cecra", "Guvi", "Pressa","BPR","VAZQUIN","PESBAC" };
+        //lista = new String[]{"Seleccionar...","Hazak"};
+           lista = new String[]{"Seleccionar...","Autodis","Vipla", "Cecra", "Guvi", "Pressa","BPR","VAZQUIN","PESBAC" };
          //lista = new String[]{"Seleccionar...","Rodatech","Partech","Shark"};
 
         adapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, lista);
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 }else if (selection=="Vipla"){
                     foto.setImageResource(R.drawable.vipla);
-                    urlEmpresa="http://sprautomotive.servehttp.com:9085";
+                    urlEmpresa="http://vipla.ath.cx:9085";
 
                 } else if (selection=="Hazak") {
                     foto.setImageResource(R.drawable.jacve);

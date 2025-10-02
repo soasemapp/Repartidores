@@ -182,6 +182,10 @@ public class GalleryFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!strscliente.isEmpty()) {
+
+
+
+
                     comentariog = null;
                     estatus = null;
 
@@ -319,7 +323,7 @@ public class GalleryFragment extends Fragment {
             case "http://jacve.dyndns.org:9085":
                 Empresa = "JACVE";
                 break;
-            case "http://sprautomotive.servehttp.com:9085":
+            case "http://vipla.ath.cx:9085":
                 Empresa = "VIPLA";
                 break;
             case "http://cecra.ath.cx:9085":
