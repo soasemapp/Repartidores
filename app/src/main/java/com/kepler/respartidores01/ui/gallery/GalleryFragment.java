@@ -1,20 +1,23 @@
 package com.kepler.respartidores01.ui.gallery;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -41,11 +45,15 @@ import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
-import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.kepler.respartidores01.SetAndGet.AdapeterDetallefac;
 import com.kepler.respartidores01.Activity.MapsSolo;
 import com.kepler.respartidores01.SetAndGet.Mdestallefac;
@@ -64,9 +72,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import java.io.IOException;
+
+
 public class GalleryFragment extends Fragment {
     MiAdaptador miAdaptador;
     MiAdaptador miAdaptador2;
@@ -119,6 +132,11 @@ public class GalleryFragment extends Fragment {
     private LinearLayout loadingLayout;
     private boolean isLoading = false;
 
+    private static final double RADIO_ENTREGA = 25.0; // metros
+    private FusedLocationProviderClient fusedLocationClient;
+    private Location currentLocation;
+    private boolean isLocationReady = false;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -138,6 +156,10 @@ public class GalleryFragment extends Fragment {
 
         preference = getContext().getSharedPreferences("Login", Context.MODE_PRIVATE);
         editor = preference.edit();
+
+        // Inicializar ubicación
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        setupLocation();
 
 
         strcodBra = preference.getString("codBra", "null");
@@ -181,105 +203,47 @@ public class GalleryFragment extends Fragment {
         btn_entregar_todo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("ENTREGAR_TODO", "Botón presionado - Cliente seleccionado: " + strscliente);
+
                 if (!strscliente.isEmpty()) {
 
 
+                   // Toast.makeText(getContext(), "Obteniendo ubicación actual...", Toast.LENGTH_SHORT).show();
 
-
-                    comentariog = null;
-                    estatus = null;
-
-
-                    builder = new AlertDialog.Builder(getContext());
-                    LayoutInflater inflaterentrega = getLayoutInflater();
-                    View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
-                    builder.setView(dialogViewww);
-                    EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
-                    EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
-                    Button enttegar = dialogViewww.findViewById(R.id.btentre);
-                    enttegar.setOnClickListener(new View.OnClickListener() {
+                    // Obtener ubicación actual
+                    obtenerUbicacionActual(new OnLocationObtainedListener() {
                         @Override
-                        public void onClick(View view) {
-                            estatus = "E";
-                            recibio.getText().toString();
-                            comentario.getText().toString();
-                            String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                            if (!lpeA.get(0).getTelefonodos().equals("")) {
-
-                                smsCamino = Empresa + " agradece su preferencia.\n" +
-                                        "" + lpeA.get(0).getNombre() + ", Su pedido con el folio " + lpeA.get(0).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
-                                        "Le deseamos un excelente día.";
-
-                                SmsManager smsManager = SmsManager.getDefault();
-                                smsManager.sendTextMessage(lpeA.get(0).getTelefonodos(), null, smsCamino, null, null);
+                        public void onLocationObtained(Location location) {
+                            if (location == null) {
+                                Toast.makeText(getContext(), "No se pudo obtener la ubicación", Toast.LENGTH_LONG).show();
+                                return;
                             }
 
-                            if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
-                                for (int i = 0; i < lpeA.size(); i++) {
-                                    String folio = "";
-                                    String recibiostr = recibio.getText().toString();
-                                    String comentariostr = comentario.getText().toString();
-                                    folio = lpeA.get(i).getFolio();
+                            currentLocation = location;
+                            Log.d("ENTREGAR_TODO",
+                                    "Mi ubicación actual: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
 
+                            // Verificar proximidad (con Geocoder si es necesario)
+                            verificarProximidadConGeocoder(new OnProximidadVerificadaListener() {
+                                @Override
+                                public void onProximidadVerificada(boolean estaCerca) {
+                                    Log.d("ENTREGAR_TODO", "Resultado verificación proximidad: " + estaCerca);
 
-                                    actualizarfirmanuevo(estatus, folio, recibiostr, comentariostr, currentTime);
+                                    if (estaCerca) {
+                                        Log.d("ENTREGAR_TODO", "Iniciando proceso de entrega...");
+                                        iniciarProcesoEntrega();
+                                    }
                                 }
-                                dialog.dismiss();
-                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                                alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.cancel();
-
-                                    }
-                                });
-
-                                android.app.AlertDialog titulo = alerta.create();
-                                titulo.setTitle("");
-                                titulo.show();
-                                lpeA.clear();
-                                ClientesListas.clear();
-                                leerWSCONFIGURACION();
-
-                                strscliente = "";
-                                ButtonListaClientes.setText("Selecciona un cliente");
-
-                            } else {
-                                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                                alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.cancel();
-                                    }
-                                });
-
-                                android.app.AlertDialog titulo = alerta.create();
-                                titulo.setTitle("Faltan casillas por rellenar");
-                                titulo.show();
-                            }
-
+                            });
                         }
                     });
-
-                    dialog = builder.create();
-                    dialog.show();
 
                 } else {
-                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
-                    alerta.setMessage("Selecciona un cliente porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-
-
-                        }
-                    });
-
-                    android.app.AlertDialog titulo = alerta.create();
-                    titulo.setTitle("Verifica");
-                    titulo.show();
+                    mostrarAlerta("Selecciona un cliente porfavor", "Verifica");
                 }
             }
         });
+
 
 
         ButtonListaClientes.setOnClickListener(new View.OnClickListener() {
@@ -421,6 +385,372 @@ public class GalleryFragment extends Fragment {
 
     }
 
+
+    private void setupLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        // No iniciamos actualizaciones continuas aquí
+    }
+
+    private void obtenerUbicacionActual(OnLocationObtainedListener listener) {
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    1001);
+            listener.onLocationObtained(null);
+            return;
+        }
+
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(getActivity(), location -> {
+                    if (location != null) {
+                        Log.d("LOCATION_OBTENIDA",
+                                "Ubicación obtenida: " + location.getLatitude() + ", " + location.getLongitude());
+                        listener.onLocationObtained(location);
+                    } else {
+                        // Si getLastLocation() retorna null, intentamos con requestLocationUpdates una vez
+                        obtenerUbicacionFresca(listener);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("LOCATION_ERROR", "Error obteniendo ubicación: " + e.getMessage());
+                    listener.onLocationObtained(null);
+                });
+    }
+
+    private void obtenerUbicacionFresca(OnLocationObtainedListener listener) {
+        // Verificar permiso explícitamente
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e("PERMISSION", "Permiso de ubicación no concedido");
+            listener.onLocationObtained(null);
+            return;
+        }
+
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setNumUpdates(1) // Solo una actualización
+                .setInterval(0); // Inmediato
+
+        LocationCallback locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    Location location = locationResult.getLastLocation();
+                    Log.d("LOCATION_FRESCA",
+                            "Ubicación fresca: " + location.getLatitude() + ", " + location.getLongitude());
+                    listener.onLocationObtained(location);
+                } else {
+                    listener.onLocationObtained(null);
+                }
+                // Remover el callback después de obtener la ubicación
+                try {
+                    fusedLocationClient.removeLocationUpdates(this);
+                } catch (SecurityException e) {
+                    Log.e("SECURITY_EXCEPTION", "Error removiendo updates: " + e.getMessage());
+                }
+            }
+        };
+
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        } catch (SecurityException e) {
+            Log.e("SECURITY_EXCEPTION", "Error solicitando ubicación: " + e.getMessage());
+            listener.onLocationObtained(null);
+            return;
+        }
+
+        // Timeout por si no se obtiene ubicación en 10 segundos
+        new Handler().postDelayed(() -> {
+            try {
+                fusedLocationClient.removeLocationUpdates(locationCallback);
+            } catch (SecurityException e) {
+                Log.e("SECURITY_EXCEPTION", "Error removiendo updates en timeout: " + e.getMessage());
+            }
+            listener.onLocationObtained(null);
+        }, 10000);
+    }
+
+    // Interface para el callback de ubicación
+    interface OnLocationObtainedListener {
+        void onLocationObtained(Location location);
+    }
+
+
+    private void verificarProximidadConGeocoder(OnProximidadVerificadaListener listener) {
+        if (currentLocation == null || lpeA.isEmpty() || strscliente.isEmpty()) {
+            Toast.makeText(getContext(), "Error: No hay ubicación o datos del cliente", Toast.LENGTH_SHORT).show();
+            listener.onProximidadVerificada(false);
+            return;
+        }
+
+        // Buscar el pedido del cliente seleccionado
+        for (Pedidos pedido : lpeA) {
+            if (pedido.getCliente().equals(strscliente)) {
+
+                // Si ya tiene coordenadas válidas, usarlas directamente
+                if (pedido.getLatitud() != 0.0 && pedido.getLongitud() != 0.0) {
+                    boolean estaCerca = calcularDistancia(pedido.getLatitud(), pedido.getLongitud());
+                    listener.onProximidadVerificada(estaCerca);
+                    return;
+                }
+                // Si no tiene coordenadas, usar Geocoder con la dirección
+                else {
+                    Log.d("GEOCODER", "Usando Geocoder para: " + pedido.getDireccion());
+                    obtenerCoordenadasDesdeDireccion(pedido.getDireccion(), new OnCoordenadasObtenidasListener() {
+                        @Override
+                        public void onCoordenadasObtenidas(double latitud, double longitud) {
+                            if (latitud != 0.0 && longitud != 0.0) {
+                                boolean estaCerca = calcularDistancia(latitud, longitud);
+                                listener.onProximidadVerificada(estaCerca);
+                            } else {
+                                Toast.makeText(getContext(), "No se pudo obtener la ubicación de la dirección", Toast.LENGTH_LONG).show();
+                                listener.onProximidadVerificada(false);
+                            }
+                        }
+                    });
+                    return;
+                }
+            }
+        }
+
+        Toast.makeText(getContext(), "No se encontró el cliente seleccionado", Toast.LENGTH_SHORT).show();
+        listener.onProximidadVerificada(false);
+    }
+
+    private boolean calcularDistancia(double latitudCliente, double longitudCliente) {
+        try {
+            float[] results = new float[1];
+            Location.distanceBetween(
+                    currentLocation.getLatitude(),
+                    currentLocation.getLongitude(),
+                    latitudCliente,
+                    longitudCliente,
+                    results
+            );
+            float distanciaMetros = results[0];
+
+            Log.d("PROXIMIDAD_CALCULO",
+                    "Distancia calculada: " + results[0] + "m" +
+                            " - Coordenadas cliente: " + latitudCliente + ", " + longitudCliente +
+                            " - Mi ubicación: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
+
+            if (distanciaMetros <= RADIO_ENTREGA) {
+                Toast.makeText(getContext(), "✓ Estás en la ubicación correcta", Toast.LENGTH_SHORT).show();
+                return true;
+            } else {
+                /*Toast.makeText(getContext(),
+                        String.format("Debes acercarte. Distancia: %.1f metros", results[0]),
+                        Toast.LENGTH_LONG).show(); */
+                mostrarDialogoDistanciaSimple(distanciaMetros);
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e("PROXIMIDAD_CALCULO", "Error calculando distancia: " + e.getMessage());
+            Toast.makeText(getContext(), "Error calculando distancia", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+    }
+
+    // Nuevo interface para el callback
+    interface OnProximidadVerificadaListener {
+        void onProximidadVerificada(boolean estaCerca);
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setupLocation();
+            } else {
+                Toast.makeText(getContext(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void iniciarProcesoEntrega() {
+        comentariog = null;
+        estatus = null;
+
+        builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflaterentrega = getLayoutInflater();
+        View dialogViewww = inflaterentrega.inflate(R.layout.recibio_, null);
+        builder.setView(dialogViewww);
+
+        EditText recibio = dialogViewww.findViewById(R.id.quien_recibio);
+        EditText comentario = dialogViewww.findViewById(R.id.id_comentario);
+        Button enttegar = dialogViewww.findViewById(R.id.btentre);
+
+        enttegar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                estatus = "E";
+                recibio.getText().toString();
+                comentario.getText().toString();
+                String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+                if (!lpeA.get(0).getTelefonodos().equals("")) {
+
+                    smsCamino = Empresa + " agradece su preferencia.\n" +
+                            "" + lpeA.get(0).getNombre() + ", Su pedido con el folio " + lpeA.get(0).getFolio() + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + recibio + ". \n" +
+                            "Le deseamos un excelente día.";
+
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(lpeA.get(0).getTelefonodos(), null, smsCamino, null, null);
+                }
+
+                if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
+                    for (int i = 0; i < lpeA.size(); i++) {
+                        String folio = "";
+                        String recibiostr = recibio.getText().toString();
+                        String comentariostr = comentario.getText().toString();
+                        folio = lpeA.get(i).getFolio();
+
+
+                        actualizarfirmanuevo(estatus, folio, recibiostr, comentariostr, currentTime);
+                    }
+                    dialog.dismiss();
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                    alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("");
+                    titulo.show();
+                    lpeA.clear();
+                    ClientesListas.clear();
+                    leerWSCONFIGURACION();
+
+                    strscliente = "";
+                    ButtonListaClientes.setText("Selecciona un cliente");
+
+                } else {
+                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                    alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.cancel();
+                        }
+                    });
+
+                    android.app.AlertDialog titulo = alerta.create();
+                    titulo.setTitle("Faltan casillas por rellenar");
+                    titulo.show();
+                }
+
+            }
+        });
+
+        dialog = builder.create();
+        dialog.show();
+    }
+
+    private void mostrarAlerta(String mensaje, String titulo) {
+        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+        alerta.setMessage(mensaje).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+        android.app.AlertDialog tituloDialog = alerta.create();
+        tituloDialog.setTitle(titulo);
+        tituloDialog.show();
+    }
+
+
+    private void obtenerCoordenadasDesdeDireccion(String direccion, OnCoordenadasObtenidasListener listener) {
+        if (getActivity() == null) return;
+
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+        new Thread(() -> {
+            try {
+                List<Address> addresses = geocoder.getFromLocationName(direccion, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    Address address = addresses.get(0);
+                    double latitud = address.getLatitude();
+                    double longitud = address.getLongitude();
+
+                    Log.d("GEOCODER", "Coordenadas obtenidas: " + latitud + ", " + longitud + " para: " + direccion);
+
+                    getActivity().runOnUiThread(() -> {
+                        listener.onCoordenadasObtenidas(latitud, longitud);
+                    });
+                } else {
+                    Log.d("GEOCODER", "No se encontraron coordenadas para: " + direccion);
+                    getActivity().runOnUiThread(() -> {
+                        listener.onCoordenadasObtenidas(0.0, 0.0);
+                    });
+                }
+            } catch (IOException e) {
+                Log.e("GEOCODER", "Error en Geocoder: " + e.getMessage());
+                getActivity().runOnUiThread(() -> {
+                    listener.onCoordenadasObtenidas(0.0, 0.0);
+                });
+            }
+        }).start();
+    }
+
+    interface OnCoordenadasObtenidasListener {
+        void onCoordenadasObtenidas(double latitud, double longitud);
+    }
+
+
+    private void mostrarDialogoDistanciaSimple(float distanciaMetros) {
+        if (getActivity() == null) return;
+
+        String distanciaFormateada = formatearDistancia(distanciaMetros);
+        String mensaje;
+
+        if (distanciaMetros > 1000) {
+            mensaje = String.format("📍 Estás muy lejos\n\nDistancia actual: %s\n\nDebes acercarte a menos de 25 metros para realizar la entrega.", distanciaFormateada);
+        } else if (distanciaMetros > 500) {
+            mensaje = String.format("📍 Aún estás lejos\n\nDistancia actual: %s\n\nSigue acercándote a la ubicación de entrega.", distanciaFormateada);
+        } else if (distanciaMetros > 100) {
+            mensaje = String.format("📍 Estás en la zona\n\nDistancia actual: %s\n\nBusca la dirección específica.", distanciaFormateada);
+        } else if (distanciaMetros > 50) {
+            mensaje = String.format("📍 Estás cerca\n\nDistancia actual: %s\n\n¡Falta poco! Acércate más.", distanciaFormateada);
+        } else {
+            mensaje = String.format("📍 Casi llegas\n\nDistancia actual: %s\n\nSolo necesitas estar a menos de 25 metros.", distanciaFormateada);
+        }
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Ubicación Requerida")
+                .setMessage(mensaje)
+                .setPositiveButton("Entendido", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private String formatearDistancia(float distanciaMetros) {
+        if (distanciaMetros >= 1000) {
+            // Mostrar en kilómetros con 1 decimal
+            float distanciaKm = distanciaMetros / 1000;
+            return String.format(Locale.getDefault(), "%.1f km", distanciaKm);
+        } else {
+            // Mostrar en metros sin decimales
+            return String.format(Locale.getDefault(), "%.0f metros", distanciaMetros);
+        }
+    }
+
+
+
+
+
     private void loadInitialData() {
         if (isLoading) return;
         showLoading(true);
@@ -525,6 +855,10 @@ public class GalleryFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         isLoading = false;
+        // Limpiar recursos si es necesario
+        if (fusedLocationClient != null) {
+            // No hay callbacks que remover
+        }
     }
 
     private void leerWSCONFIGURACION() {
