@@ -382,7 +382,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                 estatus = "E";
 
 
-              //  if (tiempoval > 10) {
+                if (tiempoval > 20) {
                     if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                         editor.putString("recibio", recibio.getText().toString());
@@ -408,7 +408,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                     }
 
 
-              /*  }else{
+                }else{
                     android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(MapsSolo .this);
                     alerta.setMessage("Estas muy lejos de la zona de entrega").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -420,7 +420,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                     android.app.AlertDialog titulo = alerta.create();
                     titulo.setTitle("¡Estas muy lejos!");
                     titulo.show();
-                }*/
+                }
 
             }
         });
