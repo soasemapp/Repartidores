@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="gogle_map_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="gogle_map_key" templateMergeStrategy="preserve" translatable="false">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
 
 </resources>

@@ -75,12 +75,14 @@ public class MiAdaptador extends BaseAdapter {
         ImageView img = vistaDiseno.findViewById(R.id.imgpendiente);
         TextView id_comentario = vistaDiseno.findViewById(R.id.id_comentario);
         TextView id_timer = vistaDiseno.findViewById(R.id.txtTiempo);
+        TextView sucursal =vistaDiseno.findViewById(R.id.txtsucursal);
 
             tvNombres.setText(auxi.getNombre());
             tvtelefonouno.setText(auxi.getTelefonouno());
             tvtelefodos.setText(auxi.getTelefonodos());
             tvtfolio.setText(auxi.getFolio());
             id_comentario.setText(auxi.getComentario());
+            sucursal.setText(auxi.getSucursal());
             int minutos=Integer.parseInt(auxi.getMinutos());
             int horas=Integer.parseInt(auxi.getHoras());
 
@@ -129,6 +131,13 @@ if (minutos>60 && minutos<120){
         if(Configuracion.equals("1")){
             entreado.setVisibility(View.GONE);
             pendiente.setVisibility(View.GONE);
+        }else if (Configuracion.equals("2")){
+            entreado.setVisibility(View.VISIBLE);
+            entreado.setText("ENTREGAR");
+            entreado.setBackgroundColor(Color.RED);
+            entreado.setTextColor(Color.WHITE);
+            pendiente.setVisibility(View.GONE);
+            irmap.setVisibility(View.GONE);
         }else {
             entreado.setVisibility(View.VISIBLE);
             pendiente.setVisibility(View.VISIBLE);

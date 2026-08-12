@@ -2,11 +2,27 @@
     <string name="app_name">Repartidores</string>
 
 
+    <string name="TokenVipla">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenColombia">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenPesbac">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenVazquin">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenBPR">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenGuvi">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenAutodis">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenCecra">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenHazak">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenPressa">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+    <string name="TokenAutotop">AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE</string>
+
+
+
+
+
     <string name="todo">TODO</string>
     <string name="usuario">Usuario</string>
     <string name="password">Password</string>
     <string name="ingresar">Ingresar</string>
-    <string name="v_1_0">V 1.12</string>
+    <string name="v_1_0">V 1.21</string>
     <string name="name_repartidores">Nombre del repartidor</string>
     <string name="seleccione"> Selecione su empresa</string>
 
@@ -21,6 +37,8 @@
 
     <string name="menu_home">Perfil</string>
     <string name="menu_gallery">Paquetes por entregar</string>
+
+    <string name="menu_entregamostrador">Mostrador</string>
     <string name="menu_slideshow">Paquetes entregados</string>
     <string name="menu_mapa">Mapa</string>
     <string name="cerrarsesion">Cerrar Sesion</string>

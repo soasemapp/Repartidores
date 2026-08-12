@@ -23,7 +23,9 @@ public class Pedidos {
     String  Minutos ;
     String PedidoHora ;
 
-    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor, String aviso, String horas, String minutos, String pedidoHora) {
+    String ClaveSuc;
+
+    public Pedidos(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String comentario, String status, String direccionclave, Double latitud, Double longitud, int distancia, String distanciaText, int tiempo, String tiempoValor, String aviso, String horas, String minutos, String pedidoHora, String claveSuc) {
         this.sucursal = sucursal;
         this.cliente = cliente;
         this.numpaq = numpaq;
@@ -45,6 +47,7 @@ public class Pedidos {
         Horas = horas;
         Minutos = minutos;
         PedidoHora = pedidoHora;
+        ClaveSuc = claveSuc;
     }
 
     public String getSucursal() {
@@ -213,5 +216,13 @@ public class Pedidos {
 
     public void setPedidoHora(String pedidoHora) {
         PedidoHora = pedidoHora;
+    }
+
+    public String getClaveSuc() {
+        return ClaveSuc;
+    }
+
+    public void setClaveSuc(String claveSuc) {
+        ClaveSuc = claveSuc;
     }
 }

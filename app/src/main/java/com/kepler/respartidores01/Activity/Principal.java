@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -17,8 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AlertDialog;
+import android.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -47,7 +47,10 @@ import com.kepler.respartidores01.Service.ConexionService;
 import com.kepler.respartidores01.SetAndGet.Pedidos;
 import com.kepler.respartidores01.R;
 import com.kepler.respartidores01.SetAndGet.ClienteSandG;
+import com.kepler.respartidores01.SetAndGet.SucursalSANDG;
 import com.kepler.respartidores01.databinding.ActivityPrincipalBinding;
+import com.kepler.respartidores01.include.HttpHandler;
+import com.kepler.respartidores01.ui.gallery.GalleryFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +61,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
 
 public class Principal extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
@@ -74,13 +79,17 @@ public class Principal extends AppCompatActivity {
     private SharedPreferences.Editor editor;
     String strusr, strpass, strname, strlname, strtype, strbran, strma, StrServer, strcodBra, strcode, strcorreo, struser, strbranch;
     int Contador = 0;
-
+    private AlertDialog mDialog;
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
+    ArrayList<SucursalSANDG> listasucursal = new ArrayList<>();
+    boolean escaneomanual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDialog = new SpotsDialog(this);
+        mDialog.setCancelable(false);
 
 
         binding = ActivityPrincipalBinding.inflate(getLayoutInflater());
@@ -112,7 +121,7 @@ public class Principal extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow, R.id.mapsActivity, R.id.mapsActivityTodos, R.id.cerrarsecion)
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow,R.id.nav_entregamostrador, R.id.mapsActivity, R.id.mapsActivityTodos, R.id.cerrarsecion)
                 .setOpenableLayout(drawer)
                 .build();
 
@@ -121,7 +130,7 @@ public class Principal extends AppCompatActivity {
 
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        MenuItem menuItem = navigationView.getMenu().getItem(5);
+        MenuItem menuItem = navigationView.getMenu().getItem(6);
 
         menuItem.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.cerrarsecion) {
@@ -252,7 +261,9 @@ public class Principal extends AppCompatActivity {
                     }
 
                 }
-                LeerWs();
+                listasucursal.clear();
+                new SucursalesLista().execute();
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -275,13 +286,34 @@ public class Principal extends AppCompatActivity {
 
     public void respuesta(View view) {
 
+        escaneomanual = true;
+        listasucursal.clear();
+        new SucursalesLista().execute();
+
+
+    }
+
+
+    public void respuestascanner(View view) {
+        IntentIntegrator integrador = new IntentIntegrator(Principal.this);
+        integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+        integrador.setPrompt("Busca un QR despues selecciona la sucursal en la que se facturo");
+        integrador.setCameraId(0);
+        integrador.setBeepEnabled(true);
+        integrador.setBarcodeImageEnabled(true);
+        integrador.initiateScan();
+    }
+
+
+    public void respuestapositiva() {
         builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.escribirfolio, null);
-        builder.setView(dialogView).setTitle("Introduce Folio y Numero de cajas")
+        builder.setView(dialogView).setMessage("La factura se cargara es de "+strcodBra+"\nIntroduce folio y numero de cajas que llevaras.")
                 .setPositiveButton(R.string.signin, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
                     }
                 });
         dialog = builder.create();
@@ -343,20 +375,113 @@ public class Principal extends AppCompatActivity {
                 return false;
             }
         });
-
     }
 
 
-    public void respuestascanner(View view) {
-        IntentIntegrator integrador = new IntentIntegrator(Principal.this);
-        integrador.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrador.setPrompt("Lector");
-        integrador.setCameraId(0);
-        integrador.setBeepEnabled(true);
-        integrador.setBarcodeImageEnabled(true);
-        integrador.initiateScan();
-    }
+    private class SucursalesLista extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+mDialog.show();
 
+        }//onPreExecute
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            HttpHandler sh = new HttpHandler();
+            String url =   StrServer + "/listasucursalapp";
+            String jsonStr = sh.makeServiceCall(url, struser, strpass);
+            if (jsonStr != null) {
+                try {
+                    JSONObject json = new JSONObject(jsonStr);
+                    if (json.length() != 0) {
+                        if (json.length() != 0) {
+                            JSONObject jitems, Numero;
+                            JSONObject jsonObject = new JSONObject(jsonStr);
+                            jitems = jsonObject.getJSONObject("Listado");
+
+                            for (int i = 0; i < jitems.length(); i++) {
+                                jitems = jsonObject.getJSONObject("Listado");
+                                Numero = jitems.getJSONObject("" + i + "");
+                                listasucursal.add(new SucursalSANDG(
+                                        Numero.getString("clave"),
+                                        Numero.getString("nombre")));
+                            }
+                        }
+                    }
+                } catch (final JSONException e) {
+
+                }//catch JSON EXCEPTION
+            } else {
+
+            }//else
+            return null;
+
+        }//doInBackground
+
+        @Override
+        protected void onPostExecute(Void aBoolean) {
+            super.onPostExecute(aBoolean);
+
+
+            if (escaneomanual) {
+                String[] opciones = new String[listasucursal.size()];
+
+                for (int i = 0; i < listasucursal.size(); i++) {
+                    opciones[i] = listasucursal.get(i).getNombre();
+                }
+
+
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(Principal.this);
+                builder.setTitle("Seleccione una Sucursal").setIcon(R.drawable.ic_sucu);
+
+
+                builder.setItems(opciones, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        strbranch = listasucursal.get(which).getClave();
+                        strcodBra= listasucursal.get(which).getNombre();
+                        respuestapositiva();
+                    }
+                });
+// create and show the alert dialog
+                android.app.AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.setCancelable(false);
+
+            } else {
+                String[] opciones = new String[listasucursal.size()];
+
+                for (int i = 0; i < listasucursal.size(); i++) {
+                    opciones[i] = listasucursal.get(i).getNombre();
+                }
+
+
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(Principal.this);
+                builder.setTitle("Seleccione una Sucursal").setIcon(R.drawable.ic_sucu);
+
+
+                builder.setItems(opciones, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        strbranch = listasucursal.get(which).getClave();
+                        LeerWs();
+
+                    }
+                });
+// create and show the alert dialog
+                android.app.AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.setCancelable(false);
+            }
+
+            mDialog.dismiss();
+
+        }//onPost
+
+    }
 
     private void LeerWs() {
         showLoading(true); // Mostrar loading
@@ -395,9 +520,10 @@ public class Principal extends AppCompatActivity {
                         if (Stauts.equals("A") && Repartidores.equals("")) {
 
                             ClientesDis.add(new ClienteSandG(Clave, Nombre, Direccion));
-                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N", "", "", ""));
+                            lpeA.add(new Pedidos("", "", "", Nombre, telun, teld, folio, Direccion, "", "", "", 0.0, 0.0, 0, "", 0, "", "N", "", "", "",""));
 
                             insertarfolioesc();
+
 
 
                             android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(Principal.this);
@@ -488,6 +614,7 @@ public class Principal extends AppCompatActivity {
                 params.put("folio", usaFolio);
                 return params;
             }
+
             @Override
             public RetryPolicy getRetryPolicy() {
                 return new DefaultRetryPolicy(
@@ -540,6 +667,9 @@ public class Principal extends AppCompatActivity {
         }
 
         if (!usaFolio.equals("") && !numcajas.equals("")) {
+            textfolio.setText("");
+            textonumcajas.setText("");
+
             LeerWs();
 
         } else {
@@ -627,6 +757,7 @@ public class Principal extends AppCompatActivity {
                 params.put("hora", currentTime);
                 return params;
             }
+
             @Override
             public RetryPolicy getRetryPolicy() {
                 return new DefaultRetryPolicy(
@@ -807,15 +938,16 @@ public class Principal extends AppCompatActivity {
                 .setCancelable(false)
                 .setNegativeButton("Ok", (dialogInterface, i) -> {
                     dialogInterface.cancel();
+                    overridePendingTransition(0, 0);
                     startActivity(getIntent());
+                    overridePendingTransition(0, 0);
                     // Recargar la actividad o limpiar campos
-                    textfolio.setText("");
-                    textonumcajas.setText("");
                     finish();
                 });
         alerta.show();
 
     }
+
     private void showLoading(boolean show) {
         if (show) {
             // Mostrar progreso (puedes usar un ProgressDialog o un View en tu layout)
@@ -835,7 +967,6 @@ public class Principal extends AppCompatActivity {
 
     // Declara la variable progressDialog
     private ProgressDialog progressDialog;
-
 
 
 }

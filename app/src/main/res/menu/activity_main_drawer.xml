@@ -10,14 +10,22 @@
             android:icon="@drawable/ic_perfil"
             android:title="@string/menu_home" />
         <item
+            android:id="@+id/nav_entregamostrador"
+            android:visible="true"
+            android:icon="@drawable/receptor"
+            android:title="@string/menu_entregamostrador"
+            />
+        <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_pacporentrega"
             android:title="@string/menu_gallery"
             />
+
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_paclisto"
             android:title="@string/menu_slideshow" />
+
         <item
             android:id="@+id/mapsActivity"
             android:title="@string/menu_mapa"

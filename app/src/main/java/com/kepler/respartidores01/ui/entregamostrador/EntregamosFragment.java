@@ -1,14 +1,14 @@
-package com.kepler.respartidores01.ui.gallery;
+package com.kepler.respartidores01.ui.entregamostrador;
 
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -21,9 +21,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.app.AlertDialog;
-
-
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,21 +50,21 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.kepler.respartidores01.SetAndGet.AdapeterDetallefac;
 import com.kepler.respartidores01.Activity.MapsSolo;
-import com.kepler.respartidores01.SetAndGet.Mdestallefac;
-import com.kepler.respartidores01.Adapter.MiAdaptador;
-import com.kepler.respartidores01.SetAndGet.Pedidos;
 import com.kepler.respartidores01.Activity.Principal;
+import com.kepler.respartidores01.Adapter.MiAdaptador;
 import com.kepler.respartidores01.R;
+import com.kepler.respartidores01.SetAndGet.AdapeterDetallefac;
+import com.kepler.respartidores01.SetAndGet.Mdestallefac;
+import com.kepler.respartidores01.SetAndGet.Pedidos;
 import com.kepler.respartidores01.SetAndGet.SetAndGetListClientes;
 import com.kepler.respartidores01.SetAndGet.SucursalSANDG;
-import com.kepler.respartidores01.databinding.FragmentGalleryBinding;
-import com.kepler.respartidores01.include.HttpHandler;
+import com.kepler.respartidores01.databinding.FragmentEntregamosBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,14 +75,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import java.io.IOException;
 
-
-public class GalleryFragment extends Fragment {
+public class EntregamosFragment extends Fragment {
     MiAdaptador miAdaptador;
     MiAdaptador miAdaptador2;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 0;
-    private FragmentGalleryBinding binding;
+    private FragmentEntregamosBinding binding;
     String folioparaentregar;
     ListView lista;
     ListView lista2;
@@ -127,8 +121,8 @@ public class GalleryFragment extends Fragment {
 
 
     String Sucursal, Folios, Nombres;
-    android.app.AlertDialog.Builder builder6;
-    android.app.AlertDialog dialog6 = null;
+    AlertDialog.Builder builder6;
+    AlertDialog dialog6 = null;
     int posicion = 0;
 
     private LinearLayout loadingLayout;
@@ -144,7 +138,7 @@ public class GalleryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        binding = FragmentGalleryBinding.inflate(inflater, container, false);
+        binding = FragmentEntregamosBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         // Inicializar loading layout
@@ -183,111 +177,30 @@ public class GalleryFragment extends Fragment {
         escdireccion = preference.getString("direccionescrito", "null");
         escnumc = preference.getString("numc", "");
 
-        ButtonTodos = getView().findViewById(R.id.ButtonTodos);
-        ButtonCliente = getActivity().findViewById(R.id.ButtonClientes);
-        ButtonCliente.setBackgroundColor(Color.RED);
-        ButtonTodos.setBackgroundColor(Color.BLACK);
-        ClientesOcular = getView().findViewById(R.id.ClienteOcultar);
-        TodosOcultar = getView().findViewById(R.id.TodoOcultar);
-        ButtonListaClientes = getActivity().findViewById(R.id.listaclientes);
-        btn_entregar_todo = getActivity().findViewById(R.id.btn_entregar_todo);
+
         entregorc = preference.getString("recibio", "");
         entregodirec = preference.getString("entregoDirec", "");
         setD.clear();
         lpeA.clear();
-        builder6 = new android.app.AlertDialog.Builder(getActivity());
+        builder6 = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.pantallacarga, null);
 
 
 
-        if (strcodBra.equals("")) {
-            new SucursalesLista().execute();
-        } else {
+
             // Cargar datos iniciales
             loadInitialData();
-        }
 
 
 
 
 
-        btn_entregar_todo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("ENTREGAR_TODO", "Botón presionado - Cliente seleccionado: " + strscliente);
-
-                if (!strscliente.isEmpty()) {
-
-
-                   // Toast.makeText(getContext(), "Obteniendo ubicación actual...", Toast.LENGTH_SHORT).show();
-
-                    // Obtener ubicación actual
-                    obtenerUbicacionActual(new OnLocationObtainedListener() {
-                        @Override
-                        public void onLocationObtained(Location location) {
-                            if (location == null) {
-                                Toast.makeText(getContext(), "No se pudo obtener la ubicación", Toast.LENGTH_LONG).show();
-                                return;
-                            }
-
-                            currentLocation = location;
-                            Log.d("ENTREGAR_TODO",
-                                    "Mi ubicación actual: " + currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
-
-                            // Verificar proximidad (con Geocoder si es necesario)
-                            verificarProximidadConGeocoder(new OnProximidadVerificadaListener() {
-                                @Override
-                                public void onProximidadVerificada(boolean estaCerca) {
-                                    Log.d("ENTREGAR_TODO", "Resultado verificación proximidad: " + estaCerca);
-
-                                    if (estaCerca) {
-                                        Log.d("ENTREGAR_TODO", "Iniciando proceso de entrega...");
-                                        iniciarProcesoEntrega();
-                                    }
-                                }
-                            });
-                        }
-                    });
-
-                } else {
-                    mostrarAlerta("Selecciona un cliente porfavor", "Verifica");
-                }
-            }
-        });
 
 
 
-        ButtonListaClientes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String[] opciones = new String[ClientesListas.size()];
-
-                for (int i = 0; i < ClientesListas.size(); i++) {
-                    opciones[i] = ClientesListas.get(i).getClave() + ":" + ClientesListas.get(i).getNombre();
-                }
 
 
-                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(getActivity());
-                builder.setTitle("SELECCIONE UN CLIENTE").setIcon(R.drawable.ic_repar);
-
-
-                builder.setItems(opciones, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        strscliente = ClientesListas.get(which).getClave();
-                        ButtonListaClientes.setText(ClientesListas.get(which).getNombre());
-                        LeerWs2();
-
-
-                    }
-                });
-// create and show the alert dialog
-                android.app.AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
 
 
 
@@ -363,127 +276,14 @@ public class GalleryFragment extends Fragment {
                 }
         );
 
-        // Obtener el refreshLayout
-        refreshLayout2 = (SwipeRefreshLayout) getView().findViewById(R.id.swipeRefresh2);
-
 // Iniciar la tarea asíncrona al revelar el indicador
-        refreshLayout2.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        new HackingBackgroundTaskk2().execute();
-                    }
 
-                }
-        );
         refreshLayout.setColorSchemeResources(R.color.ColorRojoTenue);
-        ButtonCliente.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ClientesOcular.setVisibility(View.VISIBLE);
-                TodosOcultar.setVisibility(View.GONE);
-                ButtonCliente.setBackgroundColor(Color.BLACK);
-                ButtonTodos.setBackgroundColor(Color.RED);
-            }
-        });
-        ButtonTodos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ClientesOcular.setVisibility(View.GONE);
-                TodosOcultar.setVisibility(View.VISIBLE);
-                ButtonCliente.setBackgroundColor(Color.RED);
-                ButtonTodos.setBackgroundColor(Color.BLACK);
-            }
-        });
+
 
     }
 
 
-    private class SucursalesLista extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-
-        }//onPreExecute
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            HttpHandler sh = new HttpHandler();
-            String url = "http://" + StrServer + "/listasucursalapp";
-            String jsonStr = sh.makeServiceCall(url, struser, strpass);
-            if (jsonStr != null) {
-                try {
-                    JSONObject json = new JSONObject(jsonStr);
-                    if (json.length() != 0) {
-                        if (json.length() != 0) {
-                            JSONObject jitems, Numero;
-                            JSONObject jsonObject = new JSONObject(jsonStr);
-                            jitems = jsonObject.getJSONObject("Listado");
-
-                            for (int i = 0; i < jitems.length(); i++) {
-                                jitems = jsonObject.getJSONObject("Listado");
-                                Numero = jitems.getJSONObject("" + i + "");
-                                listasucursal.add(new SucursalSANDG(
-                                        Numero.getString("clave"),
-                                        Numero.getString("nombre")));
-                            }
-                        }
-                    }
-                } catch (final JSONException e) {
-
-                }//catch JSON EXCEPTION
-            } else {
-
-            }//else
-            return null;
-
-        }//doInBackground
-
-        @Override
-        protected void onPostExecute(Void aBoolean) {
-            super.onPostExecute(aBoolean);
-
-            String[] opciones = new String[listasucursal.size()];
-
-            for (int i = 0; i < listasucursal.size(); i++) {
-                opciones[i] = listasucursal.get(i).getNombre();
-            }
-
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Seleccione una Sucursal").setIcon(R.drawable.ic_sucu);
-
-
-            builder.setItems(opciones, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                    strbranch = listasucursal.get(which).getNombre();
-                    strcodBra = listasucursal.get(which).getClave();
-                    editor.putString("branch", strbranch);
-                    editor.putString("NameBra", strcodBra);
-                    editor.putString("cambiarsucursal", "1");
-                    editor.commit();
-                    editor.apply();
-
-                    getActivity().overridePendingTransition(0, 0);
-                    getActivity().startActivity(getActivity().getIntent());
-                    getActivity().overridePendingTransition(0, 0);
-                    getActivity().finish();
-
-
-                }
-            });
-// create and show the alert dialog
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            dialog.setCancelable(false);
-
-
-        }//onPost
-
-    }
 
     private void setupLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -691,51 +491,26 @@ public class GalleryFragment extends Fragment {
                 recibio.getText().toString();
                 comentario.getText().toString();
                 String currentTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-                if (!lpeA.get(0).getTelefonodos().equals("")) {
 
-
-
-
-
-                    smsCamino = Empresa + " agradece su preferencia.Su pedido con el folio " +  lpeA.get(0).getFolio() +
-                            " ha sido entregado por el Repartidor " +
-                            strname + " " + strlname + " a " +
-                            recibio.getText().toString() + ".Le deseamos un excelente día.";
-
-                    if(!Pagina.equals("")){
-                        smsCamino = smsCamino + "Consulta en nuestra pagina web tus facturas... " + Pagina;
-                    }
-
-
-                    SmsManager smsManager = SmsManager.getDefault();
-                    ArrayList<String> partes = smsManager.divideMessage(smsCamino);
-                    smsManager.sendMultipartTextMessage(
-                            lpeA.get(0).getTelefonodos(),
-                            null,
-                            partes,
-                            null,
-                            null
-                    );
-                }
 
                 if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
                     String folios="";
                     String Telefonos="";
                     for (int i = 0; i < lpeA.size(); i++) {
-                        String folio = "",clavesuc="";
+                        String folio = "",clavesuc;
                         String recibiostr = recibio.getText().toString();
                         String comentariostr = comentario.getText().toString();
                         folio = lpeA.get(i).getFolio();
-                        clavesuc=lpeA.get(i).getClaveSuc();
-                    folios=folios+folio+",";
+                        folios=folios+folio+",";
                         Telefonos=lpeA.get(i).getTelefonodos();
+                        clavesuc=lpeA.get(i).getClaveSuc();
 
 
                         actualizarfirmanuevo(estatus, folio, recibiostr, comentariostr, currentTime,clavesuc);
                     }
 
-                    if (!Telefonos.equals("")) {
 
+                    if (!Telefonos.equals("")) {
 
                         smsCamino = Empresa + " agradece su preferencia.Sus pedidos con los folios " + folios +
                                 " han sido entregado por el Repartidor " +
@@ -756,9 +531,11 @@ public class GalleryFragment extends Fragment {
                                 null,
                                 null
                         );
+
+
                     }
-                        dialog.dismiss();
-                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                    dialog.dismiss();
+                    AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                     alerta.setMessage("El cliente a recibido su pedido").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -767,18 +544,18 @@ public class GalleryFragment extends Fragment {
                         }
                     });
 
-                    android.app.AlertDialog titulo = alerta.create();
+                    AlertDialog titulo = alerta.create();
                     titulo.setTitle("");
                     titulo.show();
                     lpeA.clear();
                     ClientesListas.clear();
-                    leerWSCONFIGURACION();
-
+                    CONFIGURACION="2";
+                    LeerWs();
                     strscliente = "";
                     ButtonListaClientes.setText("Selecciona un cliente");
 
                 } else {
-                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                    AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                     alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -786,7 +563,7 @@ public class GalleryFragment extends Fragment {
                         }
                     });
 
-                    android.app.AlertDialog titulo = alerta.create();
+                    AlertDialog titulo = alerta.create();
                     titulo.setTitle("Faltan casillas por rellenar");
                     titulo.show();
                 }
@@ -799,14 +576,14 @@ public class GalleryFragment extends Fragment {
     }
 
     private void mostrarAlerta(String mensaje, String titulo) {
-        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
         alerta.setMessage(mensaje).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.cancel();
             }
         });
-        android.app.AlertDialog tituloDialog = alerta.create();
+        AlertDialog tituloDialog = alerta.create();
         tituloDialog.setTitle(titulo);
         tituloDialog.show();
     }
@@ -900,12 +677,13 @@ public class GalleryFragment extends Fragment {
         if (isLoading) return;
         showLoading(true);
         startLoadingTimeout(); // Añadir timeout
-        leerWSCONFIGURACION();
+        CONFIGURACION="2";
+        LeerWs();
 
        /* if (isLoading) return;
 
         showLoading(true);
-        leerWSCONFIGURACION();*/
+       */
     }
 
     private void showLoading(boolean show) {
@@ -928,10 +706,7 @@ public class GalleryFragment extends Fragment {
 
     private void setButtonsEnabled(boolean enabled) {
         if (getView() != null) {
-            ButtonTodos.setEnabled(enabled);
-            ButtonCliente.setEnabled(enabled);
-            ButtonListaClientes.setEnabled(enabled);
-            btn_entregar_todo.setEnabled(enabled);
+
         }
     }
 
@@ -959,7 +734,6 @@ public class GalleryFragment extends Fragment {
             showLoading(true); // Mostrar loading durante actualización
             lpeA.clear();
             LeerWs();
-            leerWSListaClientes();
             ClientesListas = new ArrayList<>();
             refreshLayout.setRefreshing(false);
         }
@@ -989,7 +763,6 @@ public class GalleryFragment extends Fragment {
             lpeA.clear();
             ClientesListas = new ArrayList<>();
             LeerWs2();
-            leerWSListaClientes();
             refreshLayout2.setRefreshing(false);
         }
 
@@ -1006,164 +779,10 @@ public class GalleryFragment extends Fragment {
         }
     }
 
-    private void leerWSCONFIGURACION() {
-        showLoading(true);
-
-        String url = StrServer + "/configuracion";
-
-        StringRequest postRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                showLoading(false);
-                try {
-
-                    JSONObject jItem;
-                    JSONObject jitems;
-                    String Repartidores = "";
-                    JSONObject jsonObject = new JSONObject(response);
-
-                    jItem = jsonObject.getJSONObject("Item");
-                    for (int i = 0; i < jItem.length(); i++) {
-                        jitems = jItem.getJSONObject("" + i);
-                        CONFIGURACION = jitems.getString("Repartidores");
-                    }
-
-                    LeerWs();
-
-                    leerWSListaClientes();
-
-                } catch (JSONException e) {
-                    showLoading(false);
-                    Toast.makeText(getActivity(), "Error al procesar configuración", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
-                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-
-                            }
-                        });
-                        AlertDialog titulo1 = alerta1.create();
-                        titulo1.setTitle("Error");
-                        titulo1.show();
-                        showLoading(false);
-                        handleNetworkError(error);
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-                header.put("user", struser);
-                header.put("pass", strpass);
-                return header;
-            }
-
-        };
-        // Configurar timeout
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000, // 15 segundos
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-
-        Volley.newRequestQueue(getActivity()).add(postRequest);
-
-    }
-
-
-    private void leerWSListaClientes() {
-        showLoading(true);
-
-        String url = StrServer + "/listclientesrepar";
-
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                showLoading(false);
-                try {
-
-                    JSONObject jItem;
-                    JSONObject jitems;
-                    String Repartidores = "";
-                    String clave, nom;
-
-                    JSONObject jsonObject = new JSONObject(response);
-
-                    if (jsonObject.length() != 0) {
-                        jItem = jsonObject.getJSONObject("Repartidores");
-                        for (int i = 0; i < jItem.length(); i++) {
-                            jitems = jItem.getJSONObject("items" + i);
-                            clave = jitems.getString("k_clave");
-                            nom = jitems.getString("k_cliente");
-
-
-                            ClientesListas.add(new SetAndGetListClientes(clave, nom));
-
-
-                        }
-                    }
 
 
 
-                } catch (JSONException e) {
-                    showLoading(false);
-                    Toast.makeText(getActivity(), "Error al procesar clientes", Toast.LENGTH_SHORT).show();
-                }
 
-            }
-        },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        AlertDialog.Builder alerta1 = new AlertDialog.Builder(getActivity());
-                        alerta1.setMessage("Tiempo de espera agotado").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-
-                            }
-                        });
-                        AlertDialog titulo1 = alerta1.create();
-                        titulo1.setTitle("Error");
-                        titulo1.show();
-                        showLoading(false);
-                        handleNetworkError(error);
-                    }
-                }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap header = new HashMap();
-                header.put("user", struser);
-                header.put("pass", strpass);
-                return header;
-            }
-
-            @Override
-            public Map<String, String> getParams() throws AuthFailureError {
-                HashMap params = new HashMap();
-                params.put("sucursal", strbranch);
-                params.put("id_repartidor", strcode);
-                return params;
-            }
-        };
-
-        postRequest.setRetryPolicy(new DefaultRetryPolicy(
-                15000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-
-        Volley.newRequestQueue(getActivity()).add(postRequest);
-
-    }
 
 
     public void LeerWs() {
@@ -1171,7 +790,7 @@ public class GalleryFragment extends Fragment {
 
         lpeA.clear();
         setD.clear();
-        String url = StrServer + "/consulxEn";
+        String url = StrServer + "/consulxEnMostrador";
         StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -1216,7 +835,7 @@ public class GalleryFragment extends Fragment {
 
 
                     } else {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                         alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1230,7 +849,7 @@ public class GalleryFragment extends Fragment {
                             }
                         });
 
-                        android.app.AlertDialog titulo = alerta.create();
+                        AlertDialog titulo = alerta.create();
                         titulo.setTitle("No hay entregas");
                         titulo.show();
                     }
@@ -1310,7 +929,7 @@ public class GalleryFragment extends Fragment {
                                     startActivity(intent);*/
 
 
-                                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    AlertDialog.Builder alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1335,7 +954,6 @@ public class GalleryFragment extends Fragment {
                                             extras.putString("clave_direccion", lpeA.get(position).getDireccionclave());
                                             extras.putString("folios", lpeA.get(position).getFolio());
                                             extras.putString("Telefono", lpeA.get(position).getTelefonodos());
-                                            extras.putString("clavesuc", lpeA.get(position).getClaveSuc());
 
 
                                             Intent intent = new Intent(getContext(), MapsSolo.class);
@@ -1349,14 +967,14 @@ public class GalleryFragment extends Fragment {
                                         }
                                     });
 
-                                    android.app.AlertDialog titulo = alerta.create();
+                                    AlertDialog titulo = alerta.create();
                                     titulo.setTitle("Seleccionar este destino");
                                     titulo.show();
 
                                     break;
 
                                 case R.id.btnntregar:
-                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1382,7 +1000,6 @@ public class GalleryFragment extends Fragment {
 
 
 
-
                                                         smsCamino = Empresa + " agradece su preferencia.Su pedido con el folio " +  lpeA.get(position).getFolio() +
                                                                 " ha sido entregado por el Repartidor " +
                                                                 strname + " " + strlname + " a " +
@@ -1391,6 +1008,8 @@ public class GalleryFragment extends Fragment {
                                                         if(!Pagina.equals("")){
                                                             smsCamino = smsCamino + "Consulta en nuestra pagina web tus facturas... " + Pagina;
                                                         }
+
+
                                                         SmsManager smsManager = SmsManager.getDefault();
                                                         ArrayList<String> partes = smsManager.divideMessage(smsCamino);
                                                         smsManager.sendMultipartTextMessage(
@@ -1400,6 +1019,7 @@ public class GalleryFragment extends Fragment {
                                                                 null,
                                                                 null
                                                         );
+
                                                     }
                                                     if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
@@ -1424,7 +1044,7 @@ public class GalleryFragment extends Fragment {
                                                         dialog.dismiss();
 
                                                     } else {
-                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1432,7 +1052,7 @@ public class GalleryFragment extends Fragment {
                                                             }
                                                         });
 
-                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        AlertDialog titulo = alerta.create();
                                                         titulo.setTitle("Faltan casillas por rellenar");
                                                         titulo.show();
                                                     }
@@ -1462,7 +1082,7 @@ public class GalleryFragment extends Fragment {
                                 case R.id.btnpendiente:
 
 
-                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas dejar pendiente este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1495,7 +1115,7 @@ public class GalleryFragment extends Fragment {
                                                         dialog.dismiss();
 
                                                     } else {
-                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1503,7 +1123,7 @@ public class GalleryFragment extends Fragment {
                                                             }
                                                         });
 
-                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        AlertDialog titulo = alerta.create();
                                                         titulo.setTitle("Faltan casillas por rellenar");
                                                         titulo.show();
                                                     }
@@ -1622,7 +1242,7 @@ public class GalleryFragment extends Fragment {
                             Hora = jitems.getString("k_Horas");
                             Minutos = jitems.getString("k_Minutos");
                             Pedidos = jitems.getString("k_Pedido");
-                            ClaveSuc = jitems.getString("k_claveSuc");
+                            ClaveSuc= jitems.getString("k_claveSuc");
 
 
                             lpeA.add(new Pedidos(sucu, cliente, numpaq, Nombre, telun, teld, folio, direccion, comentario, status, direccionclave, latitud, longitud, 0, "", 0, "", Aviso, Hora, Minutos, Pedidos,ClaveSuc));
@@ -1633,7 +1253,7 @@ public class GalleryFragment extends Fragment {
 
 
                     } else {
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                         alerta.setMessage("").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1647,7 +1267,7 @@ public class GalleryFragment extends Fragment {
                             }
                         });
 
-                        android.app.AlertDialog titulo = alerta.create();
+                        AlertDialog titulo = alerta.create();
                         titulo.setTitle("No hay entregas");
                         titulo.show();
                     }
@@ -1727,7 +1347,7 @@ public class GalleryFragment extends Fragment {
                                     startActivity(intent);*/
 
 
-                                    android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    AlertDialog.Builder alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas ir a realizar esta entrega a este cliente?,\n Se le avisara que iras en camino").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1765,14 +1385,14 @@ public class GalleryFragment extends Fragment {
                                         }
                                     });
 
-                                    android.app.AlertDialog titulo = alerta.create();
+                                    AlertDialog titulo = alerta.create();
                                     titulo.setTitle("Seleccionar este destino");
                                     titulo.show();
 
                                     break;
 
                                 case R.id.btnntregar:
-                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas entregar este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1796,16 +1416,16 @@ public class GalleryFragment extends Fragment {
 
                                                     if (!lpeA.get(position).getTelefonodos().equals("")) {
 
-
-
                                                         smsCamino = Empresa + " agradece su preferencia.Su pedido con el folio " +  lpeA.get(position).getFolio() +
                                                                 " ha sido entregado por el Repartidor " +
                                                                 strname + " " + strlname + " a " +
-                                                                recibio.getText().toString() + ".Le deseamos un excelente día.";
+                                                                recibio.getText().toString()+ ".Le deseamos un excelente día.";
 
                                                         if(!Pagina.equals("")){
                                                             smsCamino = smsCamino + "Consulta en nuestra pagina web tus facturas... " + Pagina;
                                                         }
+
+
                                                         SmsManager smsManager = SmsManager.getDefault();
                                                         ArrayList<String> partes = smsManager.divideMessage(smsCamino);
                                                         smsManager.sendMultipartTextMessage(
@@ -1815,6 +1435,7 @@ public class GalleryFragment extends Fragment {
                                                                 null,
                                                                 null
                                                         );
+
                                                     }
                                                     if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
@@ -1839,7 +1460,7 @@ public class GalleryFragment extends Fragment {
                                                         dialog.dismiss();
 
                                                     } else {
-                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba quien recibio y un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1847,7 +1468,7 @@ public class GalleryFragment extends Fragment {
                                                             }
                                                         });
 
-                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        AlertDialog titulo = alerta.create();
                                                         titulo.setTitle("Faltan casillas por rellenar");
                                                         titulo.show();
                                                     }
@@ -1875,7 +1496,7 @@ public class GalleryFragment extends Fragment {
                                 case R.id.btnpendiente:
 
 
-                                    alerta = new android.app.AlertDialog.Builder(getActivity());
+                                    alerta = new AlertDialog.Builder(getActivity());
                                     alerta.setMessage("¿Deseas dejar pendiente este pedido?").setCancelable(false).setPositiveButton("Si", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -1908,7 +1529,7 @@ public class GalleryFragment extends Fragment {
                                                         dialog.dismiss();
 
                                                     } else {
-                                                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                                                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                                                         alerta.setMessage("Escriba un comentario porfavor").setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -1916,7 +1537,7 @@ public class GalleryFragment extends Fragment {
                                                             }
                                                         });
 
-                                                        android.app.AlertDialog titulo = alerta.create();
+                                                        AlertDialog titulo = alerta.create();
                                                         titulo.setTitle("Faltan casillas por rellenar");
                                                         titulo.show();
                                                     }
@@ -2175,7 +1796,7 @@ public class GalleryFragment extends Fragment {
 
 
         folioconfirma = preference.getString("entregoFolio", "");
-        sucursalonfrima =preference.getString("clavesuc","");
+        sucursalonfrima=preference.getString("clavesuc", "");
         recibiofir = preference.getString("recibio", "");
         comentariog = preference.getString("Comentario", "");
         int posi = preference.getInt("posicion", 0);
@@ -2210,7 +1831,7 @@ public class GalleryFragment extends Fragment {
                     //throw new RuntimeException(e);
                 }
 
-                android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
                 alerta.setMessage(mensajes).setCancelable(false).setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -2220,7 +1841,7 @@ public class GalleryFragment extends Fragment {
                     }
                 });
 
-                android.app.AlertDialog titulo = alerta.create();
+                AlertDialog titulo = alerta.create();
                 titulo.setTitle("");
                 titulo.show();
 
@@ -2301,7 +1922,7 @@ public class GalleryFragment extends Fragment {
                         showLoading(false); // OCULTAR LOADING EN ERROR
 
                         // Manejar error con reintento
-                        android.app.AlertDialog.Builder alerta = new android.app.AlertDialog.Builder(getContext());
+                        AlertDialog.Builder alerta = new AlertDialog.Builder(getContext());
 
                         alerta.setMessage("Error de conexión. ¿Reintentar?")
                                 .setCancelable(false)

@@ -17,6 +17,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -87,7 +88,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
     ArrayList<String> values = new ArrayList<>();
     private ActivityMapsSoloBinding binding;
     String  strpass, StrServer, strcodBra, strcode, struser, strbranch, strname, strlname;
-    String direclis = "", nombre_direccion = "", clave_cliente, clave_direccion, folioparaentregar, Telefono = "";
+    String direclis = "", nombre_direccion = "", clave_cliente, clave_direccion, folioparaentregar, Telefono = "",clavesuc="";
     double latitudclien, longitudclien;
     String estatus, comentariog;
     ImageButton bntwaze;
@@ -99,6 +100,8 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
     String Empresa, smsCamino;
     AlertDialog.Builder builder6;
     AlertDialog dialog6 = null;
+    String Token="";
+    String Pagina="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,22 +124,30 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
 
         switch (StrServer) {
             case "http://jacve.dyndns.org:9085":
-                Empresa = "JACVE";
+                Empresa = "HAZAK";
+                Token =getString(R.string.TokenHazak);
+
                 break;
             case "http://vipla.ath.cx:9085":
                 Empresa = "VIPLA";
+                Token =getString(R.string.TokenVipla);
+                Pagina="https://vipla.mx/consultdocumentosSat";
                 break;
             case "http://cecra.ath.cx:9085":
                 Empresa = "CECRA";
+                Token =getString(R.string.TokenCecra);
                 break;
             case "http://guvi.ath.cx:9085":
                 Empresa = "GUVI";
+                Token =getString(R.string.TokenGuvi);
                 break;
             case "http://cedistabasco.ddns.net:9085":
                 Empresa = "PRESSA";
+                Token =getString(R.string.TokenPressa);
                 break;
             case "http://autodis.ath.cx:9085":
                 Empresa = "AUTODIS";
+                Token =getString(R.string.TokenAutodis);
                 break;
 
             case "http://sprautomotive.servehttp.com:9090":
@@ -150,21 +161,27 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                 break;
             case "http://autotop.ath.cx:9090":
                 Empresa = "AUTOTOP";
+                Token =getString(R.string.TokenAutotop);
                 break;
             case "http://autotop.ath.cx:9085":
                 Empresa = "TOTALCAR";
+                Token =getString(R.string.TokenAutotop);
                 break;
             case "http://autotop.ath.cx:9080":
                 Empresa = "PRUEBA";
+                Token =getString(R.string.TokenAutotop);
                 break;
             case "http://bpr.ath.cx:9095":
                 Empresa = "BPR";
+                Token =getString(R.string.TokenBPR);
                 break;
             case "http://vazquin.ath.cx:9085":
                 Empresa = "VAZQUIN";
+                Token =getString(R.string.TokenVazquin);
                 break;
             case "http://pesbac.ath.cx:9095":
                 Empresa = "PESBAC";
+                Token =getString(R.string.TokenVazquin);
                 break;
             default:
                 break;
@@ -189,6 +206,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         clave_direccion = parametros.getString("clave_direccion");
         folioparaentregar = parametros.getString("folios");
         Telefono = parametros.getString("Telefono");
+        clavesuc = parametros.getString("clavesuc");
 
 
         Vendedortxt = findViewById(R.id.txtVendedor);
@@ -264,7 +282,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                             mMarker = mMap.addMarker(new MarkerOptions().position(cliente).title(nombre_direccion).icon(BitmapDescriptorFactory.fromResource(R.drawable.local2)));
 
 
-                            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + latitudclien + "," + longitudclien + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
+                            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + latitudclien + "," + longitudclien + "&key="+Token;
                             RequestQueue queue = Volley.newRequestQueue(MapsSolo.this);
                             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                 @Override
@@ -273,7 +291,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                                         JSONObject jso = new JSONObject(response);
                                         trazarRuta(jso);
 
-                                        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + latitudclien + "," + longitudclien + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
+                                        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + latitudclien + "," + longitudclien + "&key="+Token;
                                         ingresarDatos(url);
 
                                     } catch (JSONException e) {
@@ -317,7 +335,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                                 throw new RuntimeException(e);
                             }
 
-                            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + dircelisLAT + "," + dircelisLONG + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
+                            String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + dircelisLAT + "," + dircelisLONG + "&key="+Token;
                             RequestQueue queue = Volley.newRequestQueue(MapsSolo.this);
                             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                                 @Override
@@ -326,7 +344,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                                         JSONObject jso = new JSONObject(response);
                                         trazarRuta(jso);
 
-                                        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + dircelisLAT + "," + dircelisLONG + "&key=AIzaSyC6u34cq2ZCBGyTicAa__hScUwcN01zVXE";
+                                        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=" + Latitud + "," + Longitud + "&destination=" + dircelisLAT + "," + dircelisLONG + "&key="+Token;
                                         ingresarDatos(url);
 
                                     } catch (JSONException e) {
@@ -367,6 +385,13 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
         }
 
     }
+    public void btnSite(View View) {
+      
+                String url = "https://ul.waze.com/ul?ll=" + latitudclien + "%2C" + longitudclien + "&navigate=yes&utm_campaign=default&utm_source=waze_website&utm_medium=lm_share_location";
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
+    }
 
     public void entregadoalone(View v) {
         builder = new AlertDialog.Builder(this);
@@ -382,7 +407,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                 estatus = "E";
 
 
-                if (tiempoval > 20) {
+                if (Integer.parseInt(value) <= 20) {
                     if (!recibio.getText().toString().equals("") && !comentario.getText().toString().equals("")) {
 
                         editor.putString("recibio", recibio.getText().toString());
@@ -425,8 +450,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
             }
         });
 
-        dialog = builder.create();
-        dialog.show();
+
 
     }
 
@@ -458,12 +482,23 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
                         dialogInterface.cancel();
 
                         if (!Telefono.equals("")) {
-                            smsCamino = Empresa + " agradece su preferencia.\n" +
-                                    "" + nombre_direccion + ", Su pedido con el folio " + folioparaentregar + " ha sido entregado por el Repartidor " + strname + " " + strlname + " a " + nombrequienrecibio + ". \n" +
-                                    "Le deseamos un excelente día.";
+                            smsCamino = Empresa + " agradece su preferencia.Su pedido con el folio " + folioparaentregar +
+                                    " ha sido entregado por el Repartidor " +
+                                    strname + " " + strlname + " a " +
+                                    nombrequienrecibio + ".Le deseamos un excelente día.";
+                            if(!Pagina.equals("")){
+                                smsCamino = smsCamino + "Consulta en nuestra pagina web tus facturas... " + Pagina;
+                            }
 
                             SmsManager smsManager = SmsManager.getDefault();
-                            smsManager.sendTextMessage(Telefono, null, smsCamino, null, null);
+                            ArrayList<String> partes = smsManager.divideMessage(smsCamino);
+                            smsManager.sendMultipartTextMessage(
+                                    Telefono,
+                                    null,
+                                    partes,
+                                    null,
+                                    null
+                            );
                         }
 
 /*
@@ -538,7 +573,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal", strbranch);
+                params.put("sucursal", clavesuc);
                 params.put("folio", folioparaentregar);
                 params.put("recibe", nombrequienrecibio);
                 params.put("status", estatus);
@@ -782,7 +817,7 @@ public class MapsSolo extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal", strbranch);
+                params.put("sucursal", clavesuc);
                 params.put("folio", folioparaentregar);
                 params.put("recibe", nombrequienrecibio);
                 params.put("status", estatus);
