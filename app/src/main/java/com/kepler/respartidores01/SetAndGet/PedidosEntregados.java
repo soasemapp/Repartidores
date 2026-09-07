@@ -13,6 +13,7 @@ public class PedidosEntregados {
     String fecha;
     String hora;
     String Comentarios;
+    String clavesucursal;
 
     public PedidosEntregados(String sucursal, String cliente, String numpaq, String nombre, String telefonouno, String telefonodos, String folio, String direccion, String recibio, String fecha, String hora, String comentarios) {
         this.sucursal = sucursal;

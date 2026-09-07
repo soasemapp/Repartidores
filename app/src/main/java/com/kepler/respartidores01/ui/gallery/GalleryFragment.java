@@ -1288,7 +1288,7 @@ public class GalleryFragment extends Fragment {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                    Sucursal = lpeA.get(position).getSucursal();
+                                                    Sucursal = lpeA.get(position).getClaveSuc();
                                                     Folios = lpeA.get(position).getFolio();
                                                     Nombres = lpeA.get(position).getCliente();
 
@@ -1705,7 +1705,7 @@ public class GalleryFragment extends Fragment {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                    Sucursal = lpeA.get(position).getSucursal();
+                                                    Sucursal = lpeA.get(position).getClaveSuc();
                                                     Folios = lpeA.get(position).getFolio();
                                                     Nombres = lpeA.get(position).getCliente();
 
@@ -2152,7 +2152,7 @@ public class GalleryFragment extends Fragment {
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal", strbranch);
+                params.put("sucursal", Sucursal);
                 params.put("cliente", Nombres);
                 params.put("folio", Folios);
                 return params;

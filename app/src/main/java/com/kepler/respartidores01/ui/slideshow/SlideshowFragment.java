@@ -237,7 +237,7 @@ public class SlideshowFragment extends Fragment {
                 try {
                     JSONObject jfacturas;
                     JSONObject jitems;
-                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, horas,Comentarios;
+                    String Nombre, telun, teld, folio, recibio, direccion, sucursal, cliente, fecha, horas,Comentarios,sucursalclave;
 
                     JSONObject jsonObject = new JSONObject(response);
 
@@ -256,7 +256,9 @@ public class SlideshowFragment extends Fragment {
                             fecha = jitems.getString("k_Fecha");
                             horas = jitems.getString("k_Hora");
                             Comentarios =jitems.getString("k_Comentario");
-                                lpE.add(new PedidosEntregados(sucursal, cliente, "", Nombre, telun, teld, folio, direccion, recibio, fecha, horas,Comentarios));
+                            sucursalclave =jitems.getString("k_claveSuc");
+
+                            lpE.add(new PedidosEntregados(sucursal, cliente, "", Nombre, telun, teld, folio, direccion, recibio, fecha, horas,Comentarios));
 
                         }
                     }else{
@@ -474,7 +476,7 @@ public class SlideshowFragment extends Fragment {
             @Override
             public Map<String, String> getParams() throws AuthFailureError {
                 HashMap params = new HashMap();
-                params.put("sucursal",strbranch);
+                params.put("sucursal",Sucursal);
                 params.put("cliente",Nombres);
                 params.put("folio",Folios);
                 return params;
